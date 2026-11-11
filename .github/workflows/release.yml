@@ -28,7 +28,7 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: Scrub My Disks ${{ github.ref_name }}
-          releaseBody: See CHANGELOG and README. Unsigned build: Windows SmartScreen will warn until code signing is set up.
+          releaseBody: "See the README. Unsigned build: Windows SmartScreen will warn until code signing is set up."
           releaseDraft: true
           prerelease: false
 
