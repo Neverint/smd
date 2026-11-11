@@ -1,0 +1,108 @@
+{
+  "app": {
+    "name": "Scrub My Disks",
+    "short": "SMD"
+  },
+  "titlebar": {
+    "minimize": "Réduire",
+    "maximize": "Agrandir ou restaurer",
+    "close": "Fermer"
+  },
+  "nav": {
+    "label": "Modules",
+    "collapse": "Réduire la navigation",
+    "expand": "Développer la navigation",
+    "pending_one": "{{count}} élément à examiner",
+    "pending_other": "{{count}} éléments à examiner"
+  },
+  "modules": {
+    "smart-care": {
+      "name": "Entretien express",
+      "tagline": "Vérifiez la santé de votre PC en une passe. Rien ne change avant que vous ayez examiné les résultats."
+    },
+    "cleanup": {
+      "name": "Nettoyage",
+      "tagline": "Trouvez les fichiers temporaires, caches et restes qui peuvent être supprimés sans risque."
+    },
+    "protection": {
+      "name": "Protection",
+      "tagline": "Voyez ce que font Microsoft Defender et votre pare-feu, et lancez une analyse."
+    },
+    "performance": {
+      "name": "Performances",
+      "tagline": "Examinez ce qui démarre avec Windows et ce qui occupe votre PC."
+    },
+    "applications": {
+      "name": "Applications",
+      "tagline": "Désinstallez proprement et gardez le reste à jour."
+    },
+    "clutter": {
+      "name": "Mes encombrants",
+      "tagline": "Repérez les fichiers volumineux, anciens ou en double dont vous n'avez peut-être plus besoin."
+    },
+    "space-lens": {
+      "name": "Carte de l'espace",
+      "tagline": "Voyez ce qui occupe un disque, dossier par dossier."
+    },
+    "hardware": {
+      "name": "Santé du matériel",
+      "tagline": "Températures, usure des disques, capacité de la batterie et mémoire, mesurées."
+    },
+    "tweaks": {
+      "name": "Confidentialité et réglages",
+      "tagline": "Désactivez publicités, télémétrie et extras, avec une annulation pour chaque changement."
+    },
+    "drive-organizer": {
+      "name": "Organisation des disques",
+      "tagline": "Chaque disque à sa place : Windows, gros jeux, petits jeux et documents, brouillon."
+    },
+    "toolbox": {
+      "name": "Boîte à outils",
+      "tagline": "Installez et ouvrez des outils gratuits et fiables pour les tâches spécialisées."
+    },
+    "activity": {
+      "name": "Mon activité",
+      "tagline": "Chaque analyse et chaque action, avec une annulation quand c'est possible."
+    },
+    "settings": {
+      "name": "Paramètres",
+      "tagline": "Langue, apparence et options de sécurité."
+    }
+  },
+  "common": {
+    "scan": "Analyser",
+    "run": "Lancer",
+    "review": "Examiner",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "selectAll": "Tout sélectionner",
+    "plannedFor": "Pas encore construit : prévu pour la phase {{phase}}.",
+    "copyDetails": "Copier les détails"
+  },
+  "settings": {
+    "language": "Langue",
+    "languageHint": "Système suit la langue d'affichage de Windows.",
+    "theme": "Thème",
+    "system": "Système",
+    "light": "Clair",
+    "dark": "Sombre",
+    "about": "À propos",
+    "version": "Version {{version}}",
+    "windowEffect": "Matière de la fenêtre : {{effect}}",
+    "effect": {
+      "mica": "Mica",
+      "acrylic": "Acrylique",
+      "none": "Opaque (sans matière)"
+    },
+    "gallery": "Ouvrir la galerie de composants",
+    "privacy": "Pas de télémétrie, pas de compte. Les journaux restent sur ce PC."
+  },
+  "errors": {
+    "accessDenied": "Windows a refusé l'accès à cet élément.",
+    "notFound": "Cet élément n'existe plus.",
+    "unsupported": "Ce n'est pas disponible sur votre version de Windows.",
+    "io": "Un fichier n'a pas pu être lu ou écrit.",
+    "internal": "Une erreur s'est produite.",
+    "unknown": "Une erreur s'est produite."
+  }
+}

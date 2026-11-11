@@ -1,0 +1,34 @@
+# Node
+node_modules
+dist
+dist-ssr
+*.local
+*.tsbuildinfo
+npm-debug.log*
+
+# Rust / Tauri
+/target
+/src-tauri/target
+/src-tauri/gen/schemas
+
+# Tests
+playwright-report
+test-results
+coverage
+
+# Logs
+logs
+*.log
+
+# Editors and OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+desktop.ini
+*.suo
+*.sw?
+
+# Local Claude Code settings (launch.json is shared)
+.claude/settings.local.json

@@ -1,0 +1,44 @@
+/*
+ * Per-module accents.
+ *   --m-from / --m-to : decorative gradient (glow, ring, illustration). Never behind text.
+ *   --m-solid / --m-on : primary button fill and its text. Contrast >= 4.5:1 (WCAG AA).
+ * Light theme: 700-level fills with white text. Dark theme: 300-level fills with black text.
+ *
+ * @scope proximity makes the nearest [data-theme] ancestor win, so a light panel
+ * nested in a dark page (the dev gallery) still gets light accents.
+ */
+
+[data-module] {
+  --m-from: var(--accent);
+  --m-to: var(--accent);
+  --m-solid: var(--accent);
+  --m-on: var(--on-accent);
+}
+
+@scope ([data-theme="light"]) {
+  :scope[data-module="smart-care"], [data-module="smart-care"]      { --m-from: #14b8a6; --m-to: #2563eb; --m-solid: #0f766e; --m-on: #fff; }
+  :scope[data-module="cleanup"], [data-module="cleanup"]         { --m-from: #22c55e; --m-to: #65a30d; --m-solid: #15803d; --m-on: #fff; }
+  :scope[data-module="protection"], [data-module="protection"]      { --m-from: #ef4444; --m-to: #ec4899; --m-solid: #b91c1c; --m-on: #fff; }
+  :scope[data-module="performance"], [data-module="performance"]     { --m-from: #f59e0b; --m-to: #f97316; --m-solid: #b45309; --m-on: #fff; }
+  :scope[data-module="applications"], [data-module="applications"]    { --m-from: #3b82f6; --m-to: #1d4ed8; --m-solid: #1d4ed8; --m-on: #fff; }
+  :scope[data-module="clutter"], [data-module="clutter"]         { --m-from: #a855f7; --m-to: #7c3aed; --m-solid: #6d28d9; --m-on: #fff; }
+  :scope[data-module="space-lens"], [data-module="space-lens"]      { --m-from: #06b6d4; --m-to: #0ea5e9; --m-solid: #0e7490; --m-on: #fff; }
+  :scope[data-module="hardware"], [data-module="hardware"]        { --m-from: #f97316; --m-to: #ea580c; --m-solid: #c2410c; --m-on: #fff; }
+  :scope[data-module="tweaks"], [data-module="tweaks"]          { --m-from: #6366f1; --m-to: #4338ca; --m-solid: #4338ca; --m-on: #fff; }
+  :scope[data-module="drive-organizer"], [data-module="drive-organizer"] { --m-from: #64748b; --m-to: #0ea5e9; --m-solid: #475569; --m-on: #fff; }
+  :scope[data-module="toolbox"], [data-module="toolbox"]         { --m-from: #78716c; --m-to: #a8a29e; --m-solid: #57534e; --m-on: #fff; }
+}
+
+@scope ([data-theme="dark"]) {
+  :scope[data-module="smart-care"], [data-module="smart-care"]      { --m-from: #2dd4bf; --m-to: #60a5fa; --m-solid: #5eead4; --m-on: #000; }
+  :scope[data-module="cleanup"], [data-module="cleanup"]         { --m-from: #4ade80; --m-to: #a3e635; --m-solid: #86efac; --m-on: #000; }
+  :scope[data-module="protection"], [data-module="protection"]      { --m-from: #f87171; --m-to: #f472b6; --m-solid: #fca5a5; --m-on: #000; }
+  :scope[data-module="performance"], [data-module="performance"]     { --m-from: #fbbf24; --m-to: #fb923c; --m-solid: #fcd34d; --m-on: #000; }
+  :scope[data-module="applications"], [data-module="applications"]    { --m-from: #60a5fa; --m-to: #3b82f6; --m-solid: #93c5fd; --m-on: #000; }
+  :scope[data-module="clutter"], [data-module="clutter"]         { --m-from: #c084fc; --m-to: #a78bfa; --m-solid: #d8b4fe; --m-on: #000; }
+  :scope[data-module="space-lens"], [data-module="space-lens"]      { --m-from: #22d3ee; --m-to: #38bdf8; --m-solid: #67e8f9; --m-on: #000; }
+  :scope[data-module="hardware"], [data-module="hardware"]        { --m-from: #fb923c; --m-to: #f97316; --m-solid: #fdba74; --m-on: #000; }
+  :scope[data-module="tweaks"], [data-module="tweaks"]          { --m-from: #818cf8; --m-to: #6366f1; --m-solid: #a5b4fc; --m-on: #000; }
+  :scope[data-module="drive-organizer"], [data-module="drive-organizer"] { --m-from: #94a3b8; --m-to: #38bdf8; --m-solid: #cbd5e1; --m-on: #000; }
+  :scope[data-module="toolbox"], [data-module="toolbox"]         { --m-from: #a8a29e; --m-to: #d6d3d1; --m-solid: #d6d3d1; --m-on: #000; }
+}

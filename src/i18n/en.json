@@ -1,0 +1,108 @@
+{
+  "app": {
+    "name": "Scrub My Disks",
+    "short": "SMD"
+  },
+  "titlebar": {
+    "minimize": "Minimize",
+    "maximize": "Maximize or restore",
+    "close": "Close"
+  },
+  "nav": {
+    "label": "Modules",
+    "collapse": "Collapse navigation",
+    "expand": "Expand navigation",
+    "pending_one": "{{count}} item to review",
+    "pending_other": "{{count}} items to review"
+  },
+  "modules": {
+    "smart-care": {
+      "name": "Smart Care",
+      "tagline": "Check your PC's health in one pass. Nothing changes until you review the results."
+    },
+    "cleanup": {
+      "name": "Cleanup",
+      "tagline": "Find temporary files, caches and leftovers that are safe to remove."
+    },
+    "protection": {
+      "name": "Protection",
+      "tagline": "See what Microsoft Defender and your firewall are doing, and run a scan."
+    },
+    "performance": {
+      "name": "Performance",
+      "tagline": "Review what starts with Windows and what keeps your PC busy."
+    },
+    "applications": {
+      "name": "Applications",
+      "tagline": "Uninstall apps cleanly and keep the rest up to date."
+    },
+    "clutter": {
+      "name": "My Clutter",
+      "tagline": "Spot large, old and duplicate files you may no longer need."
+    },
+    "space-lens": {
+      "name": "Space Lens",
+      "tagline": "See what takes up space on a drive, folder by folder."
+    },
+    "hardware": {
+      "name": "Hardware Health",
+      "tagline": "Temperatures, drive wear, battery capacity and memory, measured."
+    },
+    "tweaks": {
+      "name": "Privacy & Tweaks",
+      "tagline": "Turn off ads, telemetry and extras, with an undo for every change."
+    },
+    "drive-organizer": {
+      "name": "Drive Organizer",
+      "tagline": "Keep each drive for its job: Windows, big games, light games and documents, scratch."
+    },
+    "toolbox": {
+      "name": "Toolbox",
+      "tagline": "Install and open trusted free tools for specialist jobs."
+    },
+    "activity": {
+      "name": "My Activity",
+      "tagline": "Every scan and action, with an undo where possible."
+    },
+    "settings": {
+      "name": "Settings",
+      "tagline": "Language, appearance and safety options."
+    }
+  },
+  "common": {
+    "scan": "Scan",
+    "run": "Run",
+    "review": "Review",
+    "cancel": "Cancel",
+    "close": "Close",
+    "selectAll": "Select all",
+    "plannedFor": "Not built yet: planned for phase {{phase}}.",
+    "copyDetails": "Copy details"
+  },
+  "settings": {
+    "language": "Language",
+    "languageHint": "System follows your Windows display language.",
+    "theme": "Theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark",
+    "about": "About",
+    "version": "Version {{version}}",
+    "windowEffect": "Window material: {{effect}}",
+    "effect": {
+      "mica": "Mica",
+      "acrylic": "Acrylic",
+      "none": "Solid (no window material)"
+    },
+    "gallery": "Open the component gallery",
+    "privacy": "No telemetry, no account. Logs stay on this PC."
+  },
+  "errors": {
+    "accessDenied": "Windows denied access to this item.",
+    "notFound": "This item no longer exists.",
+    "unsupported": "This isn't available on your version of Windows.",
+    "io": "A file couldn't be read or written.",
+    "internal": "Something went wrong.",
+    "unknown": "Something went wrong."
+  }
+}

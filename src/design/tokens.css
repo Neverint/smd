@@ -1,0 +1,139 @@
+/*
+ * Design tokens. Documented in docs/design-system.md: keep both in sync.
+ * Tokens live on [data-theme] (not only :root) so the gallery can render
+ * light and dark side by side.
+ */
+
+:root {
+  /* Typography */
+  --font-text: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  --font-icons: "Segoe Fluent Icons", "Segoe MDL2 Assets";
+  --text-caption: 12px;
+  --text-body: 14px;
+  --text-body-strong: 14px;
+  --text-subtitle: 20px;
+  --text-title: 28px;
+  --text-title-large: 40px;
+  --text-display: 68px;
+
+  /* Spacing (4 px grid) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Radii */
+  --radius-control: 4px;
+  --radius-card: 8px;
+  --radius-overlay: 12px;
+  --radius-pill: 999px;
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --ease-decelerate: cubic-bezier(0, 0, 0, 1);
+  --ease-standard: cubic-bezier(0.55, 0.55, 0, 1);
+
+  /* Layout */
+  --titlebar-height: 40px;
+  --sidebar-width: 240px;
+  --sidebar-width-collapsed: 56px;
+}
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-solid: #f3f3f3;
+  --bg-layer: #f9f9f9;
+  --bg-layer-mica: rgba(255, 255, 255, 0.5);
+  --bg-card: #ffffff;
+  --bg-card-hover: #f9f9f9;
+  --bg-overlay: #f9f9f9;
+  --bg-subtle-hover: rgba(0, 0, 0, 0.037);
+  --bg-subtle-pressed: rgba(0, 0, 0, 0.024);
+  --bg-control: rgba(255, 255, 255, 0.7);
+  --bg-control-hover: rgba(249, 249, 249, 0.5);
+  --bg-smoke: rgba(0, 0, 0, 0.3);
+
+  --stroke-card: rgba(0, 0, 0, 0.0578);
+  --stroke-control: rgba(0, 0, 0, 0.0803);
+  --stroke-control-strong: rgba(0, 0, 0, 0.4458);
+  --stroke-divider: rgba(0, 0, 0, 0.0803);
+
+  --text-primary: rgba(0, 0, 0, 0.896);
+  --text-secondary: rgba(0, 0, 0, 0.606);
+  --text-disabled: rgba(0, 0, 0, 0.361);
+
+  --accent: #005fb8;
+  --accent-hover: #0067c0;
+  --on-accent: #ffffff;
+  --focus-ring: #000000;
+  --focus-ring-inner: #ffffff;
+
+  --success: #0f7b0f;
+  --caution: #9d5d00;
+  --critical: #c42b1c;
+  --caption-close-hover: #c42b1c;
+
+  --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-flyout: 0 8px 16px rgba(0, 0, 0, 0.14);
+  --shadow-dialog: 0 32px 64px rgba(0, 0, 0, 0.19), 0 2px 21px rgba(0, 0, 0, 0.15);
+  --glow-opacity: 0.35;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg-solid: #202020;
+  --bg-layer: #272727;
+  --bg-layer-mica: rgba(58, 58, 58, 0.3);
+  --bg-card: #2b2b2b;
+  --bg-card-hover: #323232;
+  --bg-overlay: #2c2c2c;
+  --bg-subtle-hover: rgba(255, 255, 255, 0.061);
+  --bg-subtle-pressed: rgba(255, 255, 255, 0.042);
+  --bg-control: rgba(255, 255, 255, 0.061);
+  --bg-control-hover: rgba(255, 255, 255, 0.084);
+  --bg-smoke: rgba(0, 0, 0, 0.5);
+
+  --stroke-card: rgba(255, 255, 255, 0.0698);
+  --stroke-control: rgba(255, 255, 255, 0.0698);
+  --stroke-control-strong: rgba(255, 255, 255, 0.5442);
+  --stroke-divider: rgba(255, 255, 255, 0.0837);
+
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.786);
+  --text-disabled: rgba(255, 255, 255, 0.3628);
+
+  --accent: #60cdff;
+  --accent-hover: #5bc0f0;
+  --on-accent: #000000;
+  --focus-ring: #ffffff;
+  --focus-ring-inner: #000000;
+
+  --success: #6ccb5f;
+  --caution: #fce100;
+  --critical: #ff99a4;
+  --caption-close-hover: #c42b1c;
+
+  --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.13);
+  --shadow-flyout: 0 8px 16px rgba(0, 0, 0, 0.26);
+  --shadow-dialog: 0 32px 64px rgba(0, 0, 0, 0.37), 0 2px 21px rgba(0, 0, 0, 0.37);
+  --glow-opacity: 0.45;
+}
+
+/* With the Mica/acrylic window material the content layer becomes translucent. */
+html.has-window-effect {
+  --bg-layer: var(--bg-layer-mica);
+}
+html.has-window-effect [data-theme="light"],
+html.has-window-effect [data-theme="dark"] {
+  --bg-layer: var(--bg-layer-mica);
+}

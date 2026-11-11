@@ -1,0 +1,39 @@
+name: Release
+
+# Builds the NSIS and MSI installers and attaches them to a draft GitHub Release
+# when a tag like v0.1.0 is pushed.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      - uses: tauri-apps/tauri-action@action-v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: Scrub My Disks ${{ github.ref_name }}
+          releaseBody: See CHANGELOG and README. Unsigned build: Windows SmartScreen will warn until code signing is set up.
+          releaseDraft: true
+          prerelease: false
+
+      # Code signing hook (not active yet).
+      # SignPath Foundation offers free signing for open-source projects: https://signpath.org
+      # Once the project is accepted, add a step here that submits the built installers
+      # (src-tauri/target/release/bundle/**) with signpath/github-action-submit-signing-request,
+      # using secrets.SIGNPATH_API_TOKEN, then upload the signed files to the release.
