@@ -77,7 +77,248 @@
     "close": "Close",
     "selectAll": "Select all",
     "plannedFor": "Not built yet: planned for phase {{phase}}.",
-    "copyDetails": "Copy details"
+    "copyDetails": "Copy details",
+    "copied": "Copied",
+    "scanAgain": "Scan again",
+    "done": "Done",
+    "retry": "Try again",
+    "back": "Back",
+    "items_one": "{{count, number}} item",
+    "items_other": "{{count, number}} items",
+    "files_one": "{{count, number}} file",
+    "files_other": "{{count, number}} files",
+    "scannedIn": "Scanned in {{seconds}} s"
+  },
+  "smartCare": {
+    "scanning": "Checking your PC…",
+    "step": {
+      "disks": "Checking disk health",
+      "memory": "Measuring memory use",
+      "drive": "Measuring free space",
+      "rule": "Looking for junk: {{name}}"
+    },
+    "scoreLabel": "Health score: {{score}} out of 100",
+    "outOf": "/ 100",
+    "verdict": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "fair": "Fair",
+      "needsAttention": "Needs attention"
+    },
+    "recommended": "Recommended",
+    "allGood": "Nothing needs your attention right now.",
+    "rec": {
+      "replaceDisk": "Back up {{disk}} now: Windows reports a problem with this disk.",
+      "freeSpace": "Free up space on drive {{drive}}. Only {{percent}} % is left.",
+      "restart_one": "Restart your PC: it has been on for {{count}} day.",
+      "restart_other": "Restart your PC: it has been on for {{count}} days.",
+      "closeApps": "Close apps you don't use: memory stays {{percent}} % full.",
+      "cleanJunk": "Free {{size}} in Cleanup."
+    },
+    "card": {
+      "junk": "Junk",
+      "junkDesc": "Temporary files and caches that are safe to remove.",
+      "junkNone": "Nothing worth cleaning.",
+      "diskHealth": "Disk health",
+      "disksOk_one": "{{count}} disk, reported healthy by Windows.",
+      "disksOk_other": "{{count}} disks, all reported healthy by Windows.",
+      "disksBad_one": "{{count}} disk needs attention.",
+      "disksBad_other": "{{count}} disks need attention.",
+      "disksUnknown": "Couldn't read disk health.",
+      "freeSpace": "Free space on {{drive}}",
+      "freeSpaceValue": "{{free}} free of {{total}}",
+      "memory": "Memory",
+      "memoryValue": "{{percent}} % in use",
+      "uptime": "Since last restart",
+      "uptimeValue_one": "{{count}} day",
+      "uptimeValue_other": "{{count}} days",
+      "uptimeHours": "{{count}} h",
+      "protection": "Protection",
+      "updates": "App updates",
+      "startup": "Startup items",
+      "comingIn": "Checked from phase {{phase}}. Not part of the score yet."
+    },
+    "status": {
+      "good": "Good",
+      "warning": "Worth a look",
+      "critical": "Needs attention"
+    },
+    "clean": "Clean {{size}}",
+    "running": "Cleaning…",
+    "doneTitle": "All done",
+    "back": "Back to results"
+  },
+  "cleanup": {
+    "scanning": "Looking for junk…",
+    "stepRule": "Checking {{name}}",
+    "found": "can be removed",
+    "foundNone": "Your PC is already clean.",
+    "group": {
+      "system": "Windows",
+      "browsers": "Browsers",
+      "recycleBin": "Recycle Bin"
+    },
+    "cat": {
+      "user-temp": {
+        "name": "Your temporary files",
+        "desc": "Files apps left in your Temp folder more than a day ago. Apps recreate what they need."
+      },
+      "thumbnail-cache": {
+        "name": "Thumbnail cache",
+        "desc": "Small previews of your pictures and videos. Explorer rebuilds them when needed."
+      },
+      "crash-dumps": {
+        "name": "App crash dumps",
+        "desc": "Data saved when an app crashed. Only useful to developers."
+      },
+      "error-reports": {
+        "name": "Error reports",
+        "desc": "Problem reports Windows has already sent or no longer needs."
+      },
+      "edge-cache": {
+        "name": "Microsoft Edge cache",
+        "desc": "Copies of pages and images Edge downloads again when needed. Passwords, cookies and history are not touched."
+      },
+      "chrome-cache": {
+        "name": "Google Chrome cache",
+        "desc": "Copies of pages and images Chrome downloads again when needed. Passwords, cookies and history are not touched."
+      },
+      "brave-cache": {
+        "name": "Brave cache",
+        "desc": "Copies of pages and images Brave downloads again when needed. Passwords, cookies and history are not touched."
+      },
+      "firefox-cache": {
+        "name": "Firefox cache",
+        "desc": "Copies of pages and images Firefox downloads again when needed. Passwords, cookies and history are not touched."
+      },
+      "system-temp": {
+        "name": "Windows temporary files",
+        "desc": "Temporary files of Windows and installers, older than a day."
+      },
+      "windows-update-cache": {
+        "name": "Windows Update downloads",
+        "desc": "Update files Windows has already installed."
+      },
+      "delivery-optimization": {
+        "name": "Delivery Optimization files",
+        "desc": "Pieces of updates Windows shares with other PCs."
+      },
+      "system-error-reports": {
+        "name": "System error reports",
+        "desc": "Problem reports of Windows itself."
+      },
+      "memory-dumps": {
+        "name": "System crash dumps",
+        "desc": "Saved after a blue screen. Keep them if you are troubleshooting crashes."
+      },
+      "recycle-bin": {
+        "name": "Recycle Bin",
+        "desc": "Files you already deleted. Emptying it frees the space for good and can't be undone."
+      }
+    },
+    "safety": {
+      "safe": "Safe to remove",
+      "advanced": "Check first"
+    },
+    "permanent": "Can't be undone",
+    "needsAdmin": "Needs admin rights. Cleaning it comes with the admin helper in phase 4.",
+    "running": "{{apps}} is open: files in use will be skipped.",
+    "unreadable": "Part of it can only be measured with admin rights.",
+    "excluded_one": "{{count}} item excluded in Settings",
+    "excluded_other": "{{count}} items excluded in Settings",
+    "empty": "Nothing found",
+    "more": "And {{count}} smaller items ({{size}}), removed with the rest.",
+    "reviewTitle": "Review: {{name}}",
+    "alwaysSkip": "Always skip",
+    "alwaysSkipLabel": "Always skip {{name}}",
+    "skipAdded": "Added to the exclusions in Settings.",
+    "clean": "Clean {{size}}",
+    "nothingSelected": "Select something to clean",
+    "recycleNote": "Removed items go to the Recycle Bin, so you can restore them from My Activity.",
+    "permanentNote": "Permanent delete is on in Settings: removed items skip the Recycle Bin.",
+    "confirmBinTitle": "Empty the Recycle Bin?",
+    "confirmBinBody": "The Recycle Bin holds {{size}}. Emptying it deletes those files for good. Everything else goes to the Recycle Bin as usual.",
+    "confirmPermanentTitle": "Delete for good?",
+    "confirmPermanentBody": "Permanent delete is on in Settings, so {{size}} will be deleted without going to the Recycle Bin. This can't be undone.",
+    "confirm": "Delete",
+    "cleaning": "Cleaning…",
+    "doneTitle": "Cleanup finished",
+    "doneRecycled": "{{size}} moved to the Recycle Bin. Empty it once you're sure, to get the space back.",
+    "donePermanent": "{{size}} deleted.",
+    "doneBin": "The Recycle Bin was emptied ({{size}}).",
+    "doneNothing": "Nothing was removed.",
+    "doneSkipped_one": "{{count}} item was skipped because it is in use or already gone.",
+    "doneSkipped_other": "{{count}} items were skipped because they are in use or already gone.",
+    "undoHint": "Changed your mind? Put everything back from My Activity.",
+    "openActivity": "Open My Activity",
+    "failReason": {
+      "inUse": "In use",
+      "gone": "Already gone",
+      "refused": "Protected"
+    },
+    "unknownSize": "Not measured"
+  },
+  "spaceLens": {
+    "pick": "Choose a drive or folder to scan",
+    "readOnly": "Space Lens only reads your drive. Nothing is changed.",
+    "driveFree": "{{free}} free of {{total}}",
+    "system": "Windows",
+    "chooseFolder": "Choose a folder…",
+    "scanning": "Scanning {{path}}",
+    "counters": "{{files}} files · {{size}}",
+    "denied_one": "{{count}} folder couldn't be read",
+    "denied_other": "{{count}} folders couldn't be read",
+    "stop": "Stop",
+    "reveal": "Show in Explorer",
+    "up": "Up one level",
+    "others_one": "{{count}} small file",
+    "others_other": "{{count}} small files",
+    "hidden_one": "{{count}} more item",
+    "hidden_other": "{{count}} more items",
+    "noAccess": "Access denied",
+    "byType": "By file type",
+    "noExt": "No extension",
+    "otherTypes": "Other types",
+    "summary": "{{files}} files in {{dirs}} folders · scanned in {{seconds}} s",
+    "newScan": "New scan",
+    "rescan": "Scan again",
+    "largest": "Largest items",
+    "treemapLabel": "Map of {{name}}: each box is a file or folder, sized by the space it uses.",
+    "open": "Open {{name}}",
+    "path": "Location"
+  },
+  "activity": {
+    "empty": "Nothing here yet. Scans and cleanups will show up here.",
+    "refresh": "Refresh",
+    "kind": {
+      "smartCareScan": "Smart Care scan",
+      "cleanupScan": "Cleanup scan",
+      "cleanup": "Cleanup",
+      "emptyRecycleBin": "Emptied the Recycle Bin",
+      "spaceLensScan": "Space Lens scan",
+      "restore": "Restored from the Recycle Bin"
+    },
+    "detail": {
+      "smartCareScan": "Score {{score}} · {{size}} of junk found",
+      "cleanupScan": "{{size}} found",
+      "cleanupRecycle": "{{size}} moved to the Recycle Bin",
+      "cleanupPermanent": "{{size}} deleted for good",
+      "emptyRecycleBin": "{{size}} deleted for good",
+      "spaceLensScan": "{{target}} · {{size}}",
+      "restore_one": "{{count}} item put back",
+      "restore_other": "{{count}} items put back",
+      "skipped_one": "{{count}} skipped",
+      "skipped_other": "{{count}} skipped"
+    },
+    "undo": "Undo",
+    "undoLabel": "Undo this cleanup",
+    "undone": "Undone",
+    "restored_one": "{{count}} item put back.",
+    "restored_other": "{{count}} items put back.",
+    "missing_one": "{{count}} was no longer in the Recycle Bin.",
+    "missing_other": "{{count}} were no longer in the Recycle Bin.",
+    "restoreFailed_one": "{{count}} couldn't be restored because a file with the same name is back in its place.",
+    "restoreFailed_other": "{{count}} couldn't be restored because files with the same names are back in their place."
   },
   "settings": {
     "language": "Language",
@@ -86,6 +327,20 @@
     "system": "System",
     "light": "Light",
     "dark": "Dark",
+    "cleanup": "Cleanup",
+    "deleteMode": "Removed items go to",
+    "deleteModeHint": "With the Recycle Bin, you can undo a cleanup from My Activity.",
+    "recycleBin": "Recycle Bin",
+    "permanent": "Delete for good",
+    "permanentWarning": "Permanent delete skips the Recycle Bin: cleanups can't be undone.",
+    "exclusions": "Exclusions",
+    "exclusionsHint": "Cleanup never touches these files and folders.",
+    "noExclusions": "No exclusions yet. Use \"Always skip\" in a Cleanup review list.",
+    "remove": "Remove",
+    "removeLabel": "Remove {{path}} from the exclusions",
+    "logs": "Log files",
+    "logsHint": "Logs stay on this PC. Share them only if you want help with a problem.",
+    "openLogs": "Open log folder",
     "about": "About",
     "version": "Version {{version}}",
     "windowEffect": "Window material: {{effect}}",
@@ -98,10 +353,13 @@
     "privacy": "No telemetry, no account. Logs stay on this PC."
   },
   "errors": {
+    "title": "That didn't work",
     "accessDenied": "Windows denied access to this item.",
     "notFound": "This item no longer exists.",
     "unsupported": "This isn't available on your version of Windows.",
     "io": "A file couldn't be read or written.",
+    "stale": "These results are out of date. Scan again.",
+    "busy": "Another scan or cleanup is still running. Try again when it finishes.",
     "internal": "Something went wrong.",
     "unknown": "Something went wrong."
   }

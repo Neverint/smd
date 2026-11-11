@@ -1,0 +1,155 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "user-temp",
+      "group": "system",
+      "kind": "files",
+      "paths": ["{TEMP}"],
+      "itemLevel": "children",
+      "minAgeHours": 24,
+      "safety": "safe",
+      "defaultSelected": true
+    },
+    {
+      "id": "thumbnail-cache",
+      "group": "system",
+      "kind": "files",
+      "paths": ["{LOCALAPPDATA}\\Microsoft\\Windows\\Explorer"],
+      "itemLevel": "children",
+      "include": ["thumbcache_*.db", "iconcache_*.db"],
+      "safety": "safe",
+      "defaultSelected": true,
+      "processes": ["explorer.exe"]
+    },
+    {
+      "id": "crash-dumps",
+      "group": "system",
+      "kind": "files",
+      "paths": ["{LOCALAPPDATA}\\CrashDumps"],
+      "itemLevel": "children",
+      "safety": "safe",
+      "defaultSelected": true
+    },
+    {
+      "id": "error-reports",
+      "group": "system",
+      "kind": "files",
+      "paths": [
+        "{LOCALAPPDATA}\\Microsoft\\Windows\\WER\\ReportArchive",
+        "{LOCALAPPDATA}\\Microsoft\\Windows\\WER\\ReportQueue"
+      ],
+      "itemLevel": "children",
+      "safety": "safe",
+      "defaultSelected": true
+    },
+    {
+      "id": "edge-cache",
+      "group": "browsers",
+      "kind": "files",
+      "paths": [
+        "{LOCALAPPDATA}\\Microsoft\\Edge\\User Data\\*\\Cache\\Cache_Data",
+        "{LOCALAPPDATA}\\Microsoft\\Edge\\User Data\\*\\Code Cache",
+        "{LOCALAPPDATA}\\Microsoft\\Edge\\User Data\\*\\GPUCache"
+      ],
+      "itemLevel": "root",
+      "safety": "safe",
+      "defaultSelected": true,
+      "processes": ["msedge.exe"]
+    },
+    {
+      "id": "chrome-cache",
+      "group": "browsers",
+      "kind": "files",
+      "paths": [
+        "{LOCALAPPDATA}\\Google\\Chrome\\User Data\\*\\Cache\\Cache_Data",
+        "{LOCALAPPDATA}\\Google\\Chrome\\User Data\\*\\Code Cache",
+        "{LOCALAPPDATA}\\Google\\Chrome\\User Data\\*\\GPUCache"
+      ],
+      "itemLevel": "root",
+      "safety": "safe",
+      "defaultSelected": true,
+      "processes": ["chrome.exe"]
+    },
+    {
+      "id": "brave-cache",
+      "group": "browsers",
+      "kind": "files",
+      "paths": [
+        "{LOCALAPPDATA}\\BraveSoftware\\Brave-Browser\\User Data\\*\\Cache\\Cache_Data",
+        "{LOCALAPPDATA}\\BraveSoftware\\Brave-Browser\\User Data\\*\\Code Cache",
+        "{LOCALAPPDATA}\\BraveSoftware\\Brave-Browser\\User Data\\*\\GPUCache"
+      ],
+      "itemLevel": "root",
+      "safety": "safe",
+      "defaultSelected": true,
+      "processes": ["brave.exe"]
+    },
+    {
+      "id": "firefox-cache",
+      "group": "browsers",
+      "kind": "files",
+      "paths": ["{LOCALAPPDATA}\\Mozilla\\Firefox\\Profiles\\*\\cache2"],
+      "itemLevel": "root",
+      "safety": "safe",
+      "defaultSelected": true,
+      "processes": ["firefox.exe"]
+    },
+    {
+      "id": "system-temp",
+      "group": "system",
+      "kind": "files",
+      "paths": ["{WINDIR}\\Temp"],
+      "itemLevel": "children",
+      "minAgeHours": 24,
+      "admin": true,
+      "safety": "safe"
+    },
+    {
+      "id": "windows-update-cache",
+      "group": "system",
+      "kind": "files",
+      "paths": ["{WINDIR}\\SoftwareDistribution\\Download"],
+      "itemLevel": "children",
+      "admin": true,
+      "safety": "safe"
+    },
+    {
+      "id": "delivery-optimization",
+      "group": "system",
+      "kind": "files",
+      "paths": ["{WINDIR}\\ServiceProfiles\\NetworkService\\AppData\\Local\\Microsoft\\Windows\\DeliveryOptimization\\Cache"],
+      "itemLevel": "children",
+      "admin": true,
+      "safety": "safe"
+    },
+    {
+      "id": "system-error-reports",
+      "group": "system",
+      "kind": "files",
+      "paths": [
+        "{PROGRAMDATA}\\Microsoft\\Windows\\WER\\ReportArchive",
+        "{PROGRAMDATA}\\Microsoft\\Windows\\WER\\ReportQueue"
+      ],
+      "itemLevel": "children",
+      "admin": true,
+      "safety": "safe"
+    },
+    {
+      "id": "memory-dumps",
+      "group": "system",
+      "kind": "files",
+      "paths": ["{WINDIR}\\MEMORY.DMP", "{WINDIR}\\Minidump"],
+      "itemLevel": "children",
+      "admin": true,
+      "safety": "advanced"
+    },
+    {
+      "id": "recycle-bin",
+      "group": "recycleBin",
+      "kind": "recycleBin",
+      "safety": "advanced",
+      "permanent": true
+    }
+  ]
+}

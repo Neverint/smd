@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import en from "../i18n/en.json";
 import fr from "../i18n/fr.json";
+import rules from "../../rules/cleanup.json";
 import { MODULES, moduleForPath } from "./modules";
 
 function keys(obj: object, prefix = ""): string[] {
@@ -33,5 +34,14 @@ describe("module registry", () => {
 describe("translations", () => {
   it("French and English have the same keys", () => {
     expect(keys(fr).sort()).toEqual(keys(en).sort());
+  });
+
+  it("every cleanup rule has a name and a plain explanation in both languages", () => {
+    for (const rule of rules.rules) {
+      for (const dict of [en, fr] as unknown as { cleanup: { cat: Record<string, { name?: string; desc?: string }> } }[]) {
+        expect(dict.cleanup.cat[rule.id]?.name, rule.id).toBeTruthy();
+        expect(dict.cleanup.cat[rule.id]?.desc, rule.id).toBeTruthy();
+      }
+    }
   });
 });

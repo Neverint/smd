@@ -7,7 +7,10 @@ import {
   Button,
   Card,
   CheckList,
+  ConfirmDialog,
+  ErrorNotice,
   IconButton,
+  UsageBar,
   ModuleHero,
   ProgressRing,
   ScanButton,
@@ -34,6 +37,7 @@ function ThemePanel({ theme, module }: { theme: "light" | "dark"; module: Module
   const [seg, setSeg] = useState<"a" | "b" | "c">("a");
   const [on, setOn] = useState(true);
   const [sheet, setSheet] = useState(false);
+  const [confirm, setConfirm] = useState(false);
   const def = MODULES.find((m) => m.id === module)!;
 
   return (
@@ -50,6 +54,20 @@ function ThemePanel({ theme, module }: { theme: "light" | "dark"; module: Module
           Disabled
         </Button>
         <IconButton label="Delete" icon={<Delete20Regular />} />
+        <Button variant="danger" onClick={() => setConfirm(true)}>
+          Danger (opens confirm)
+        </Button>
+      </div>
+      <ConfirmDialog open={confirm} title="Empty the Recycle Bin?" confirmLabel="Delete" onCancel={() => setConfirm(false)} onConfirm={() => setConfirm(false)}>
+        <p>The Recycle Bin holds 2.3 GB. Emptying it deletes those files for good.</p>
+      </ConfirmDialog>
+
+      <h3>Usage bars and error notice</h3>
+      <div className="gallery__row" style={{ flexDirection: "column", alignItems: "stretch" }}>
+        <UsageBar value={45} label="Normal" />
+        <UsageBar value={84} label="Warning" tone="warning" />
+        <UsageBar value={95} label="Critical" tone="critical" />
+        <ErrorNotice error={{ code: "busy", message: "busy: cannot start a cleanup", details: "Busy(\"cannot start a cleanup\")" }} />
       </div>
       <div className="gallery__row">
         <Button variant="primary" size="lg" icon={<Broom24Regular />}>

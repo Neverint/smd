@@ -4,9 +4,12 @@ import { createHashRouter, Outlet, RouterProvider, useLocation } from "react-rou
 import { call } from "../lib/backend";
 import { useApplyTheme } from "../lib/theme";
 import { GalleryPage } from "../dev/gallery/GalleryPage";
+import { ActivityPage } from "../modules/activity/ActivityPage";
+import { CleanupPage } from "../modules/cleanup/CleanupPage";
 import { ModulePage } from "../modules/ModulePage";
 import { SettingsPage } from "../modules/settings/SettingsPage";
 import { SmartCarePage } from "../modules/smart-care/SmartCarePage";
+import { SpaceLensPage } from "../modules/space-lens/SpaceLensPage";
 import { MODULES, moduleForPath } from "./modules";
 import { Sidebar } from "./Sidebar";
 import { TitleBar } from "./TitleBar";
@@ -28,13 +31,19 @@ function Shell() {
   );
 }
 
+/** Modules with their own page; the others show the "planned for phase N" placeholder. */
+const BUILT = new Set(["smart-care", "cleanup", "space-lens", "activity", "settings"]);
+
 const router = createHashRouter([
   {
     element: <Shell />,
     children: [
       { index: true, element: <SmartCarePage /> },
+      { path: "cleanup", element: <CleanupPage /> },
+      { path: "space-lens", element: <SpaceLensPage /> },
+      { path: "activity", element: <ActivityPage /> },
       { path: "settings", element: <SettingsPage /> },
-      ...MODULES.filter((m) => m.id !== "smart-care" && m.id !== "settings").map((m) => ({
+      ...MODULES.filter((m) => !BUILT.has(m.id)).map((m) => ({
         path: m.path.slice(1),
         element: <ModulePage id={m.id} />,
       })),

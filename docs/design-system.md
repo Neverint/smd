@@ -26,6 +26,10 @@ Source of truth: `src/design/tokens.css` and `src/design/module-accents.css`. Li
 | `--success` | `#0f7b0f` | `#6ccb5f` | 🟢 |
 | `--caution` | `#9d5d00` | `#fce100` | 🟡 |
 | `--critical` | `#c42b1c` | `#ff99a4` | 🔴 |
+| `--critical-solid` | `#c42b1c` | `#c42b1c` | Fill of the Danger button (white text, 5.9:1) |
+| `--critical-bg` / `--caution-bg` / `--success-bg` | `#fde7e9` / `#fff4ce` / `#dff6dd` | `#442726` / `#433519` / `#393d1b` | Error notice, warning tags, success message |
+| `--lens-1` … `--lens-8` | 700-level cyan, blue, violet, teal, indigo, sky, emerald, fuchsia | 300-level of the same | Space Lens folders (text: `--lens-on`) |
+| `--lens-file` / `--lens-others` / `--lens-on` | `#64748b` / `#475569` / white | `#cbd5e1` / `#94a3b8` / black | Space Lens files, grouped small files, text on tiles |
 | `--focus-ring` / inner | black / white | white / black | Double focus ring, keyboard only |
 
 ## Module accents
@@ -90,7 +94,7 @@ Falls back to Segoe UI on Windows 10.
 
 ## Components (all in the gallery)
 
-Button (primary / accent / secondary / subtle, md / lg), IconButton (label required), Card (icon tile, big value, actions), Badge (5 tones), ProgressRing (determinate / indeterminate, `role=progressbar`), ScanButton (round, module colors), ModuleHero, SideSheet (modal, Esc, focus trap, focus return), CheckList (select all with indeterminate state), Segmented (radio group, arrow keys), Toggle (`role=switch`), setting row.
+Button (primary / accent / secondary / subtle / danger, md / lg), IconButton (label required), ConfirmDialog (native `<dialog>`, Cancel focused first, for anything that can't be undone), ErrorNotice (friendly text + "Copy details"), UsageBar (`role=meter`, warning / critical tones), Card (icon tile, big value, actions), Badge (5 tones), ProgressRing (determinate / indeterminate, `role=progressbar`), ScanButton (round, module colors), ModuleHero, SideSheet (modal, Esc, focus trap, focus return), CheckList (select all with indeterminate state), Segmented (radio group, arrow keys), Toggle (`role=switch`), setting row.
 
 ## Accessibility checklist
 

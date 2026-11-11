@@ -77,7 +77,248 @@
     "close": "Fermer",
     "selectAll": "Tout sélectionner",
     "plannedFor": "Pas encore construit : prévu pour la phase {{phase}}.",
-    "copyDetails": "Copier les détails"
+    "copyDetails": "Copier les détails",
+    "copied": "Copié",
+    "scanAgain": "Analyser à nouveau",
+    "done": "Terminé",
+    "retry": "Réessayer",
+    "back": "Retour",
+    "items_one": "{{count, number}} élément",
+    "items_other": "{{count, number}} éléments",
+    "files_one": "{{count, number}} fichier",
+    "files_other": "{{count, number}} fichiers",
+    "scannedIn": "Analysé en {{seconds}} s"
+  },
+  "smartCare": {
+    "scanning": "Vérification de votre PC…",
+    "step": {
+      "disks": "Vérification de la santé des disques",
+      "memory": "Mesure de la mémoire",
+      "drive": "Mesure de l'espace libre",
+      "rule": "Recherche de fichiers inutiles : {{name}}"
+    },
+    "scoreLabel": "Score de santé : {{score}} sur 100",
+    "outOf": "/ 100",
+    "verdict": {
+      "excellent": "Excellent",
+      "good": "Bon",
+      "fair": "Correct",
+      "needsAttention": "À surveiller"
+    },
+    "recommended": "Recommandé",
+    "allGood": "Rien ne demande votre attention pour le moment.",
+    "rec": {
+      "replaceDisk": "Sauvegardez {{disk}} maintenant : Windows signale un problème sur ce disque.",
+      "freeSpace": "Libérez de l'espace sur le disque {{drive}}. Il ne reste que {{percent}} %.",
+      "restart_one": "Redémarrez votre PC : il est allumé depuis {{count}} jour.",
+      "restart_other": "Redémarrez votre PC : il est allumé depuis {{count}} jours.",
+      "closeApps": "Fermez les applications inutilisées : la mémoire reste pleine à {{percent}} %.",
+      "cleanJunk": "Libérez {{size}} avec le Nettoyage."
+    },
+    "card": {
+      "junk": "Fichiers inutiles",
+      "junkDesc": "Fichiers temporaires et caches que vous pouvez supprimer sans risque.",
+      "junkNone": "Rien qui mérite un nettoyage.",
+      "diskHealth": "Santé des disques",
+      "disksOk_one": "{{count}} disque, en bonne santé selon Windows.",
+      "disksOk_other": "{{count}} disques, tous en bonne santé selon Windows.",
+      "disksBad_one": "{{count}} disque demande votre attention.",
+      "disksBad_other": "{{count}} disques demandent votre attention.",
+      "disksUnknown": "Impossible de lire la santé des disques.",
+      "freeSpace": "Espace libre sur {{drive}}",
+      "freeSpaceValue": "{{free}} libres sur {{total}}",
+      "memory": "Mémoire",
+      "memoryValue": "{{percent}} % utilisée",
+      "uptime": "Depuis le dernier redémarrage",
+      "uptimeValue_one": "{{count}} jour",
+      "uptimeValue_other": "{{count}} jours",
+      "uptimeHours": "{{count}} h",
+      "protection": "Protection",
+      "updates": "Mises à jour des applications",
+      "startup": "Éléments au démarrage",
+      "comingIn": "Vérifié à partir de la phase {{phase}}. Pas encore compté dans le score."
+    },
+    "status": {
+      "good": "Bon",
+      "warning": "À regarder",
+      "critical": "À traiter"
+    },
+    "clean": "Nettoyer {{size}}",
+    "running": "Nettoyage…",
+    "doneTitle": "C'est fait",
+    "back": "Retour aux résultats"
+  },
+  "cleanup": {
+    "scanning": "Recherche des fichiers inutiles…",
+    "stepRule": "Vérification : {{name}}",
+    "found": "peuvent être supprimés",
+    "foundNone": "Votre PC est déjà propre.",
+    "group": {
+      "system": "Windows",
+      "browsers": "Navigateurs",
+      "recycleBin": "Corbeille"
+    },
+    "cat": {
+      "user-temp": {
+        "name": "Vos fichiers temporaires",
+        "desc": "Fichiers laissés dans votre dossier Temp il y a plus d'un jour. Les applications recréent ce dont elles ont besoin."
+      },
+      "thumbnail-cache": {
+        "name": "Cache des miniatures",
+        "desc": "Petits aperçus de vos images et vidéos. L'Explorateur les recrée au besoin."
+      },
+      "crash-dumps": {
+        "name": "Rapports de plantage des applications",
+        "desc": "Données enregistrées quand une application a planté. Utiles seulement aux développeurs."
+      },
+      "error-reports": {
+        "name": "Rapports d'erreurs",
+        "desc": "Rapports de problèmes que Windows a déjà envoyés ou dont il n'a plus besoin."
+      },
+      "edge-cache": {
+        "name": "Cache de Microsoft Edge",
+        "desc": "Copies de pages et d'images qu'Edge retélécharge au besoin. Mots de passe, cookies et historique ne sont pas touchés."
+      },
+      "chrome-cache": {
+        "name": "Cache de Google Chrome",
+        "desc": "Copies de pages et d'images que Chrome retélécharge au besoin. Mots de passe, cookies et historique ne sont pas touchés."
+      },
+      "brave-cache": {
+        "name": "Cache de Brave",
+        "desc": "Copies de pages et d'images que Brave retélécharge au besoin. Mots de passe, cookies et historique ne sont pas touchés."
+      },
+      "firefox-cache": {
+        "name": "Cache de Firefox",
+        "desc": "Copies de pages et d'images que Firefox retélécharge au besoin. Mots de passe, cookies et historique ne sont pas touchés."
+      },
+      "system-temp": {
+        "name": "Fichiers temporaires de Windows",
+        "desc": "Fichiers temporaires de Windows et des installateurs, de plus d'un jour."
+      },
+      "windows-update-cache": {
+        "name": "Téléchargements de Windows Update",
+        "desc": "Fichiers de mise à jour que Windows a déjà installés."
+      },
+      "delivery-optimization": {
+        "name": "Fichiers d'optimisation de la distribution",
+        "desc": "Morceaux de mises à jour que Windows partage avec d'autres PC."
+      },
+      "system-error-reports": {
+        "name": "Rapports d'erreurs du système",
+        "desc": "Rapports de problèmes de Windows lui-même."
+      },
+      "memory-dumps": {
+        "name": "Vidages mémoire du système",
+        "desc": "Enregistrés après un écran bleu. Gardez-les si vous cherchez la cause de plantages."
+      },
+      "recycle-bin": {
+        "name": "Corbeille",
+        "desc": "Fichiers que vous avez déjà supprimés. La vider libère l'espace pour de bon et ne peut pas être annulé."
+      }
+    },
+    "safety": {
+      "safe": "Sans risque",
+      "advanced": "À vérifier"
+    },
+    "permanent": "Irréversible",
+    "needsAdmin": "Demande les droits d'administrateur. Son nettoyage arrive avec l'assistant administrateur en phase 4.",
+    "running": "{{apps}} est ouvert : les fichiers en cours d'utilisation seront ignorés.",
+    "unreadable": "Une partie ne peut être mesurée qu'avec les droits d'administrateur.",
+    "excluded_one": "{{count}} élément exclu dans les Paramètres",
+    "excluded_other": "{{count}} éléments exclus dans les Paramètres",
+    "empty": "Rien trouvé",
+    "more": "Et {{count}} éléments plus petits ({{size}}), supprimés avec le reste.",
+    "reviewTitle": "Examiner : {{name}}",
+    "alwaysSkip": "Toujours ignorer",
+    "alwaysSkipLabel": "Toujours ignorer {{name}}",
+    "skipAdded": "Ajouté aux exclusions dans les Paramètres.",
+    "clean": "Nettoyer {{size}}",
+    "nothingSelected": "Sélectionnez quelque chose à nettoyer",
+    "recycleNote": "Les éléments supprimés vont dans la Corbeille : vous pouvez les restaurer depuis Mon activité.",
+    "permanentNote": "La suppression définitive est activée dans les Paramètres : les éléments ne passent pas par la Corbeille.",
+    "confirmBinTitle": "Vider la Corbeille ?",
+    "confirmBinBody": "La Corbeille contient {{size}}. La vider supprime ces fichiers pour de bon. Le reste va dans la Corbeille comme d'habitude.",
+    "confirmPermanentTitle": "Supprimer définitivement ?",
+    "confirmPermanentBody": "La suppression définitive est activée dans les Paramètres : {{size}} seront supprimés sans passer par la Corbeille. C'est irréversible.",
+    "confirm": "Supprimer",
+    "cleaning": "Nettoyage…",
+    "doneTitle": "Nettoyage terminé",
+    "doneRecycled": "{{size}} déplacés dans la Corbeille. Videz-la quand vous êtes sûr, pour récupérer l'espace.",
+    "donePermanent": "{{size}} supprimés.",
+    "doneBin": "La Corbeille a été vidée ({{size}}).",
+    "doneNothing": "Rien n'a été supprimé.",
+    "doneSkipped_one": "{{count}} élément a été ignoré car il est utilisé ou n'existe plus.",
+    "doneSkipped_other": "{{count}} éléments ont été ignorés car ils sont utilisés ou n'existent plus.",
+    "undoHint": "Vous avez changé d'avis ? Remettez tout en place depuis Mon activité.",
+    "openActivity": "Ouvrir Mon activité",
+    "failReason": {
+      "inUse": "Utilisé",
+      "gone": "N'existe plus",
+      "refused": "Protégé"
+    },
+    "unknownSize": "Non mesuré"
+  },
+  "spaceLens": {
+    "pick": "Choisissez un disque ou un dossier à analyser",
+    "readOnly": "La Carte de l'espace ne fait que lire votre disque. Rien n'est modifié.",
+    "driveFree": "{{free}} libres sur {{total}}",
+    "system": "Windows",
+    "chooseFolder": "Choisir un dossier…",
+    "scanning": "Analyse de {{path}}",
+    "counters": "{{files}} fichiers · {{size}}",
+    "denied_one": "{{count}} dossier n'a pas pu être lu",
+    "denied_other": "{{count}} dossiers n'ont pas pu être lus",
+    "stop": "Arrêter",
+    "reveal": "Afficher dans l'Explorateur",
+    "up": "Remonter d'un niveau",
+    "others_one": "{{count}} petit fichier",
+    "others_other": "{{count}} petits fichiers",
+    "hidden_one": "{{count}} autre élément",
+    "hidden_other": "{{count}} autres éléments",
+    "noAccess": "Accès refusé",
+    "byType": "Par type de fichier",
+    "noExt": "Sans extension",
+    "otherTypes": "Autres types",
+    "summary": "{{files}} fichiers dans {{dirs}} dossiers · analysé en {{seconds}} s",
+    "newScan": "Nouvelle analyse",
+    "rescan": "Analyser à nouveau",
+    "largest": "Plus gros éléments",
+    "treemapLabel": "Carte de {{name}} : chaque case est un fichier ou un dossier, à la taille de l'espace qu'il occupe.",
+    "open": "Ouvrir {{name}}",
+    "path": "Emplacement"
+  },
+  "activity": {
+    "empty": "Rien pour l'instant. Les analyses et nettoyages apparaîtront ici.",
+    "refresh": "Actualiser",
+    "kind": {
+      "smartCareScan": "Analyse Entretien express",
+      "cleanupScan": "Analyse Nettoyage",
+      "cleanup": "Nettoyage",
+      "emptyRecycleBin": "Corbeille vidée",
+      "spaceLensScan": "Analyse Carte de l'espace",
+      "restore": "Restauré depuis la Corbeille"
+    },
+    "detail": {
+      "smartCareScan": "Score {{score}} · {{size}} de fichiers inutiles trouvés",
+      "cleanupScan": "{{size}} trouvés",
+      "cleanupRecycle": "{{size}} déplacés dans la Corbeille",
+      "cleanupPermanent": "{{size}} supprimés définitivement",
+      "emptyRecycleBin": "{{size}} supprimés définitivement",
+      "spaceLensScan": "{{target}} · {{size}}",
+      "restore_one": "{{count}} élément remis en place",
+      "restore_other": "{{count}} éléments remis en place",
+      "skipped_one": "{{count}} ignoré",
+      "skipped_other": "{{count}} ignorés"
+    },
+    "undo": "Annuler",
+    "undoLabel": "Annuler ce nettoyage",
+    "undone": "Annulé",
+    "restored_one": "{{count}} élément remis en place.",
+    "restored_other": "{{count}} éléments remis en place.",
+    "missing_one": "{{count}} n'était plus dans la Corbeille.",
+    "missing_other": "{{count}} n'étaient plus dans la Corbeille.",
+    "restoreFailed_one": "{{count}} n'a pas pu être restauré car un fichier du même nom est revenu à sa place.",
+    "restoreFailed_other": "{{count}} n'ont pas pu être restaurés car des fichiers du même nom sont revenus à leur place."
   },
   "settings": {
     "language": "Langue",
@@ -86,6 +327,20 @@
     "system": "Système",
     "light": "Clair",
     "dark": "Sombre",
+    "cleanup": "Nettoyage",
+    "deleteMode": "Les éléments supprimés vont",
+    "deleteModeHint": "Avec la Corbeille, vous pouvez annuler un nettoyage depuis Mon activité.",
+    "recycleBin": "Dans la Corbeille",
+    "permanent": "Supprimer définitivement",
+    "permanentWarning": "La suppression définitive ne passe pas par la Corbeille : les nettoyages ne peuvent pas être annulés.",
+    "exclusions": "Exclusions",
+    "exclusionsHint": "Le Nettoyage ne touche jamais à ces fichiers et dossiers.",
+    "noExclusions": "Aucune exclusion pour l'instant. Utilisez « Toujours ignorer » en examinant les résultats du Nettoyage.",
+    "remove": "Retirer",
+    "removeLabel": "Retirer {{path}} des exclusions",
+    "logs": "Fichiers journaux",
+    "logsHint": "Les journaux restent sur ce PC. Partagez-les seulement si vous voulez de l'aide pour un problème.",
+    "openLogs": "Ouvrir le dossier des journaux",
     "about": "À propos",
     "version": "Version {{version}}",
     "windowEffect": "Matière de la fenêtre : {{effect}}",
@@ -98,10 +353,13 @@
     "privacy": "Pas de télémétrie, pas de compte. Les journaux restent sur ce PC."
   },
   "errors": {
+    "title": "Ça n'a pas marché",
     "accessDenied": "Windows a refusé l'accès à cet élément.",
     "notFound": "Cet élément n'existe plus.",
     "unsupported": "Ce n'est pas disponible sur votre version de Windows.",
     "io": "Un fichier n'a pas pu être lu ou écrit.",
+    "stale": "Ces résultats ne sont plus à jour. Relancez l'analyse.",
+    "busy": "Une autre analyse ou un nettoyage est en cours. Réessayez quand il sera fini.",
     "internal": "Une erreur s'est produite.",
     "unknown": "Une erreur s'est produite."
   }

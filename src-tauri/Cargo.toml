@@ -18,11 +18,18 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 tauri = { version = "2", features = [] }
 tauri-plugin-log = "2"
-log = "0.4"
+tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
+log.workspace = true
+rayon.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 smd-core.workspace = true
+smd-win.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 window-vibrancy = "0.8"

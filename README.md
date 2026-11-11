@@ -4,7 +4,7 @@
 
 A free, open-source maintenance app for Windows 10 and 11. It brings the best free PC-health tools together in one place, with a calm, guided scan flow and Windows 11 materials (Mica, Segoe UI Variable, Fluent icons).
 
-> **Status: Phase 0 (scaffold).** The app shell, design system, French/English UI and light/dark themes are in place. The modules arrive phase by phase; see the roadmap below.
+> **Status: Phase 1.** Smart Care (health score), Cleanup (review, then Recycle Bin), Space Lens (drive map) and My Activity (history with undo) work. The other modules arrive phase by phase; see the roadmap below.
 
 ## Safety principles
 

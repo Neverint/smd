@@ -1,5 +1,12 @@
+mod activity;
+mod cleanup;
 mod commands;
 mod error;
+mod settings;
+mod smart_care;
+mod space_lens;
+mod state;
+mod store;
 mod window_effect;
 
 use tauri::Manager;
@@ -24,20 +31,39 @@ pub fn run() {
                 .level(log::LevelFilter::Info)
                 .build(),
         )
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let window = app
                 .get_webview_window("main")
                 .expect("main window is declared in tauri.conf.json");
             let effect = window_effect::apply(&window);
             log::info!("window effect: {effect:?}");
-            app.manage(commands::AppState {
-                window_effect: effect,
-            });
+
+            let data_dir = app.path().app_local_data_dir()?;
+            std::fs::create_dir_all(&data_dir)?;
+            let state = state::AppState::new(effect, data_dir);
+            *state.settings.lock().expect("fresh mutex") = settings::load(&state);
+            app.manage(state);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             commands::app_info,
-            commands::format_bytes
+            commands::format_bytes,
+            settings::settings_get,
+            settings::settings_set,
+            settings::open_log_folder,
+            activity::activity_list,
+            activity::activity_undo,
+            cleanup::cleanup_scan,
+            cleanup::cleanup_run,
+            smart_care::smart_care_scan,
+            space_lens::drives_list,
+            space_lens::pick_folder,
+            space_lens::space_scan,
+            space_lens::space_cancel,
+            space_lens::space_view,
+            space_lens::space_reveal,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Scrub My Disks");

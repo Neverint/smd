@@ -1,14 +1,11 @@
-//! Tauri commands exposed to the frontend. Each one returns `AppResult<T>`.
+//! General commands. Module commands live in their own files (cleanup, smart_care, space_lens, activity, settings).
 
 use serde::Serialize;
 use tauri::State;
 
 use crate::error::AppResult;
+use crate::state::AppState;
 use crate::window_effect::WindowEffect;
-
-pub struct AppState {
-    pub window_effect: WindowEffect,
-}
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]

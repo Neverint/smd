@@ -1,9 +1,12 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-export type ButtonVariant = "primary" | "accent" | "secondary" | "subtle";
+export type ButtonVariant = "primary" | "accent" | "secondary" | "subtle" | "danger";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** primary = module color (one per screen), accent = system accent, secondary = neutral, subtle = no fill. */
+  /**
+   * primary = module color (one per screen), accent = system accent, secondary = neutral,
+   * subtle = no fill, danger = confirms something that can't be undone.
+   */
   variant?: ButtonVariant;
   size?: "md" | "lg";
   icon?: ReactNode;

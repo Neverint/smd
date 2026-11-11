@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 export interface CheckItem {
@@ -15,10 +15,12 @@ export interface CheckListProps {
   onChange: (next: Set<string>) => void;
   /** Accessible name of the list. */
   label: string;
+  /** Optional button shown at the end of each row (outside the label). */
+  action?: (item: CheckItem) => ReactNode;
 }
 
 /** Checkable review list with a "Select all" row (indeterminate when partly selected). */
-export function CheckList({ items, selected, onChange, label }: CheckListProps) {
+export function CheckList({ items, selected, onChange, label, action }: CheckListProps) {
   const { t } = useTranslation();
   const baseId = useId();
   const allRef = useRef<HTMLInputElement>(null);
@@ -51,7 +53,7 @@ export function CheckList({ items, selected, onChange, label }: CheckListProps) 
         {items.map((item) => {
           const descId = item.description ? `${baseId}-${item.id}-desc` : undefined;
           return (
-            <li key={item.id}>
+            <li key={item.id} className={action ? "smd-checklist__row" : undefined}>
               <label className="smd-check">
                 <input type="checkbox" checked={selected.has(item.id)} onChange={() => toggle(item.id)} aria-describedby={descId} />
                 <span className="smd-check__text">
@@ -64,6 +66,7 @@ export function CheckList({ items, selected, onChange, label }: CheckListProps) 
                 </span>
                 {item.size && <span className="smd-check__size">{item.size}</span>}
               </label>
+              {action?.(item)}
             </li>
           );
         })}

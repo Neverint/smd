@@ -80,12 +80,29 @@
   --success: #0f7b0f;
   --caution: #9d5d00;
   --critical: #c42b1c;
+  --critical-solid: #c42b1c;
+  --critical-bg: #fde7e9;
+  --caution-bg: #fff4ce;
+  --success-bg: #dff6dd;
   --caption-close-hover: #c42b1c;
 
   --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.04);
   --shadow-flyout: 0 8px 16px rgba(0, 0, 0, 0.14);
   --shadow-dialog: 0 32px 64px rgba(0, 0, 0, 0.19), 0 2px 21px rgba(0, 0, 0, 0.15);
   --glow-opacity: 0.35;
+
+  /* Space Lens treemap: 700-level fills with white text (AA). */
+  --lens-1: #0e7490;
+  --lens-2: #1d4ed8;
+  --lens-3: #6d28d9;
+  --lens-4: #0f766e;
+  --lens-5: #4338ca;
+  --lens-6: #0369a1;
+  --lens-7: #047857;
+  --lens-8: #a21caf;
+  --lens-file: #64748b;
+  --lens-others: #475569;
+  --lens-on: #ffffff;
 }
 
 [data-theme="dark"] {
@@ -121,12 +138,30 @@
   --success: #6ccb5f;
   --caution: #fce100;
   --critical: #ff99a4;
+  /* White text on this fill: 5.9:1. */
+  --critical-solid: #c42b1c;
+  --critical-bg: #442726;
+  --caution-bg: #433519;
+  --success-bg: #393d1b;
   --caption-close-hover: #c42b1c;
 
   --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.13);
   --shadow-flyout: 0 8px 16px rgba(0, 0, 0, 0.26);
   --shadow-dialog: 0 32px 64px rgba(0, 0, 0, 0.37), 0 2px 21px rgba(0, 0, 0, 0.37);
   --glow-opacity: 0.45;
+
+  /* Space Lens treemap: 300-level fills with black text (AA). */
+  --lens-1: #67e8f9;
+  --lens-2: #93c5fd;
+  --lens-3: #c4b5fd;
+  --lens-4: #5eead4;
+  --lens-5: #a5b4fc;
+  --lens-6: #7dd3fc;
+  --lens-7: #6ee7b7;
+  --lens-8: #f0abfc;
+  --lens-file: #cbd5e1;
+  --lens-others: #94a3b8;
+  --lens-on: #000000;
 }
 
 /* With the Mica/acrylic window material the content layer becomes translucent. */

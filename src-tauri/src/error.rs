@@ -8,7 +8,7 @@ use serde::Serialize;
 #[derive(Debug, thiserror::Error)]
 #[allow(
     dead_code,
-    reason = "variants are used by the module commands from Phase 1 on"
+    reason = "AccessDenied and Unsupported are used from Phase 2 on"
 )]
 pub enum AppError {
     #[error("access denied: {0}")]
@@ -19,6 +19,12 @@ pub enum AppError {
     Unsupported(String),
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
+    /// The results the UI sent back are from an older scan.
+    #[error("results are out of date: {0}")]
+    Stale(String),
+    /// Another scan or cleanup is already running.
+    #[error("busy: {0}")]
+    Busy(String),
     #[error("{0}")]
     Internal(String),
 }
@@ -30,8 +36,16 @@ impl AppError {
             AppError::NotFound(_) => "notFound",
             AppError::Unsupported(_) => "unsupported",
             AppError::Io(_) => "io",
+            AppError::Stale(_) => "stale",
+            AppError::Busy(_) => "busy",
             AppError::Internal(_) => "internal",
         }
+    }
+}
+
+impl From<tauri::Error> for AppError {
+    fn from(e: tauri::Error) -> Self {
+        AppError::Internal(e.to_string())
     }
 }
 
