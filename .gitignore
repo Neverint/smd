@@ -32,3 +32,8 @@ desktop.ini
 
 # Local Claude Code settings (launch.json is shared)
 .claude/settings.local.json
+
+# Sensor helper build output (npm run hwmon)
+/src-tauri/resources/hwmon/
+/sidecars/hwmon/bin/
+/sidecars/hwmon/obj/

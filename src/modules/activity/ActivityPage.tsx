@@ -9,6 +9,8 @@ import {
   Delete20Regular,
   DocumentCopy20Regular,
   FolderArrowRight20Regular,
+  LockClosed20Regular,
+  ShieldCheckmark20Regular,
   Search20Regular,
   Sparkle20Regular,
   TopSpeed20Regular,
@@ -34,6 +36,9 @@ const ICONS: Record<ActivityKind, typeof Broom20Regular> = {
   appUpdate: ArrowSync20Regular,
   updatesSetup: ArrowDownload20Regular,
   clutterRemoved: DocumentCopy20Regular,
+  defenderScan: ShieldCheckmark20Regular,
+  signatureUpdate: ArrowDownload20Regular,
+  permissionChange: LockClosed20Regular,
 };
 
 function Detail({ e }: { e: ActivityEntry }) {
@@ -78,6 +83,14 @@ function Detail({ e }: { e: ActivityEntry }) {
       return <>{t(e.failed > 0 ? "activity.detail.updateFailed" : "activity.detail.update", { name: e.target ?? "" })}</>;
     case "updatesSetup":
       return <>{t(e.failed > 0 ? "activity.detail.setupFailed" : "activity.detail.setup")}</>;
+    case "defenderScan":
+      return <>{t(e.failed > 0 ? "activity.detail.scanStopped" : e.items > 0 ? "activity.detail.scanFound" : "activity.detail.scanClean", { kind: t(`protection.scanKind.${e.target ?? "quick"}`) })}</>;
+    case "signatureUpdate":
+      return <>{t(e.failed > 0 ? "activity.detail.signaturesFailed" : "activity.detail.signatures")}</>;
+    case "permissionChange": {
+      const [cap, app] = (e.target ?? "|").split("|");
+      return <>{t(e.enabled ? "activity.detail.permissionOn" : "activity.detail.permissionOff", { app, what: t(`protection.capability.${cap}`) })}</>;
+    }
     case "clutterRemoved":
       return (
         <>

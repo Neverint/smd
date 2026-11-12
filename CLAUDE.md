@@ -39,7 +39,7 @@ src-tauri/           Tauri app: one file per module's commands (cleanup, smart_c
                      clutter, activity, settings),
                      state.rs, store.rs (JSON files), error.rs (typed AppError), window_effect.rs
 rules/               cleanup.json (declarative cleanup rules); tweaks.json and the drive policy come later
-sidecars/hwmon/      .NET LibreHardwareMonitor sidecar (Phase 3)
+sidecars/hwmon/      .NET 8 LibreHardwareMonitor helper; `npm run hwmon` builds it into src-tauri/resources/hwmon (not committed)
 docs/                DECISIONS.md, design-system.md
 ```
 
@@ -58,7 +58,8 @@ $env:Path += ';G:\Documents\Dev\.rust\cargo\bin'; $env:RUSTUP_HOME='G:\Documents
 | Lint / types / unit tests | `npm run lint`, `npm run typecheck`, `npm test` |
 | Smoke tests | `npm run e2e` |
 | Rust checks | `cargo fmt --all --check`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo test --workspace` |
-| Release build | `npm run tauri build` (NSIS + MSI in `target/release/bundle`) |
+| Sensor helper | `npm run hwmon` (needs the .NET 8 SDK; on this PC it is in `G:\Documents\Dev\.dotnet`: add it to PATH first). Required before any Rust build: tauri-build checks the bundled resources. |
+| Release build | `npm run hwmon`, then `npm run tauri build` (NSIS + MSI in `target/release/bundle`) |
 
 ## Conventions
 

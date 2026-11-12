@@ -1,6 +1,7 @@
 import {
   Apps24Regular,
   ArrowClockwise24Regular,
+  Battery1024Regular,
   Broom24Regular,
   HardDrive24Regular,
   Lightbulb20Regular,
@@ -48,7 +49,14 @@ function RecText({ rec }: { rec: Recommendation }) {
     case "installWindowsUpdates":
     case "updateApps":
     case "reviewStartup":
+    case "resolveThreats":
       return <>{t(`smartCare.rec.${rec.kind}`, { count: rec.count })}</>;
+    case "turnOnRealTimeProtection":
+      return <>{t("smartCare.rec.turnOnRealTimeProtection")}</>;
+    case "updateSignatures":
+      return <>{t("smartCare.rec.updateSignatures", { count: rec.days })}</>;
+    case "checkBattery":
+      return <>{t("smartCare.rec.checkBattery", { percent: f.percent(rec.healthPercent) })}</>;
   }
 }
 
@@ -192,9 +200,36 @@ function Results({ result }: { result: SmartCareResult }) {
         >
           {result.windowsUpdates && <div className="row__sub">{t("smartCare.card.windowsUpdatesLine", { total: result.windowsUpdates.total, security: result.windowsUpdates.security })}</div>}
         </Card>
-        <div className="card--muted">
-          <Card module="protection" icon={<ShieldCheckmark24Regular />} title={t("smartCare.card.protection")} description={t("smartCare.card.comingIn", { phase: "3" })} />
-        </div>
+        <Card
+          module="protection"
+          icon={<ShieldCheckmark24Regular />}
+          title={t("smartCare.card.protection")}
+          value={
+            result.defender
+              ? (result.activeThreats ?? 0) > 0
+                ? t("smartCare.card.threats", { count: result.activeThreats ?? 0 })
+                : result.defender.realTime
+                  ? t("smartCare.card.protected")
+                  : t("smartCare.card.notProtected")
+              : undefined
+          }
+          description={result.defender ? (result.defender.signaturesUpdatedMs ? t("protection.signatures", { date: f.dateTime(result.defender.signaturesUpdatedMs) }) : undefined) : t("smartCare.card.defenderUnknown")}
+          actions={<Button onClick={() => navigate("/protection")}>{t("smartCare.card.open")}</Button>}
+        >
+          <StatusLine status={statusOf("protection")} />
+        </Card>
+        {result.batteryHealth !== null && (
+          <Card
+            module="hardware"
+            icon={<Battery1024Regular />}
+            title={t("smartCare.card.battery")}
+            value={`${f.percent(result.batteryHealth)} %`}
+            description={t("smartCare.card.batteryDesc")}
+            actions={<Button onClick={() => navigate("/hardware")}>{t("smartCare.card.open")}</Button>}
+          >
+            <StatusLine status={statusOf("battery")} />
+          </Card>
+        )}
       </div>
     </div>
   );

@@ -21,6 +21,11 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      # Sensor helper (LibreHardwareMonitor), bundled under resources/hwmon.
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 8.0.x
+      - run: npm run hwmon
 
       - uses: tauri-apps/tauri-action@action-v1.0.0
         env:

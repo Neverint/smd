@@ -106,7 +106,8 @@
       "drive": "Measuring free space",
       "rule": "Looking for junk: {{name}}",
       "startup": "Counting startup items",
-      "updates": "Checking for updates"
+      "updates": "Checking for updates",
+      "protection": "Checking Microsoft Defender"
     },
     "scoreLabel": "Health score: {{score}} out of 100",
     "outOf": "/ 100",
@@ -131,7 +132,13 @@
       "installWindowsUpdates_other": "Install {{count}} waiting Windows updates.",
       "updateApps_one": "Update {{count}} app in Applications.",
       "updateApps_other": "Update {{count}} apps in Applications.",
-      "reviewStartup": "{{count}} apps start with Windows. Turn off the ones you don't need in Performance."
+      "reviewStartup": "{{count}} apps start with Windows. Turn off the ones you don't need in Performance.",
+      "resolveThreats_one": "Microsoft Defender found {{count}} threat that still needs attention. Open Protection.",
+      "resolveThreats_other": "Microsoft Defender found {{count}} threats that still need attention. Open Protection.",
+      "turnOnRealTimeProtection": "Turn real-time protection back on in Windows Security.",
+      "updateSignatures_one": "Update Microsoft Defender: its virus definitions are {{count}} day old.",
+      "updateSignatures_other": "Update Microsoft Defender: its virus definitions are {{count}} days old.",
+      "checkBattery": "Your battery holds {{percent}} % of its original charge. Plan a replacement if it runs out too fast."
     },
     "card": {
       "junk": "Junk",
@@ -163,7 +170,14 @@
       "updatesDesc": "Apps with a newer version, and waiting Windows updates.",
       "updatesNotSetUp": "App updates need a one-time setup in Applications.",
       "windowsUpdatesLine": "Windows Update: {{total}} waiting, {{security}} security",
-      "open": "Open"
+      "open": "Open",
+      "protected": "Protected",
+      "notProtected": "Real-time protection off",
+      "threats_one": "{{count}} threat",
+      "threats_other": "{{count}} threats",
+      "defenderUnknown": "Microsoft Defender couldn't be read (another antivirus may be in charge).",
+      "battery": "Battery health",
+      "batteryDesc": "Full charge compared with the original capacity."
     },
     "status": {
       "good": "Good",
@@ -329,7 +343,10 @@
       "leftoversRemoved": "Leftovers removed",
       "appUpdate": "App updated",
       "updatesSetup": "App updates set up",
-      "clutterRemoved": "Files moved to the Recycle Bin"
+      "clutterRemoved": "Files moved to the Recycle Bin",
+      "defenderScan": "Microsoft Defender scan",
+      "signatureUpdate": "Virus definitions update",
+      "permissionChange": "App permission changed"
     },
     "detail": {
       "smartCareScan": "Score {{score}} · {{size}} of junk found",
@@ -353,7 +370,14 @@
       "setup": "WinGet module downloaded",
       "setupFailed": "Setup failed",
       "clutter_one": "{{count}} item, {{size}}",
-      "clutter_other": "{{count}} items, {{size}}"
+      "clutter_other": "{{count}} items, {{size}}",
+      "scanClean": "{{kind}}: no threats found",
+      "scanFound": "{{kind}}: threats found and handled by Defender",
+      "scanStopped": "{{kind}}: stopped",
+      "signatures": "Definitions updated",
+      "signaturesFailed": "Update failed",
+      "permissionOn": "{{app}} can use the {{what}} again",
+      "permissionOff": "{{app}} can no longer use the {{what}}"
     },
     "undo": "Undo",
     "undoLabel": "Undo: {{what}}",
@@ -541,5 +565,140 @@
     "scannedFolders": "Folders: {{folders}}",
     "newScan": "New scan",
     "selectSome": "Select files to move to the Recycle Bin"
+  },
+  "protection": {
+    "tabs": {
+      "defender": "Microsoft Defender",
+      "firewall": "Firewall",
+      "permissions": "App permissions"
+    },
+    "overall": {
+      "good": "Microsoft Defender and the firewall are on. Nothing needs your attention.",
+      "warning": "Protected, but something is worth a look.",
+      "critical": "Your PC needs attention.",
+      "unknown": "Microsoft Defender couldn't be read. Another antivirus may be in charge."
+    },
+    "noDefender": "Microsoft Defender couldn't be read. If you use another antivirus, check it in its own app.",
+    "openSecurity": "Open Windows Security",
+    "passive": "Another antivirus is in charge; Defender runs alongside it",
+    "realTimeOn": "Real-time protection is on",
+    "realTimeOff": "Real-time protection is off",
+    "signatures": "Virus definitions updated {{date}}",
+    "signaturesUnknown": "Virus definitions: date unknown",
+    "tamperOn": "Tamper protection is on",
+    "tamperOff": "Tamper protection is off",
+    "lastQuick": "Last quick scan: {{date}}",
+    "lastFull": "last full scan: {{date}}",
+    "scanType": "Scan type",
+    "scanKind": {
+      "quick": "Quick scan",
+      "full": "Full scan"
+    },
+    "quickHint": "Checks the places threats usually hide. A few minutes.",
+    "fullHint": "Checks every file on every drive. Can take an hour or more; you can keep using your PC.",
+    "scanNow": "Scan now",
+    "scanning": "{{kind}} running",
+    "scanStopped": "Scan stopped.",
+    "scanFound": "Microsoft Defender found something and handled it. See the history below.",
+    "scanClean": "No threats found ({{seconds}} s).",
+    "updateSignatures": "Update definitions",
+    "updating": "Updating…",
+    "history": "Protection history",
+    "noThreats": "No threats found.",
+    "severity": {
+      "Low": "Low",
+      "Moderate": "Moderate",
+      "High": "High",
+      "Severe": "Severe"
+    },
+    "threatStatus": {
+      "Detected": "Needs attention",
+      "Cleaned": "Cleaned",
+      "Quarantined": "Quarantined",
+      "Removed": "Removed",
+      "Allowed": "Allowed by you",
+      "Blocked": "Blocked",
+      "ActionFailed": "Action failed: open Windows Security",
+      "Unknown": "Unknown"
+    },
+    "firewallHint": "The firewall blocks unwanted network connections. Each network type has its own setting.",
+    "profile": {
+      "Domain": "Domain network",
+      "Private": "Private network",
+      "Public": "Public network"
+    },
+    "profileHint": {
+      "Domain": "Work networks managed by an organization.",
+      "Private": "Your home network.",
+      "Public": "Cafés, stations and other shared networks."
+    },
+    "on": "On",
+    "off": "Off",
+    "capability": {
+      "webcam": "Camera",
+      "microphone": "Microphone",
+      "location": "Location"
+    },
+    "capOn": "Apps can ask for access on this account.",
+    "capOff": "Access is turned off for all apps on this account.",
+    "openPrivacy": "Open privacy settings",
+    "permissionsHint": "Store apps can be allowed or blocked one by one here. Desktop apps share one switch in Windows Settings; they are listed so you can see who used what.",
+    "noApps": "No app has asked for this yet.",
+    "inUse": "In use now",
+    "desktopApp": "Desktop app",
+    "lastUsed": "Last used {{date}}",
+    "neverUsed": "Never used",
+    "allowed": "Allowed",
+    "denied": "Blocked",
+    "allowLabel": "Allow {{app}} to use the {{what}}"
+  },
+  "hardware": {
+    "live": "Live sensors",
+    "adminForCpu": "Processor temperature and motherboard fans need admin rights. They will appear with the admin helper (phase 4).",
+    "helperMissing": "Live sensors aren't available: the sensor helper is missing from this installation.",
+    "helperStopped": "The sensor helper stopped. It needs the .NET 8 Runtime from Microsoft.",
+    "sensorsStarting": "Starting the sensors…",
+    "kind": {
+      "cpu": "Processor",
+      "gpu": "Graphics",
+      "memory": "Memory",
+      "motherboard": "Motherboard",
+      "storage": "Drive",
+      "superio": "Motherboard",
+      "cooler": "Cooler",
+      "embeddedcontroller": "Embedded controller",
+      "psu": "Power supply",
+      "battery": "Battery",
+      "network": "Network",
+      "other": "Device"
+    },
+    "sensor": {
+      "Temperature": "temperature",
+      "Fan": "fan",
+      "Load": "load",
+      "Power": "power",
+      "Clock": "clock",
+      "Control": "fan control"
+    },
+    "disks": "Drives",
+    "health": {
+      "healthy": "Healthy",
+      "warning": "Warning",
+      "unhealthy": "Unhealthy",
+      "unknown": "Health unknown"
+    },
+    "smartAdmin": "Health comes from Windows. Wear, temperature and error counters (SMART) need admin rights and arrive with the admin helper (phase 4). CrystalDiskInfo in the Toolbox shows them all.",
+    "processor": "Processor",
+    "cpuLine": "{{cores}} cores, {{threads}} threads, up to {{ghz}} GHz",
+    "graphics": "Graphics",
+    "driver": "driver {{version}}",
+    "memory": "Memory",
+    "memInUse": "{{used}} in use of {{total}}",
+    "slots": "{{used}} of {{total}} slots used",
+    "battery": "Battery",
+    "batteryHealth": "{{percent}} % of the original capacity",
+    "batteryLine": "{{full}} Wh now, {{design}} Wh when new",
+    "cycles_one": "{{count}} charge cycle",
+    "cycles_other": "{{count}} charge cycles"
   }
 }

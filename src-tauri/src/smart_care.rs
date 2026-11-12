@@ -4,8 +4,9 @@ use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::Duration;
 
 use serde::Serialize;
-use smd_core::health::{Assessment, Facts, PendingUpdates, assess};
+use smd_core::health::{Assessment, Facts, PendingUpdates, ProtectionFacts, assess};
 use smd_win::disks::PhysicalDisk;
+use smd_win::protection::DefenderStatus;
 use smd_win::system::{DriveInfo, MemoryInfo};
 use smd_win::winget::WindowsUpdates;
 use tauri::ipc::Channel;
@@ -39,6 +40,11 @@ pub struct SmartCareResult {
     /// Apps with an update (only when the WinGet module is set up).
     pub app_updates: Option<u32>,
     pub windows_updates: Option<WindowsUpdates>,
+    pub defender: Option<DefenderStatus>,
+    /// Threats Defender still lists as needing attention.
+    pub active_threats: Option<u32>,
+    /// Lowest battery health in percent (laptops only).
+    pub battery_health: Option<f64>,
     pub duration_ms: u64,
     pub activity_id: u64,
 }
@@ -61,7 +67,7 @@ fn sample_memory() -> (Option<MemoryInfo>, Option<f64>) {
 
 pub fn scan(state: &AppState, on_progress: &Channel<ScanProgress>) -> SmartCareResult {
     let started = now_ms();
-    let total = rule_count() + 5;
+    let total = rule_count() + 6;
     let done = AtomicU32::new(0);
     let report = |step: &str| {
         let n = done.fetch_add(1, Ordering::Relaxed) + 1;
@@ -72,52 +78,71 @@ pub fn scan(state: &AppState, on_progress: &Channel<ScanProgress>) -> SmartCareR
         });
     };
 
-    let (disks, (memory, min_load), cleanup, startup_enabled, (app_updates, windows_updates)) =
-        std::thread::scope(|s| {
-            let startup = s.spawn(|| {
-                let n = smd_win::startup::list()
-                    .iter()
-                    .filter(|i| i.enabled && !i.microsoft)
-                    .count();
-                report("startup");
-                n
-            });
-            let updates = s.spawn(|| {
-                let apps = s.spawn(|| match smd_win::winget::module_installed() {
-                    Ok(true) => smd_win::winget::list_updates(UPDATES_TIMEOUT)
-                        .map(|l| l.len() as u32)
-                        .ok(),
-                    _ => None,
-                });
-                let wu = smd_win::winget::windows_updates(UPDATES_TIMEOUT)
-                    .map_err(|e| log::info!("Windows Update check skipped: {e}"))
-                    .ok();
-                let a = apps.join().ok().flatten();
-                report("updates");
-                (a, wu)
-            });
-            let disks = s.spawn(|| {
-                let d = smd_win::disks::physical_disks();
-                if let Err(e) = &d {
-                    log::warn!("disk health check failed: {e}");
-                }
-                report("disks");
-                d.ok()
-            });
-            let mem = s.spawn(|| {
-                let m = sample_memory();
-                report("memory");
-                m
-            });
-            let cleanup = scan_all(state, &report);
-            (
-                disks.join().ok().flatten(),
-                mem.join().unwrap_or((None, None)),
-                cleanup,
-                startup.join().ok(),
-                updates.join().unwrap_or((None, None)),
-            )
+    let (
+        disks,
+        (memory, min_load),
+        cleanup,
+        startup_enabled,
+        (app_updates, windows_updates),
+        (defender, active_threats, battery_health),
+    ) = std::thread::scope(|s| {
+        let protection = s.spawn(|| {
+            let d = smd_win::protection::defender_status().ok();
+            let t = smd_win::protection::threats()
+                .ok()
+                .map(|l| l.iter().filter(|t| t.active).count() as u32);
+            let temp = state.data_dir.join("tmp");
+            let b = smd_win::hardware::batteries(&temp)
+                .ok()
+                .and_then(|l| l.iter().map(|b| b.health_percent()).reduce(f64::min));
+            report("protection");
+            (d, t, b)
         });
+        let startup = s.spawn(|| {
+            let n = smd_win::startup::list()
+                .iter()
+                .filter(|i| i.enabled && !i.microsoft)
+                .count();
+            report("startup");
+            n
+        });
+        let updates = s.spawn(|| {
+            let apps = s.spawn(|| match smd_win::winget::module_installed() {
+                Ok(true) => smd_win::winget::list_updates(UPDATES_TIMEOUT)
+                    .map(|l| l.len() as u32)
+                    .ok(),
+                _ => None,
+            });
+            let wu = smd_win::winget::windows_updates(UPDATES_TIMEOUT)
+                .map_err(|e| log::info!("Windows Update check skipped: {e}"))
+                .ok();
+            let a = apps.join().ok().flatten();
+            report("updates");
+            (a, wu)
+        });
+        let disks = s.spawn(|| {
+            let d = smd_win::disks::physical_disks();
+            if let Err(e) = &d {
+                log::warn!("disk health check failed: {e}");
+            }
+            report("disks");
+            d.ok()
+        });
+        let mem = s.spawn(|| {
+            let m = sample_memory();
+            report("memory");
+            m
+        });
+        let cleanup = scan_all(state, &report);
+        (
+            disks.join().ok().flatten(),
+            mem.join().unwrap_or((None, None)),
+            cleanup,
+            startup.join().ok(),
+            updates.join().unwrap_or((None, None)),
+            protection.join().unwrap_or((None, None, None)),
+        )
+    });
 
     let system_letter = smd_win::system::system_drive().to_uppercase();
     let system_drive = smd_win::system::drives()
@@ -142,6 +167,14 @@ pub fn scan(state: &AppState, on_progress: &Channel<ScanProgress>) -> SmartCareR
             security: windows_updates.as_ref().map(|w| w.security),
         },
         startup_enabled_third_party: startup_enabled,
+        protection: defender.as_ref().map(|d| ProtectionFacts {
+            real_time: d.real_time,
+            other_antivirus: d.running_mode.eq_ignore_ascii_case("Passive")
+                || d.running_mode.eq_ignore_ascii_case("EDR Block Mode"),
+            signature_age_days: d.signature_age_days,
+            active_threats: active_threats.unwrap_or(0),
+        }),
+        battery_health_percent: battery_health,
     };
     let assessment = assess(&facts);
 
@@ -168,6 +201,9 @@ pub fn scan(state: &AppState, on_progress: &Channel<ScanProgress>) -> SmartCareR
         startup_enabled,
         app_updates,
         windows_updates,
+        defender,
+        active_threats,
+        battery_health,
         duration_ms: (now_ms() - started).max(0) as u64,
         activity_id: id,
     }

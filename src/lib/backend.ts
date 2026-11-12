@@ -9,6 +9,14 @@ import type {
   CleanupReport,
   CleanupScanResult,
   CleanupSelection,
+  Capability,
+  CapabilityState,
+  DefenderScanResult,
+  DefenderStatus,
+  HardwareView,
+  ProtectionView,
+  ScanKind,
+  SensorsView,
   ClutterProgress,
   ClutterView,
   DownloadsView,
@@ -79,6 +87,13 @@ export interface Commands {
   clutter_cancel: { args: NoArgs; result: null };
   clutter_downloads: { args: NoArgs; result: DownloadsView };
   clutter_remove: { args: { scanId: number; paths: string[] }; result: RemovalReport };
+  protection_status: { args: NoArgs; result: ProtectionView };
+  protection_cancel_scan: { args: NoArgs; result: null };
+  protection_update_signatures: { args: NoArgs; result: DefenderStatus | null };
+  permission_set: { args: { capability: Capability; id: string; allowed: boolean }; result: CapabilityState[] };
+  hardware_info: { args: NoArgs; result: HardwareView };
+  sensors_poll: { args: NoArgs; result: SensorsView };
+  sensors_stop: { args: NoArgs; result: null };
 }
 
 /** Commands that stream progress through a channel (`on_progress` in Rust). */
@@ -89,6 +104,7 @@ export interface StreamCommands {
   apps_uninstall: { args: { ids: string[] }; progress: IndexProgress; result: UninstallOutcome[] };
   updates_apply: { args: { ids: string[] }; progress: IndexProgress; result: UpdateOutcome[] };
   clutter_scan: { args: { path: string | null }; progress: ClutterProgress; result: ClutterView };
+  protection_scan: { args: { kind: ScanKind }; progress: { elapsedMs: number }; result: DefenderScanResult };
 }
 
 export type CommandName = keyof Commands;

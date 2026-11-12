@@ -74,7 +74,7 @@ function clutterView(id: number): ClutterView {
   };
 }
 
-export function phase2Handlers(log: Log): Omit<MockHandlers, "app_info" | "format_bytes" | "settings_get" | "settings_set" | "open_log_folder" | "activity_list" | "activity_undo" | "cleanup_run" | "drives_list" | "pick_folder" | "space_cancel" | "space_view" | "space_reveal"> {
+export function phase2Handlers(log: Log): Omit<MockHandlers, "app_info" | "format_bytes" | "settings_get" | "settings_set" | "open_log_folder" | "activity_list" | "activity_undo" | "cleanup_run" | "drives_list" | "pick_folder" | "space_cancel" | "space_view" | "space_reveal" | "protection_status" | "protection_cancel_scan" | "protection_update_signatures" | "permission_set" | "hardware_info" | "sensors_poll" | "sensors_stop"> {
   return {
     startup_list: () => startup,
     startup_set: ({ id, enabled }) => {

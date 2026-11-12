@@ -31,7 +31,10 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "msi"],
+    "targets": [
+      "nsis",
+      "msi"
+    ],
     "publisher": "Neverint",
     "copyright": "Copyright (c) 2026 Neverint. MIT License.",
     "category": "Utility",
@@ -44,7 +47,12 @@
       "icons/icon.ico"
     ],
     "windows": {
-      "webviewInstallMode": { "type": "downloadBootstrapper" }
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      }
+    },
+    "resources": {
+      "resources/hwmon/": "hwmon/"
     }
   }
 }

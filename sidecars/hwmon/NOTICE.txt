@@ -1,0 +1,17 @@
+smd-hwmon - sensor helper of Scrub My Disks
+Copyright (c) 2026 Neverint. MIT License. https://github.com/Neverint/smd
+
+This helper uses the following libraries, unmodified. Their source code is available at the
+addresses below. If a copy of the Mozilla Public License 2.0 was not distributed with this
+file, you can obtain one at https://mozilla.org/MPL/2.0/.
+
+- LibreHardwareMonitorLib 0.9.6 - MPL-2.0
+  https://github.com/LibreHardwareMonitor/LibreHardwareMonitor
+- DiskInfoToolkit 1.1.2, RAMSPDToolkit-NDD 1.4.2, BlackSharp.Core 1.0.7 - MPL-2.0
+  https://www.nuget.org/packages/DiskInfoToolkit
+  https://www.nuget.org/packages/RAMSPDToolkit-NDD
+  https://www.nuget.org/packages/BlackSharp.Core
+- HidSharp 2.6.4 - Apache-2.0 (Copyright 2010-2025 James F. Bellinger)
+  http://software.seekye.com/hidsharp
+- System.Management, System.IO.Ports, System.CodeDom, Mono.Posix.NETStandard - MIT (Microsoft / .NET Foundation)
+  https://github.com/dotnet/runtime

@@ -222,6 +222,7 @@ pub async fn apps_remove_leftovers(
             paths: outcome.removed.iter().map(|r| r.0.clone()).collect(),
             registry,
             startup: None,
+            permission: None,
         };
         let undo_available = removed_items > 0 && activity::save_undo(&state, id, &undo);
         let mut e = Entry::new(id, activity::Kind::LeftoversRemoved);

@@ -7,9 +7,11 @@ import { GalleryPage } from "../dev/gallery/GalleryPage";
 import { ActivityPage } from "../modules/activity/ActivityPage";
 import { ApplicationsPage } from "../modules/applications/ApplicationsPage";
 import { CleanupPage } from "../modules/cleanup/CleanupPage";
+import { HardwarePage } from "../modules/hardware/HardwarePage";
 import { ClutterPage } from "../modules/clutter/ClutterPage";
 import { ModulePage } from "../modules/ModulePage";
 import { PerformancePage } from "../modules/performance/PerformancePage";
+import { ProtectionPage } from "../modules/protection/ProtectionPage";
 import { SettingsPage } from "../modules/settings/SettingsPage";
 import { SmartCarePage } from "../modules/smart-care/SmartCarePage";
 import { SpaceLensPage } from "../modules/space-lens/SpaceLensPage";
@@ -35,7 +37,7 @@ function Shell() {
 }
 
 /** Modules with their own page; the others show the "planned for phase N" placeholder. */
-const BUILT = new Set(["smart-care", "cleanup", "space-lens", "activity", "settings", "performance", "applications", "clutter"]);
+const BUILT = new Set(["smart-care", "cleanup", "space-lens", "activity", "settings", "performance", "applications", "clutter", "protection", "hardware"]);
 
 const router = createHashRouter([
   {
@@ -48,6 +50,8 @@ const router = createHashRouter([
       { path: "performance", element: <PerformancePage /> },
       { path: "applications", element: <ApplicationsPage /> },
       { path: "clutter", element: <ClutterPage /> },
+      { path: "protection", element: <ProtectionPage /> },
+      { path: "hardware", element: <HardwarePage /> },
       { path: "settings", element: <SettingsPage /> },
       ...MODULES.filter((m) => !BUILT.has(m.id)).map((m) => ({
         path: m.path.slice(1),

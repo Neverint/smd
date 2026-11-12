@@ -115,6 +115,28 @@ pub struct PendingUpdates {
     pub security: Option<u32>,
 }
 
+/// What Protection measured about Microsoft Defender.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct ProtectionFacts {
+    pub real_time: bool,
+    /// Another antivirus is in charge (Defender in passive mode): Defender's own switches don't apply.
+    pub other_antivirus: bool,
+    pub signature_age_days: Option<u32>,
+    pub active_threats: u32,
+}
+
+/// Defender on and signatures under 3 days: good. Stale signatures: warning.
+/// Real-time protection off (with no other antivirus) or an active threat: critical.
+pub fn protection_status(p: &ProtectionFacts) -> Status {
+    if p.active_threats > 0 || (!p.real_time && !p.other_antivirus) {
+        Status::Critical
+    } else if !p.other_antivirus && p.signature_age_days.is_some_and(|d| d >= 3) {
+        Status::Warning
+    } else {
+        Status::Good
+    }
+}
+
 /// Uptime alone: under 7 days good, 7-30 days warning, over 30 days critical.
 pub fn uptime_status(uptime_days: f64) -> Status {
     if uptime_days < 7.0 {
@@ -190,6 +212,9 @@ pub struct Facts {
     pub updates: PendingUpdates,
     /// Third-party startup items that are on.
     pub startup_enabled_third_party: Option<usize>,
+    pub protection: Option<ProtectionFacts>,
+    /// Lowest battery health (full charge vs design), laptops only.
+    pub battery_health_percent: Option<f64>,
 }
 
 /// One suggestion, ranked by impact. The UI words it from `kind`.
@@ -209,6 +234,10 @@ pub enum Recommendation {
     InstallWindowsUpdates { count: u32 },
     UpdateApps { count: u32 },
     ReviewStartup { count: u32 },
+    ResolveThreats { count: u32 },
+    TurnOnRealTimeProtection,
+    UpdateSignatures { days: u32 },
+    CheckBattery { health_percent: f64 },
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -313,6 +342,45 @@ pub fn assess(f: &Facts) -> Assessment {
             recs.push((1, Recommendation::UpdateApps { count: apps }));
         }
     }
+    if let Some(p) = &f.protection {
+        let status = protection_status(p);
+        areas.push(AreaResult {
+            area: Area::Protection,
+            status,
+        });
+        if p.active_threats > 0 {
+            recs.push((
+                0,
+                Recommendation::ResolveThreats {
+                    count: p.active_threats,
+                },
+            ));
+        }
+        if !p.real_time && !p.other_antivirus {
+            recs.push((0, Recommendation::TurnOnRealTimeProtection));
+        }
+        if let Some(days) = p
+            .signature_age_days
+            .filter(|d| *d >= 3 && !p.other_antivirus)
+        {
+            recs.push((1, Recommendation::UpdateSignatures { days }));
+        }
+    }
+    if let Some(health) = f.battery_health_percent {
+        let status = battery_status(health);
+        areas.push(AreaResult {
+            area: Area::Battery,
+            status,
+        });
+        if status != Status::Good {
+            recs.push((
+                rank(status),
+                Recommendation::CheckBattery {
+                    health_percent: health,
+                },
+            ));
+        }
+    }
     if let Some(n) = f.startup_enabled_third_party {
         let status = crate::startup::load_status(n);
         areas.push(AreaResult {
@@ -389,6 +457,75 @@ mod tests {
             security: Some(0),
         };
         assert_eq!(maintenance_status(1.0, &zero), Status::Good);
+    }
+
+    #[test]
+    fn protection_and_battery() {
+        let ok = ProtectionFacts {
+            real_time: true,
+            other_antivirus: false,
+            signature_age_days: Some(0),
+            active_threats: 0,
+        };
+        assert_eq!(protection_status(&ok), Status::Good);
+        assert_eq!(
+            protection_status(&ProtectionFacts {
+                signature_age_days: Some(4),
+                ..ok
+            }),
+            Status::Warning
+        );
+        assert_eq!(
+            protection_status(&ProtectionFacts {
+                real_time: false,
+                ..ok
+            }),
+            Status::Critical
+        );
+        assert_eq!(
+            protection_status(&ProtectionFacts {
+                active_threats: 1,
+                ..ok
+            }),
+            Status::Critical
+        );
+        let passive = ProtectionFacts {
+            real_time: false,
+            other_antivirus: true,
+            signature_age_days: Some(30),
+            active_threats: 0,
+        };
+        assert_eq!(
+            protection_status(&passive),
+            Status::Good,
+            "another antivirus is in charge"
+        );
+
+        let f = Facts {
+            protection: Some(ProtectionFacts {
+                real_time: false,
+                other_antivirus: false,
+                signature_age_days: Some(5),
+                active_threats: 2,
+            }),
+            battery_health_percent: Some(72.0),
+            ..Facts::default()
+        };
+        let a = assess(&f);
+        assert_eq!(a.score, 100 - 18 - 8);
+        assert_eq!(
+            a.recommendations,
+            vec![
+                Recommendation::ResolveThreats { count: 2 },
+                Recommendation::TurnOnRealTimeProtection,
+                Recommendation::UpdateSignatures { days: 5 },
+                Recommendation::CheckBattery {
+                    health_percent: 72.0
+                },
+            ]
+        );
+        let json = serde_json::to_string(&Recommendation::TurnOnRealTimeProtection).unwrap();
+        assert_eq!(json, r#"{"kind":"turnOnRealTimeProtection"}"#);
     }
 
     #[test]

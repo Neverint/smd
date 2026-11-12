@@ -1,6 +1,7 @@
 import type { MockHandlers, MockStreams } from "./backend";
 import { formatBytes } from "./format";
 import { phase2Handlers, phase2Streams, resetPhase2Mocks } from "./mocks-phase2";
+import { phase3Handlers, phase3Streams, resetPhase3Mocks } from "./mocks-phase3";
 import type {
   ActivityEntry,
   BackendSettings,
@@ -275,6 +276,7 @@ export const mockHandlers: MockHandlers = {
   },
   space_reveal: () => null,
   ...phase2Handlers(log),
+  ...phase3Handlers(log),
 };
 
 export const mockStreams: MockStreams = {
@@ -317,6 +319,9 @@ export const mockStreams: MockStreams = {
       startupEnabled: 5,
       appUpdates: null,
       windowsUpdates: { total: 2, security: 1, titles: [] },
+      defender: null,
+      activeThreats: 0,
+      batteryHealth: null,
       activityId: 0,
     };
     const e = log({ ...blank, kind: "smartCareScan", score: result.assessment.score, bytes: lastCleanup.reclaimableBytes });
@@ -356,6 +361,7 @@ export const mockStreams: MockStreams = {
     };
   },
   ...phase2Streams(log),
+  ...phase3Streams(log),
 };
 
 /** Test helper: start every mock session from a clean state. */
@@ -366,4 +372,5 @@ export function resetMocks(): void {
   lastCleanup = null;
   lastScanId = 0;
   resetPhase2Mocks();
+  resetPhase3Mocks();
 }

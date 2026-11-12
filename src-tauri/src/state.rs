@@ -8,6 +8,7 @@ use smd_core::space::Arena;
 use smd_win::apps::{InstalledApp, Leftover};
 use smd_win::cleanup::Category;
 use smd_win::clutter::{ClutterResult, FolderItem};
+use smd_win::hardware::SensorHelper;
 use smd_win::processes::Monitor;
 
 use crate::error::{AppError, AppResult};
@@ -67,6 +68,10 @@ pub struct AppState {
     /// Uninstalls and updates run their own installers one at a time.
     pub apps_busy: AtomicBool,
     pub monitor: Mutex<Option<Monitor>>,
+    /// The LibreHardwareMonitor helper, while the Hardware Health page is open.
+    pub sensors: Mutex<Option<SensorHelper>>,
+    /// A Defender scan in progress (killed to cancel).
+    pub defender_scan: Mutex<Option<std::process::Child>>,
     next_id: AtomicU64,
 }
 
@@ -90,6 +95,8 @@ impl AppState {
             clutter_busy: AtomicBool::new(false),
             apps_busy: AtomicBool::new(false),
             monitor: Mutex::new(None),
+            sensors: Mutex::new(None),
+            defender_scan: Mutex::new(None),
             next_id: AtomicU64::new(crate::store::now_ms() as u64),
         }
     }

@@ -15,7 +15,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
-    "check:rust": "cargo fmt --all --check && cargo clippy --workspace --all-targets -- -D warnings && cargo test --workspace"
+    "check:rust": "cargo fmt --all --check && cargo clippy --workspace --all-targets -- -D warnings && cargo test --workspace",
+    "hwmon": "dotnet publish sidecars/hwmon -c Release -o src-tauri/resources/hwmon --nologo"
   },
   "dependencies": {
     "@fluentui/react-icons": "^2.0.345",

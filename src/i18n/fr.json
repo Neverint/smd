@@ -106,7 +106,8 @@
       "drive": "Mesure de l'espace libre",
       "rule": "Recherche de fichiers inutiles : {{name}}",
       "startup": "Comptage des éléments au démarrage",
-      "updates": "Recherche des mises à jour"
+      "updates": "Recherche des mises à jour",
+      "protection": "Vérification de Microsoft Defender"
     },
     "scoreLabel": "Score de santé : {{score}} sur 100",
     "outOf": "/ 100",
@@ -131,7 +132,13 @@
       "installWindowsUpdates_other": "Installez {{count}} mises à jour de Windows en attente.",
       "updateApps_one": "Mettez à jour {{count}} application dans Applications.",
       "updateApps_other": "Mettez à jour {{count}} applications dans Applications.",
-      "reviewStartup": "{{count}} applications démarrent avec Windows. Désactivez celles qui ne servent pas dans Performances."
+      "reviewStartup": "{{count}} applications démarrent avec Windows. Désactivez celles qui ne servent pas dans Performances.",
+      "resolveThreats_one": "Microsoft Defender a trouvé {{count}} menace qui demande encore votre attention. Ouvrez Protection.",
+      "resolveThreats_other": "Microsoft Defender a trouvé {{count}} menaces qui demandent encore votre attention. Ouvrez Protection.",
+      "turnOnRealTimeProtection": "Réactivez la protection en temps réel dans Sécurité Windows.",
+      "updateSignatures_one": "Mettez à jour Microsoft Defender : ses définitions de virus ont {{count}} jour.",
+      "updateSignatures_other": "Mettez à jour Microsoft Defender : ses définitions de virus ont {{count}} jours.",
+      "checkBattery": "Votre batterie garde {{percent}} % de sa charge d'origine. Prévoyez son remplacement si elle se vide trop vite."
     },
     "card": {
       "junk": "Fichiers inutiles",
@@ -163,7 +170,14 @@
       "updatesDesc": "Applications avec une version plus récente, et mises à jour de Windows en attente.",
       "updatesNotSetUp": "Les mises à jour des applications demandent une installation unique dans Applications.",
       "windowsUpdatesLine": "Windows Update : {{total}} en attente, dont {{security}} de sécurité",
-      "open": "Ouvrir"
+      "open": "Ouvrir",
+      "protected": "Protégé",
+      "notProtected": "Protection en temps réel désactivée",
+      "threats_one": "{{count}} menace",
+      "threats_other": "{{count}} menaces",
+      "defenderUnknown": "Impossible de lire Microsoft Defender (un autre antivirus est peut-être en charge).",
+      "battery": "Santé de la batterie",
+      "batteryDesc": "Charge complète comparée à la capacité d'origine."
     },
     "status": {
       "good": "Bon",
@@ -329,7 +343,10 @@
       "leftoversRemoved": "Restes supprimés",
       "appUpdate": "Application mise à jour",
       "updatesSetup": "Mises à jour des applications activées",
-      "clutterRemoved": "Fichiers mis à la Corbeille"
+      "clutterRemoved": "Fichiers mis à la Corbeille",
+      "defenderScan": "Analyse Microsoft Defender",
+      "signatureUpdate": "Mise à jour des définitions de virus",
+      "permissionChange": "Autorisation d'application modifiée"
     },
     "detail": {
       "smartCareScan": "Score {{score}} · {{size}} de fichiers inutiles trouvés",
@@ -353,7 +370,14 @@
       "setup": "Module WinGet téléchargé",
       "setupFailed": "Échec de l'installation",
       "clutter_one": "{{count}} élément, {{size}}",
-      "clutter_other": "{{count}} éléments, {{size}}"
+      "clutter_other": "{{count}} éléments, {{size}}",
+      "scanClean": "{{kind}} : aucune menace trouvée",
+      "scanFound": "{{kind}} : menaces trouvées et traitées par Defender",
+      "scanStopped": "{{kind}} : arrêtée",
+      "signatures": "Définitions mises à jour",
+      "signaturesFailed": "Échec de la mise à jour",
+      "permissionOn": "{{app}} peut de nouveau utiliser : {{what}}",
+      "permissionOff": "{{app}} ne peut plus utiliser : {{what}}"
     },
     "undo": "Annuler",
     "undoLabel": "Annuler : {{what}}",
@@ -541,5 +565,140 @@
     "scannedFolders": "Dossiers : {{folders}}",
     "newScan": "Nouvelle analyse",
     "selectSome": "Sélectionnez des fichiers à mettre à la Corbeille"
+  },
+  "protection": {
+    "tabs": {
+      "defender": "Microsoft Defender",
+      "firewall": "Pare-feu",
+      "permissions": "Autorisations des applications"
+    },
+    "overall": {
+      "good": "Microsoft Defender et le pare-feu sont activés. Rien ne demande votre attention.",
+      "warning": "Protégé, mais quelque chose mérite un coup d'œil.",
+      "critical": "Votre PC demande votre attention.",
+      "unknown": "Impossible de lire Microsoft Defender. Un autre antivirus est peut-être en charge."
+    },
+    "noDefender": "Impossible de lire Microsoft Defender. Si vous utilisez un autre antivirus, vérifiez-le dans sa propre application.",
+    "openSecurity": "Ouvrir Sécurité Windows",
+    "passive": "Un autre antivirus est en charge ; Defender fonctionne à ses côtés",
+    "realTimeOn": "La protection en temps réel est activée",
+    "realTimeOff": "La protection en temps réel est désactivée",
+    "signatures": "Définitions de virus mises à jour le {{date}}",
+    "signaturesUnknown": "Définitions de virus : date inconnue",
+    "tamperOn": "La protection contre les falsifications est activée",
+    "tamperOff": "La protection contre les falsifications est désactivée",
+    "lastQuick": "Dernière analyse rapide : {{date}}",
+    "lastFull": "dernière analyse complète : {{date}}",
+    "scanType": "Type d'analyse",
+    "scanKind": {
+      "quick": "Analyse rapide",
+      "full": "Analyse complète"
+    },
+    "quickHint": "Vérifie les endroits où les menaces se cachent d'habitude. Quelques minutes.",
+    "fullHint": "Vérifie chaque fichier de chaque disque. Peut prendre une heure ou plus ; vous pouvez continuer à utiliser votre PC.",
+    "scanNow": "Analyser",
+    "scanning": "{{kind}} en cours",
+    "scanStopped": "Analyse arrêtée.",
+    "scanFound": "Microsoft Defender a trouvé quelque chose et s'en est occupé. Voir l'historique ci-dessous.",
+    "scanClean": "Aucune menace trouvée ({{seconds}} s).",
+    "updateSignatures": "Mettre à jour les définitions",
+    "updating": "Mise à jour…",
+    "history": "Historique de protection",
+    "noThreats": "Aucune menace trouvée.",
+    "severity": {
+      "Low": "Faible",
+      "Moderate": "Modérée",
+      "High": "Élevée",
+      "Severe": "Grave"
+    },
+    "threatStatus": {
+      "Detected": "À traiter",
+      "Cleaned": "Nettoyée",
+      "Quarantined": "En quarantaine",
+      "Removed": "Supprimée",
+      "Allowed": "Autorisée par vous",
+      "Blocked": "Bloquée",
+      "ActionFailed": "Échec de l'action : ouvrez Sécurité Windows",
+      "Unknown": "Inconnu"
+    },
+    "firewallHint": "Le pare-feu bloque les connexions réseau indésirables. Chaque type de réseau a son propre réglage.",
+    "profile": {
+      "Domain": "Réseau de domaine",
+      "Private": "Réseau privé",
+      "Public": "Réseau public"
+    },
+    "profileHint": {
+      "Domain": "Réseaux de travail gérés par une organisation.",
+      "Private": "Votre réseau à la maison.",
+      "Public": "Cafés, gares et autres réseaux partagés."
+    },
+    "on": "Activé",
+    "off": "Désactivé",
+    "capability": {
+      "webcam": "Caméra",
+      "microphone": "Microphone",
+      "location": "Localisation"
+    },
+    "capOn": "Les applications peuvent demander l'accès sur ce compte.",
+    "capOff": "L'accès est coupé pour toutes les applications sur ce compte.",
+    "openPrivacy": "Ouvrir les paramètres de confidentialité",
+    "permissionsHint": "Les applications du Store peuvent être autorisées ou bloquées une par une ici. Les applications de bureau partagent un seul interrupteur dans les Paramètres de Windows ; elles sont listées pour voir qui a utilisé quoi.",
+    "noApps": "Aucune application ne l'a encore demandé.",
+    "inUse": "En cours d'utilisation",
+    "desktopApp": "Application de bureau",
+    "lastUsed": "Dernière utilisation le {{date}}",
+    "neverUsed": "Jamais utilisé",
+    "allowed": "Autorisé",
+    "denied": "Bloqué",
+    "allowLabel": "Autoriser {{app}} à utiliser : {{what}}"
+  },
+  "hardware": {
+    "live": "Capteurs en direct",
+    "adminForCpu": "La température du processeur et les ventilateurs de la carte mère demandent les droits d'administrateur. Ils arriveront avec l'assistant administrateur (phase 4).",
+    "helperMissing": "Les capteurs en direct ne sont pas disponibles : l'assistant capteurs manque dans cette installation.",
+    "helperStopped": "L'assistant capteurs s'est arrêté. Il a besoin du runtime .NET 8 de Microsoft.",
+    "sensorsStarting": "Démarrage des capteurs…",
+    "kind": {
+      "cpu": "Processeur",
+      "gpu": "Carte graphique",
+      "memory": "Mémoire",
+      "motherboard": "Carte mère",
+      "storage": "Disque",
+      "superio": "Carte mère",
+      "cooler": "Refroidissement",
+      "embeddedcontroller": "Contrôleur embarqué",
+      "psu": "Alimentation",
+      "battery": "Batterie",
+      "network": "Réseau",
+      "other": "Périphérique"
+    },
+    "sensor": {
+      "Temperature": "température",
+      "Fan": "ventilateur",
+      "Load": "charge",
+      "Power": "puissance",
+      "Clock": "fréquence",
+      "Control": "contrôle ventilateur"
+    },
+    "disks": "Disques",
+    "health": {
+      "healthy": "En bonne santé",
+      "warning": "Avertissement",
+      "unhealthy": "Défaillant",
+      "unknown": "Santé inconnue"
+    },
+    "smartAdmin": "La santé vient de Windows. Usure, température et compteurs d'erreurs (SMART) demandent les droits d'administrateur et arrivent avec l'assistant administrateur (phase 4). CrystalDiskInfo dans la Boîte à outils les montre tous.",
+    "processor": "Processeur",
+    "cpuLine": "{{cores}} cœurs, {{threads}} threads, jusqu'à {{ghz}} GHz",
+    "graphics": "Carte graphique",
+    "driver": "pilote {{version}}",
+    "memory": "Mémoire",
+    "memInUse": "{{used}} utilisés sur {{total}}",
+    "slots": "{{used}} emplacements utilisés sur {{total}}",
+    "battery": "Batterie",
+    "batteryHealth": "{{percent}} % de la capacité d'origine",
+    "batteryLine": "{{full}} Wh aujourd'hui, {{design}} Wh neuve",
+    "cycles_one": "{{count}} cycle de charge",
+    "cycles_other": "{{count}} cycles de charge"
   }
 }

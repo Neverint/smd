@@ -91,7 +91,11 @@ export type Recommendation =
   | { kind: "installSecurityUpdates"; count: number }
   | { kind: "installWindowsUpdates"; count: number }
   | { kind: "updateApps"; count: number }
-  | { kind: "reviewStartup"; count: number };
+  | { kind: "reviewStartup"; count: number }
+  | { kind: "resolveThreats"; count: number }
+  | { kind: "turnOnRealTimeProtection" }
+  | { kind: "updateSignatures"; days: number }
+  | { kind: "checkBattery"; healthPercent: number };
 
 export interface Assessment {
   score: number;
@@ -142,6 +146,9 @@ export interface SmartCareResult {
   startupEnabled: number | null;
   appUpdates: number | null;
   windowsUpdates: WindowsUpdates | null;
+  defender: DefenderStatus | null;
+  activeThreats: number | null;
+  batteryHealth: number | null;
   durationMs: number;
   activityId: number;
 }
@@ -214,7 +221,10 @@ export type ActivityKind =
   | "leftoversRemoved"
   | "appUpdate"
   | "updatesSetup"
-  | "clutterRemoved";
+  | "clutterRemoved"
+  | "defenderScan"
+  | "signatureUpdate"
+  | "permissionChange";
 
 export interface ActivityEntry {
   id: number;
@@ -295,7 +305,7 @@ export interface Background {
   boot: BootInfo | null;
 }
 
-export type SystemTool = "taskScheduler" | "services" | "windowsUpdate";
+export type SystemTool = "taskScheduler" | "services" | "windowsUpdate" | "windowsSecurity" | "privacySettings";
 
 /* ---------- Applications ---------- */
 export interface InstalledApp {
@@ -429,4 +439,124 @@ export interface DownloadsView {
   scanId: number;
   path: string;
   items: FolderItem[];
+}
+
+/* ---------- Protection ---------- */
+export interface DefenderStatus {
+  serviceEnabled: boolean;
+  antivirusEnabled: boolean;
+  realTime: boolean;
+  tamperProtected: boolean | null;
+  signaturesUpdatedMs: number | null;
+  signatureAgeDays: number | null;
+  quickScanEndMs: number | null;
+  fullScanEndMs: number | null;
+  runningMode: string;
+}
+
+export interface Threat {
+  name: string;
+  severity: string;
+  detectedMs: number | null;
+  status: string;
+  active: boolean;
+  resources: string[];
+}
+
+export interface FirewallProfile {
+  name: string;
+  enabled: boolean;
+}
+
+export type Capability = "webcam" | "microphone" | "location";
+
+export interface PermissionEntry {
+  capability: Capability;
+  id: string;
+  app: string;
+  packaged: boolean;
+  allowed: boolean;
+  lastUsedMs: number | null;
+  inUse: boolean;
+}
+
+export interface CapabilityState {
+  capability: Capability;
+  allowed: boolean;
+  apps: PermissionEntry[];
+}
+
+export interface ProtectionView {
+  defender: DefenderStatus | null;
+  threats: Threat[] | null;
+  firewall: FirewallProfile[] | null;
+  permissions: CapabilityState[];
+}
+
+export type ScanKind = "quick" | "full";
+
+export interface DefenderScanResult {
+  cancelled: boolean;
+  threatsFound: boolean;
+  exitCode: number | null;
+  durationMs: number;
+  threats: Threat[] | null;
+}
+
+/* ---------- Hardware Health ---------- */
+export interface CpuInfo {
+  name: string;
+  cores: number;
+  threads: number;
+  maxMhz: number;
+}
+
+export interface MemoryModule {
+  slot: string;
+  bank: string;
+  capacityBytes: number;
+  speedMts: number;
+  partNumber: string;
+  manufacturer: string;
+  kind: string;
+}
+
+export interface SystemInfo {
+  cpu: CpuInfo | null;
+  gpus: { name: string; driverVersion: string }[];
+  modules: MemoryModule[];
+  slots: number | null;
+}
+
+export interface BatteryInfo {
+  name: string;
+  designCapacity: number;
+  fullChargeCapacity: number;
+  cycleCount: number | null;
+}
+
+export interface HardwareView {
+  system: SystemInfo | null;
+  disks: PhysicalDisk[] | null;
+  memory: MemoryInfo | null;
+  batteries: BatteryInfo[];
+  hasBattery: boolean;
+}
+
+export interface SensorReading {
+  name: string;
+  kind: string;
+  value: number;
+}
+
+export interface HardwareReading {
+  name: string;
+  kind: string;
+  sensors: SensorReading[];
+}
+
+export interface SensorsView {
+  running: boolean;
+  exitCode: number | null;
+  snapshot: { elevated: boolean; hardware: HardwareReading[]; error: string | null } | null;
 }

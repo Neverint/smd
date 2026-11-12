@@ -31,6 +31,9 @@ pub enum Kind {
     AppUpdate,
     UpdatesSetup,
     ClutterRemoved,
+    DefenderScan,
+    SignatureUpdate,
+    PermissionChange,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -116,6 +119,17 @@ pub struct UndoData {
     pub registry: Vec<RegBackup>,
     #[serde(default)]
     pub startup: Option<StartupUndo>,
+    #[serde(default)]
+    pub permission: Option<PermissionUndo>,
+}
+
+/// An app permission before it was changed.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PermissionUndo {
+    pub capability: smd_win::protection::Capability,
+    pub id: String,
+    pub was_allowed: bool,
 }
 
 fn file(dir: &Path) -> PathBuf {
@@ -192,6 +206,15 @@ pub async fn activity_undo(app: tauri::AppHandle, id: u64) -> AppResult<RestoreR
                 Ok(()) => report.restored += 1,
                 Err(e) => {
                     log::warn!("could not restore {}: {e}", b.key);
+                    report.failed += 1;
+                }
+            }
+        }
+        if let Some(p) = &undo.permission {
+            match smd_win::protection::set_permission(p.capability, &p.id, p.was_allowed) {
+                Ok(_) => report.restored += 1,
+                Err(e) => {
+                    log::warn!("could not undo permission change {}: {e}", p.id);
                     report.failed += 1;
                 }
             }

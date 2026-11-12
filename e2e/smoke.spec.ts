@@ -126,6 +126,38 @@ test("My Clutter keeps at least one copy of each duplicate", async ({ page }) =>
   await expect(page.getByRole("heading", { name: "Moved to the Recycle Bin" })).toBeVisible();
 });
 
+test("Protection: status, a quick scan, and a Store app permission with undo", async ({ page }) => {
+  await page.goto("/#/protection");
+  await expect(page.getByText("Microsoft Defender and the firewall are on.")).toBeVisible();
+  await page.getByRole("button", { name: "Scan now" }).click();
+  await expect(page.getByRole("status")).toContainText("No threats found");
+  await expect(page.getByText("PUA:Win32/Presenoker")).toBeVisible();
+
+  await page.getByRole("tab", { name: "Firewall" }).click();
+  await expect(page.getByText("Public network")).toBeVisible();
+
+  await page.getByRole("tab", { name: "App permissions" }).click();
+  const camera = page.getByRole("switch", { name: "Allow Microsoft.WindowsCamera to use the Camera" });
+  await camera.click();
+  await expect(camera).toHaveAttribute("aria-checked", "false");
+  await page.getByRole("radio", { name: "Microphone" }).click();
+  await expect(page.getByText("In use now")).toBeVisible();
+  // Desktop apps have no per-app switch in Windows: shown read-only.
+  await expect(page.getByRole("switch", { name: /Discord/ })).toHaveCount(0);
+
+  await page.goto("/#/activity");
+  await expect(page.getByText("Microsoft.WindowsCamera can no longer use the Camera")).toBeVisible();
+});
+
+test("Hardware Health: live sensors, drives and memory", async ({ page }) => {
+  await page.goto("/#/hardware");
+  await expect(page.getByRole("region", { name: "AMD Radeon RX 6700 XT" })).toContainText("°C");
+  await expect(page.getByText("Processor temperature and motherboard fans need admin rights")).toBeVisible();
+  await expect(page.getByText("X: Samsung SSD 990 PRO with Heatsink 1TB")).toBeVisible();
+  await expect(page.getByText("2 of 4 slots used")).toBeVisible();
+  await expect(page.getByText("Battery", { exact: true })).toHaveCount(0);
+});
+
 test("Settings: permanent delete shows a warning", async ({ page }) => {
   await page.goto("/#/settings");
   await page.getByRole("radio", { name: "Delete for good" }).click();

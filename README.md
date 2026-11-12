@@ -4,7 +4,7 @@
 
 A free, open-source maintenance app for Windows 10 and 11. It brings the best free PC-health tools together in one place, with a calm, guided scan flow and Windows 11 materials (Mica, Segoe UI Variable, Fluent icons).
 
-> **Status: Phase 2.** Smart Care (health score), Cleanup (review, then Recycle Bin), Space Lens (drive map), Performance (startup items, live programs, background tasks), Applications (uninstall with leftovers review, app updates), My Clutter (large, old and duplicate files) and My Activity (history with undo) work. The other modules arrive phase by phase; see the roadmap below.
+> **Status: Phase 3.** Protection (Microsoft Defender, firewall, app permissions), Hardware Health (live sensors, drives, memory, battery), Smart Care (complete health score), Cleanup (review, then Recycle Bin), Space Lens (drive map), Performance (startup items, live programs, background tasks), Applications (uninstall with leftovers review, app updates), My Clutter (large, old and duplicate files) and My Activity (history with undo) work. The other modules arrive phase by phase; see the roadmap below.
 
 ## Safety principles
 
@@ -40,9 +40,11 @@ Requirements (Windows 10/11):
 - [Rust](https://rustup.rs) (stable, MSVC toolchain)
 - Visual Studio 2022 Build Tools with the **Desktop development with C++** workload
 - Microsoft Edge WebView2 (preinstalled on Windows 11)
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) for the sensor helper (users only need the .NET 8 runtime)
 
 ```bash
 npm install
+npm run hwmon          # build the sensor helper (once, and after changing sidecars/hwmon)
 npm run tauri dev      # run the app
 npm test               # unit tests
 npm run e2e            # smoke tests (uses Microsoft Edge)

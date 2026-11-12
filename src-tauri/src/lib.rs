@@ -4,7 +4,9 @@ mod cleanup;
 mod clutter;
 mod commands;
 mod error;
+mod hardware;
 mod performance;
+mod protection;
 mod settings;
 mod smart_care;
 mod space_lens;
@@ -86,6 +88,14 @@ pub fn run() {
             clutter::clutter_cancel,
             clutter::clutter_downloads,
             clutter::clutter_remove,
+            protection::protection_status,
+            protection::protection_scan,
+            protection::protection_cancel_scan,
+            protection::protection_update_signatures,
+            protection::permission_set,
+            hardware::hardware_info,
+            hardware::sensors_poll,
+            hardware::sensors_stop,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Scrub My Disks");

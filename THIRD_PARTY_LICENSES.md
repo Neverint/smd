@@ -27,6 +27,19 @@ Update this file whenever a crate, npm package, data file or bundled binary is a
 
 Transitive crates (Windows target, checked again 2026-11-11 for Phase 1): all MIT, Apache-2.0, BSD, ISC, Zlib, Unicode-3.0, Unlicense, CC0, BSL-1.0 or 0BSD, except these **MPL-2.0** crates pulled in by Tauri: `cssparser`, `cssparser-macros`, `selectors`, `dtoa-short`, `option-ext`. MPL-2.0 is file-level copyleft: it is compatible with an MIT app as long as these crates are used unmodified (their source is on crates.io). We do not modify them.
 
+### Sensor helper (`resources\hwmon\smd-hwmon.exe`, .NET 8)
+
+Built from `sidecars/hwmon`. Started only while the Hardware Health page is open. `NOTICE.txt` ships next to it.
+
+| Package | Version | License | Use |
+|---|---|---|---|
+| LibreHardwareMonitorLib | 0.9.6 | MPL-2.0 | Temperatures, fans, loads (unmodified; no kernel driver is loaded without admin rights) |
+| DiskInfoToolkit, RAMSPDToolkit-NDD, BlackSharp.Core | 1.1.2, 1.4.2, 1.0.7 | MPL-2.0 | LibreHardwareMonitor dependencies |
+| HidSharp | 2.6.4 | Apache-2.0 | LibreHardwareMonitor dependency (USB controllers) |
+| System.Management, System.IO.Ports, System.CodeDom, Mono.Posix.NETStandard | 10.0 / 1.0 | MIT | .NET libraries |
+
+Needs the .NET 8 runtime (Microsoft, MIT), already present on most PCs; without it the Hardware page shows everything except live sensors.
+
 ### npm packages bundled into the frontend
 
 | Package | License | Use |
@@ -57,6 +70,5 @@ vite (MIT), @vitejs/plugin-react (MIT), typescript (Apache-2.0), vitest (MIT), j
 |---|---|---|---|
 | Microsoft.WinGet.Client (PowerShell module) | MIT | 2 | Not bundled: downloaded from the PowerShell Gallery for the current user when they click "Set up app updates" |
 | image_hasher | MIT OR Apache-2.0 | 2 | Similar images |
-| LibreHardwareMonitorLib | MPL-2.0 | 3 | Optional .NET sidecar; license file shipped with it |
 | winapp2.ini | CC BY-NC-SA 3.0 (to confirm) | later | Not used in Phase 1 (own rules in `rules/cleanup.json`). Likely **not** bundleable; download at runtime with consent if ever used |
 | Toolbox tools (BCUninstaller, Krokiet, WinDirStat, ...) | various | 4 | Not bundled: installed by winget on request |

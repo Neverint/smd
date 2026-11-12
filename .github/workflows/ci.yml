@@ -45,6 +45,11 @@ jobs:
       # tauri::generate_context! needs the built frontend in dist/.
       - run: npm ci
       - run: npm run build
+      # The bundled sensor helper (resources/hwmon) must exist for tauri-build.
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 8.0.x
+      - run: npm run hwmon
       - run: cargo fmt --all --check
       - run: cargo clippy --workspace --all-targets -- -D warnings
       - run: cargo test --workspace

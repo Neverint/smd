@@ -7,6 +7,7 @@ pub mod apps;
 pub mod cleanup;
 pub mod cmdline;
 pub mod format;
+pub mod hardware;
 pub mod health;
 pub mod safety;
 pub mod space;
