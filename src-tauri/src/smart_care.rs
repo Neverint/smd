@@ -4,9 +4,10 @@ use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::Duration;
 
 use serde::Serialize;
-use smd_core::health::{Assessment, Facts, assess};
+use smd_core::health::{Assessment, Facts, PendingUpdates, assess};
 use smd_win::disks::PhysicalDisk;
 use smd_win::system::{DriveInfo, MemoryInfo};
+use smd_win::winget::WindowsUpdates;
 use tauri::ipc::Channel;
 use tauri::{AppHandle, Manager};
 
@@ -19,6 +20,8 @@ use crate::store::now_ms;
 /// Memory is sampled a few times during the scan; "sustained" use is the lowest sample.
 const MEMORY_SAMPLES: u32 = 3;
 const MEMORY_INTERVAL: Duration = Duration::from_millis(900);
+/// Update checks are skipped (not guessed) when they take longer than this.
+const UPDATES_TIMEOUT: Duration = Duration::from_secs(25);
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -31,6 +34,11 @@ pub struct SmartCareResult {
     pub disks: Option<Vec<PhysicalDisk>>,
     pub has_battery: bool,
     pub cleanup: CleanupScanResult,
+    /// Third-party startup items that are on.
+    pub startup_enabled: Option<usize>,
+    /// Apps with an update (only when the WinGet module is set up).
+    pub app_updates: Option<u32>,
+    pub windows_updates: Option<WindowsUpdates>,
     pub duration_ms: u64,
     pub activity_id: u64,
 }
@@ -53,7 +61,7 @@ fn sample_memory() -> (Option<MemoryInfo>, Option<f64>) {
 
 pub fn scan(state: &AppState, on_progress: &Channel<ScanProgress>) -> SmartCareResult {
     let started = now_ms();
-    let total = rule_count() + 3;
+    let total = rule_count() + 5;
     let done = AtomicU32::new(0);
     let report = |step: &str| {
         let n = done.fetch_add(1, Ordering::Relaxed) + 1;
@@ -64,27 +72,52 @@ pub fn scan(state: &AppState, on_progress: &Channel<ScanProgress>) -> SmartCareR
         });
     };
 
-    let (disks, (memory, min_load), cleanup) = std::thread::scope(|s| {
-        let disks = s.spawn(|| {
-            let d = smd_win::disks::physical_disks();
-            if let Err(e) = &d {
-                log::warn!("disk health check failed: {e}");
-            }
-            report("disks");
-            d.ok()
+    let (disks, (memory, min_load), cleanup, startup_enabled, (app_updates, windows_updates)) =
+        std::thread::scope(|s| {
+            let startup = s.spawn(|| {
+                let n = smd_win::startup::list()
+                    .iter()
+                    .filter(|i| i.enabled && !i.microsoft)
+                    .count();
+                report("startup");
+                n
+            });
+            let updates = s.spawn(|| {
+                let apps = s.spawn(|| match smd_win::winget::module_installed() {
+                    Ok(true) => smd_win::winget::list_updates(UPDATES_TIMEOUT)
+                        .map(|l| l.len() as u32)
+                        .ok(),
+                    _ => None,
+                });
+                let wu = smd_win::winget::windows_updates(UPDATES_TIMEOUT)
+                    .map_err(|e| log::info!("Windows Update check skipped: {e}"))
+                    .ok();
+                let a = apps.join().ok().flatten();
+                report("updates");
+                (a, wu)
+            });
+            let disks = s.spawn(|| {
+                let d = smd_win::disks::physical_disks();
+                if let Err(e) = &d {
+                    log::warn!("disk health check failed: {e}");
+                }
+                report("disks");
+                d.ok()
+            });
+            let mem = s.spawn(|| {
+                let m = sample_memory();
+                report("memory");
+                m
+            });
+            let cleanup = scan_all(state, &report);
+            (
+                disks.join().ok().flatten(),
+                mem.join().unwrap_or((None, None)),
+                cleanup,
+                startup.join().ok(),
+                updates.join().unwrap_or((None, None)),
+            )
         });
-        let mem = s.spawn(|| {
-            let m = sample_memory();
-            report("memory");
-            m
-        });
-        let cleanup = scan_all(state, &report);
-        (
-            disks.join().ok().flatten(),
-            mem.join().unwrap_or((None, None)),
-            cleanup,
-        )
-    });
 
     let system_letter = smd_win::system::system_drive().to_uppercase();
     let system_drive = smd_win::system::drives()
@@ -103,6 +136,12 @@ pub fn scan(state: &AppState, on_progress: &Channel<ScanProgress>) -> SmartCareR
             .as_ref()
             .map(|d| d.iter().map(|x| (x.name.clone(), x.health)).collect()),
         reclaimable_bytes: cleanup.reclaimable_bytes,
+        updates: PendingUpdates {
+            apps: app_updates,
+            windows: windows_updates.as_ref().map(|w| w.total),
+            security: windows_updates.as_ref().map(|w| w.security),
+        },
+        startup_enabled_third_party: startup_enabled,
     };
     let assessment = assess(&facts);
 
@@ -126,6 +165,9 @@ pub fn scan(state: &AppState, on_progress: &Channel<ScanProgress>) -> SmartCareR
         disks,
         has_battery: smd_win::system::has_battery(),
         cleanup,
+        startup_enabled,
+        app_updates,
+        windows_updates,
         duration_ms: (now_ms() - started).max(0) as u64,
         activity_id: id,
     }

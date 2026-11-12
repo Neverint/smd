@@ -13,4 +13,5 @@ export { ProgressRing } from "./ProgressRing";
 export { ScanButton } from "./ScanButton";
 export { Segmented } from "./Segmented";
 export { SideSheet } from "./SideSheet";
+export { Tabs, type TabDef } from "./Tabs";
 export { Toggle } from "./Toggle";

@@ -104,15 +104,41 @@ pub fn memory_status(min_load_percent: f64, commit_percent: f64) -> Status {
     }
 }
 
-/// Maintenance from uptime: under 7 days good, 7-30 days warning, over 30 days critical.
-/// Pending app and Windows updates are added in Phase 2.
-pub fn maintenance_status(uptime_days: f64) -> Status {
+/// Pending updates. `None` = not checked (the check is skipped, never guessed).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct PendingUpdates {
+    /// Apps with a newer version in winget.
+    pub apps: Option<u32>,
+    /// Windows updates waiting to install, including security ones.
+    pub windows: Option<u32>,
+    /// Of those, security updates.
+    pub security: Option<u32>,
+}
+
+/// Uptime alone: under 7 days good, 7-30 days warning, over 30 days critical.
+pub fn uptime_status(uptime_days: f64) -> Status {
     if uptime_days < 7.0 {
         Status::Good
     } else if uptime_days <= 30.0 {
         Status::Warning
     } else {
         Status::Critical
+    }
+}
+
+/// Maintenance: uptime, plus pending updates. Any app or Windows update is a warning;
+/// a pending security update is critical.
+pub fn maintenance_status(uptime_days: f64, pending: &PendingUpdates) -> Status {
+    let uptime = uptime_status(uptime_days);
+    if uptime == Status::Critical || pending.security.unwrap_or(0) > 0 {
+        Status::Critical
+    } else if uptime == Status::Warning
+        || pending.apps.unwrap_or(0) > 0
+        || pending.windows.unwrap_or(0) > 0
+    {
+        Status::Warning
+    } else {
+        Status::Good
     }
 }
 
@@ -161,6 +187,9 @@ pub struct Facts {
     pub disks: Option<Vec<(String, DiskHealth)>>,
     /// Space the Cleanup scan found (information only, not part of the score).
     pub reclaimable_bytes: u64,
+    pub updates: PendingUpdates,
+    /// Third-party startup items that are on.
+    pub startup_enabled_third_party: Option<usize>,
 }
 
 /// One suggestion, ranked by impact. The UI words it from `kind`.
@@ -176,6 +205,10 @@ pub enum Recommendation {
     Restart { uptime_days: u32 },
     CloseApps { load_percent: u32 },
     CleanJunk { bytes: u64 },
+    InstallSecurityUpdates { count: u32 },
+    InstallWindowsUpdates { count: u32 },
+    UpdateApps { count: u32 },
+    ReviewStartup { count: u32 },
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -246,17 +279,50 @@ pub fn assess(f: &Facts) -> Assessment {
         }
     }
     if let Some(days) = f.uptime_days {
-        let status = maintenance_status(days);
+        let status = maintenance_status(days, &f.updates);
         areas.push(AreaResult {
             area: Area::Maintenance,
+            status,
+        });
+        let uptime = uptime_status(days);
+        if uptime != Status::Good {
+            recs.push((
+                rank(uptime),
+                Recommendation::Restart {
+                    uptime_days: days.floor() as u32,
+                },
+            ));
+        }
+        let security = f.updates.security.unwrap_or(0);
+        let other_windows = f.updates.windows.unwrap_or(0).saturating_sub(security);
+        if security > 0 {
+            recs.push((
+                0,
+                Recommendation::InstallSecurityUpdates { count: security },
+            ));
+        }
+        if other_windows > 0 {
+            recs.push((
+                1,
+                Recommendation::InstallWindowsUpdates {
+                    count: other_windows,
+                },
+            ));
+        }
+        if let Some(apps) = f.updates.apps.filter(|n| *n > 0) {
+            recs.push((1, Recommendation::UpdateApps { count: apps }));
+        }
+    }
+    if let Some(n) = f.startup_enabled_third_party {
+        let status = crate::startup::load_status(n);
+        areas.push(AreaResult {
+            area: Area::StartupLoad,
             status,
         });
         if status != Status::Good {
             recs.push((
                 rank(status),
-                Recommendation::Restart {
-                    uptime_days: days.floor() as u32,
-                },
+                Recommendation::ReviewStartup { count: n as u32 },
             ));
         }
     }
@@ -301,10 +367,54 @@ mod tests {
 
     #[test]
     fn maintenance_thresholds() {
-        assert_eq!(maintenance_status(0.5), Status::Good);
-        assert_eq!(maintenance_status(7.0), Status::Warning);
-        assert_eq!(maintenance_status(30.0), Status::Warning);
-        assert_eq!(maintenance_status(34.0), Status::Critical);
+        let none = PendingUpdates::default();
+        assert_eq!(maintenance_status(0.5, &none), Status::Good);
+        assert_eq!(maintenance_status(7.0, &none), Status::Warning);
+        assert_eq!(maintenance_status(30.0, &none), Status::Warning);
+        assert_eq!(maintenance_status(34.0, &none), Status::Critical);
+        let apps = PendingUpdates {
+            apps: Some(3),
+            ..none
+        };
+        assert_eq!(maintenance_status(1.0, &apps), Status::Warning);
+        let security = PendingUpdates {
+            windows: Some(2),
+            security: Some(1),
+            ..none
+        };
+        assert_eq!(maintenance_status(1.0, &security), Status::Critical);
+        let zero = PendingUpdates {
+            apps: Some(0),
+            windows: Some(0),
+            security: Some(0),
+        };
+        assert_eq!(maintenance_status(1.0, &zero), Status::Good);
+    }
+
+    #[test]
+    fn updates_and_startup_recommendations() {
+        let f = Facts {
+            uptime_days: Some(2.0),
+            updates: PendingUpdates {
+                apps: Some(4),
+                windows: Some(3),
+                security: Some(1),
+            },
+            startup_enabled_third_party: Some(9),
+            ..Facts::default()
+        };
+        let a = assess(&f);
+        // maintenance critical (security) 18, startup warning 8
+        assert_eq!(a.score, 100 - 18 - 8);
+        assert_eq!(
+            a.recommendations,
+            vec![
+                Recommendation::InstallSecurityUpdates { count: 1 },
+                Recommendation::InstallWindowsUpdates { count: 2 },
+                Recommendation::UpdateApps { count: 4 },
+                Recommendation::ReviewStartup { count: 9 },
+            ]
+        );
     }
 
     #[test]
@@ -336,6 +446,7 @@ mod tests {
             memory_commit_percent: Some(50.0),
             disks: Some(vec![("SSD".into(), DiskHealth::Healthy)]),
             reclaimable_bytes: 100,
+            ..Facts::default()
         };
         let a = assess(&f);
         assert_eq!(a.score, 100);
@@ -354,6 +465,7 @@ mod tests {
             memory_commit_percent: None,
             disks: Some(vec![("Old HDD".into(), DiskHealth::Unhealthy)]),
             reclaimable_bytes: 12 * 1024 * 1024 * 1024,
+            ..Facts::default()
         };
         let a = assess(&f);
         // disk critical 18, uptime critical 18, free space warning 8

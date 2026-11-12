@@ -16,6 +16,7 @@ import {
   ScanButton,
   Segmented,
   SideSheet,
+  Tabs,
   Toggle,
   type CheckItem,
 } from "../../components";
@@ -38,6 +39,7 @@ function ThemePanel({ theme, module }: { theme: "light" | "dark"; module: Module
   const [on, setOn] = useState(true);
   const [sheet, setSheet] = useState(false);
   const [confirm, setConfirm] = useState(false);
+  const [tab, setTab] = useState<"a" | "b" | "c">("a");
   const def = MODULES.find((m) => m.id === module)!;
 
   return (
@@ -128,6 +130,20 @@ function ThemePanel({ theme, module }: { theme: "light" | "dark"; module: Module
         />
         <Toggle checked={on} onChange={setOn} label="Quarantine mode" showLabel />
       </div>
+
+      <h3>Tabs</h3>
+      <Tabs
+        label="Sample tabs"
+        value={tab}
+        onChange={setTab}
+        tabs={[
+          { id: "a", label: "Startup" },
+          { id: "b", label: "Duplicates", count: 71 },
+          { id: "c", label: "Downloads" },
+        ]}
+      >
+        <p>Panel for tab {tab}</p>
+      </Tabs>
 
       <h3>Check list</h3>
       <div className="smd-card">

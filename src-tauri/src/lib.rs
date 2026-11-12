@@ -1,7 +1,10 @@
 mod activity;
+mod applications;
 mod cleanup;
+mod clutter;
 mod commands;
 mod error;
+mod performance;
 mod settings;
 mod smart_care;
 mod space_lens;
@@ -64,6 +67,25 @@ pub fn run() {
             space_lens::space_cancel,
             space_lens::space_view,
             space_lens::space_reveal,
+            performance::startup_list,
+            performance::startup_set,
+            performance::processes_snapshot,
+            performance::processes_stop,
+            performance::background_list,
+            performance::open_system_tool,
+            applications::apps_list,
+            applications::apps_uninstall,
+            applications::apps_leftovers,
+            applications::apps_remove_leftovers,
+            applications::updates_status,
+            applications::updates_setup,
+            applications::updates_list,
+            applications::updates_apply,
+            applications::windows_updates,
+            clutter::clutter_scan,
+            clutter::clutter_cancel,
+            clutter::clutter_downloads,
+            clutter::clutter_remove,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Scrub My Disks");

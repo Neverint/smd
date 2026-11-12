@@ -1,7 +1,7 @@
 //! My Activity: a local history of every scan and action, with undo where possible.
 //!
-//! `activity.json` keeps the newest entries. For each undoable cleanup,
-//! `undo\<id>.json` lists the paths moved to the Recycle Bin.
+//! `activity.json` keeps the newest entries. For each undoable action, `undo\<id>.json`
+//! holds what is needed to put it back: recycled paths, registry backups, a startup item's state.
 
 use serde::{Deserialize, Serialize};
 use smd_win::cleanup::{DeleteMode, RestoreReport};
@@ -25,6 +25,12 @@ pub enum Kind {
     EmptyRecycleBin,
     SpaceLensScan,
     Restore,
+    StartupChange,
+    Uninstall,
+    LeftoversRemoved,
+    AppUpdate,
+    UpdatesSetup,
+    ClutterRemoved,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -56,6 +62,9 @@ pub struct Entry {
     pub target: Option<String>,
     #[serde(default)]
     pub mode: Option<DeleteMode>,
+    /// Startup item turned on (true) or off (false).
+    #[serde(default)]
+    pub enabled: Option<bool>,
     #[serde(default)]
     pub undo: Undo,
 }
@@ -72,16 +81,41 @@ impl Entry {
             score: None,
             target: None,
             mode: None,
+            enabled: None,
             undo: Undo::None,
         }
     }
 }
 
-#[derive(Serialize, Deserialize)]
+/// A registry key exported before it was deleted.
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct UndoFile {
-    started_unix_s: i64,
-    paths: Vec<String>,
+pub struct RegBackup {
+    pub key: String,
+    pub file: PathBuf,
+}
+
+/// A startup item's state before it was changed.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StartupUndo {
+    pub id: String,
+    pub was_enabled: bool,
+}
+
+/// What an undo needs. Phase 1 files (paths only) still load.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UndoData {
+    #[serde(default)]
+    pub started_unix_s: i64,
+    /// Moved to the Recycle Bin.
+    #[serde(default)]
+    pub paths: Vec<String>,
+    #[serde(default)]
+    pub registry: Vec<RegBackup>,
+    #[serde(default)]
+    pub startup: Option<StartupUndo>,
 }
 
 fn file(dir: &Path) -> PathBuf {
@@ -104,6 +138,7 @@ pub fn record(state: &AppState, entry: Entry) {
     all.insert(0, entry);
     for dropped in all.drain(MAX_ENTRIES.min(all.len())..) {
         let _ = std::fs::remove_file(undo_path(&state.data_dir, dropped.id));
+        let _ = std::fs::remove_dir_all(undo_files_dir(state, dropped.id));
     }
     if let Err(e) = store::write_json(&file(&state.data_dir), &all) {
         log::warn!("could not save activity: {e}");
@@ -115,15 +150,13 @@ fn undo_path(dir: &Path, id: u64) -> PathBuf {
 }
 
 /// Saves the recycled paths so the action can be undone later.
-pub fn save_undo(state: &AppState, id: u64, started_unix_s: i64, paths: Vec<String>) -> bool {
-    store::write_json(
-        &undo_path(&state.data_dir, id),
-        &UndoFile {
-            started_unix_s,
-            paths,
-        },
-    )
-    .is_ok()
+pub fn save_undo(state: &AppState, id: u64, data: &UndoData) -> bool {
+    store::write_json(&undo_path(&state.data_dir, id), data).is_ok()
+}
+
+/// Folder for files an undo needs (registry backups).
+pub fn undo_files_dir(state: &AppState, id: u64) -> PathBuf {
+    state.data_dir.join(UNDO_DIR).join(id.to_string())
 }
 
 #[tauri::command]
@@ -147,9 +180,31 @@ pub async fn activity_undo(app: tauri::AppHandle, id: u64) -> AppResult<RestoreR
         if entry.undo != Undo::Available {
             return Err(AppError::Stale("this action cannot be undone".into()));
         }
-        let undo: UndoFile = store::read_json(&undo_path(&state.data_dir, id))?
+        let undo: UndoData = store::read_json(&undo_path(&state.data_dir, id))?
             .ok_or_else(|| AppError::NotFound(format!("undo data for {id}")))?;
-        let report = smd_win::cleanup::restore(&undo.paths, undo.started_unix_s)?;
+        let mut report = if undo.paths.is_empty() {
+            RestoreReport::default()
+        } else {
+            smd_win::cleanup::restore(&undo.paths, undo.started_unix_s)?
+        };
+        for b in &undo.registry {
+            match smd_win::apps::restore_key(&b.file) {
+                Ok(()) => report.restored += 1,
+                Err(e) => {
+                    log::warn!("could not restore {}: {e}", b.key);
+                    report.failed += 1;
+                }
+            }
+        }
+        if let Some(s) = &undo.startup {
+            match smd_win::startup::set_enabled(&s.id, s.was_enabled, store::now_ms()) {
+                Ok(_) => report.restored += 1,
+                Err(e) => {
+                    log::warn!("could not undo startup change {}: {e}", s.id);
+                    report.failed += 1;
+                }
+            }
+        }
         log::info!(
             "undo {id}: restored {}, missing {}, failed {}",
             report.restored,

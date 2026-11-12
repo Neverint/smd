@@ -3,17 +3,33 @@ import { mockHandlers, mockStreams } from "./mocks";
 import type {
   ActivityEntry,
   AppInfo,
+  AppUpdate,
+  Background,
   BackendSettings,
   CleanupReport,
   CleanupScanResult,
   CleanupSelection,
+  ClutterProgress,
+  ClutterView,
+  DownloadsView,
   DriveInfo,
+  IndexProgress,
+  InstalledApp,
+  LeftoversView,
+  ProcessSnapshot,
+  RemovalReport,
   RestoreReport,
   ScanProgress,
   SmartCareResult,
   SpaceProgress,
   SpaceSummary,
   SpaceView,
+  StartupItem,
+  SystemTool,
+  UninstallOutcome,
+  UpdateOutcome,
+  UpdatesStatus,
+  WindowsUpdates,
 } from "./types";
 
 export type * from "./types";
@@ -47,6 +63,22 @@ export interface Commands {
   space_cancel: { args: NoArgs; result: null };
   space_view: { args: { scanId: number; nodeId: number }; result: SpaceView };
   space_reveal: { args: { scanId: number; nodeId: number }; result: null };
+  startup_list: { args: NoArgs; result: StartupItem[] };
+  startup_set: { args: { id: string; enabled: boolean }; result: StartupItem[] };
+  processes_snapshot: { args: NoArgs; result: ProcessSnapshot };
+  processes_stop: { args: NoArgs; result: null };
+  background_list: { args: NoArgs; result: Background };
+  open_system_tool: { args: { tool: SystemTool }; result: null };
+  apps_list: { args: NoArgs; result: InstalledApp[] };
+  apps_leftovers: { args: { id: string }; result: LeftoversView };
+  apps_remove_leftovers: { args: { scanId: number; paths: string[] }; result: RemovalReport };
+  updates_status: { args: NoArgs; result: UpdatesStatus };
+  updates_setup: { args: NoArgs; result: UpdatesStatus };
+  updates_list: { args: NoArgs; result: AppUpdate[] };
+  windows_updates: { args: NoArgs; result: WindowsUpdates };
+  clutter_cancel: { args: NoArgs; result: null };
+  clutter_downloads: { args: NoArgs; result: DownloadsView };
+  clutter_remove: { args: { scanId: number; paths: string[] }; result: RemovalReport };
 }
 
 /** Commands that stream progress through a channel (`on_progress` in Rust). */
@@ -54,6 +86,9 @@ export interface StreamCommands {
   cleanup_scan: { args: NoArgs; progress: ScanProgress; result: CleanupScanResult };
   smart_care_scan: { args: NoArgs; progress: ScanProgress; result: SmartCareResult };
   space_scan: { args: { path: string }; progress: SpaceProgress; result: SpaceSummary };
+  apps_uninstall: { args: { ids: string[] }; progress: IndexProgress; result: UninstallOutcome[] };
+  updates_apply: { args: { ids: string[] }; progress: IndexProgress; result: UpdateOutcome[] };
+  clutter_scan: { args: { path: string | null }; progress: ClutterProgress; result: ClutterView };
 }
 
 export type CommandName = keyof Commands;

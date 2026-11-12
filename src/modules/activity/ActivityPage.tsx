@@ -1,11 +1,17 @@
 import {
+  AppsListDetail20Regular,
   ArrowClockwise20Regular,
+  ArrowDownload20Regular,
+  ArrowSync20Regular,
   ArrowUndo20Regular,
   Broom20Regular,
   DataPie20Regular,
   Delete20Regular,
+  DocumentCopy20Regular,
+  FolderArrowRight20Regular,
   Search20Regular,
   Sparkle20Regular,
+  TopSpeed20Regular,
 } from "@fluentui/react-icons";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -22,6 +28,12 @@ const ICONS: Record<ActivityKind, typeof Broom20Regular> = {
   emptyRecycleBin: Delete20Regular,
   spaceLensScan: DataPie20Regular,
   restore: ArrowUndo20Regular,
+  startupChange: TopSpeed20Regular,
+  uninstall: AppsListDetail20Regular,
+  leftoversRemoved: FolderArrowRight20Regular,
+  appUpdate: ArrowSync20Regular,
+  updatesSetup: ArrowDownload20Regular,
+  clutterRemoved: DocumentCopy20Regular,
 };
 
 function Detail({ e }: { e: ActivityEntry }) {
@@ -48,6 +60,28 @@ function Detail({ e }: { e: ActivityEntry }) {
       return (
         <>
           {t("activity.detail.restore", { count: e.items })}
+          {skipped}
+        </>
+      );
+    case "startupChange":
+      return <>{t(e.enabled ? "activity.detail.startupOn" : "activity.detail.startupOff", { name: e.target ?? "" })}</>;
+    case "uninstall":
+      return <>{t(e.failed > 0 ? "activity.detail.uninstallFailed" : "activity.detail.uninstall", { name: e.target ?? "" })}</>;
+    case "leftoversRemoved":
+      return (
+        <>
+          {t("activity.detail.leftovers", { name: e.target ?? "", size: f.bytes(e.bytes), count: e.items })}
+          {skipped}
+        </>
+      );
+    case "appUpdate":
+      return <>{t(e.failed > 0 ? "activity.detail.updateFailed" : "activity.detail.update", { name: e.target ?? "" })}</>;
+    case "updatesSetup":
+      return <>{t(e.failed > 0 ? "activity.detail.setupFailed" : "activity.detail.setup")}</>;
+    case "clutterRemoved":
+      return (
+        <>
+          {t("activity.detail.clutter", { size: f.bytes(e.bytes), count: e.items })}
           {skipped}
         </>
       );
@@ -122,7 +156,7 @@ export function ActivityPage() {
                 </div>
                 <span className="activity-row__time">{f.dateTime(e.timeMs)}</span>
                 {e.undo === "available" && (
-                  <Button icon={<ArrowUndo20Regular />} disabled={busy !== null} onClick={() => void undo(e.id)} aria-label={t("activity.undoLabel")}>
+                  <Button icon={<ArrowUndo20Regular />} disabled={busy !== null} onClick={() => void undo(e.id)} aria-label={t("activity.undoLabel", { what: t(`activity.kind.${e.kind}`) })}>
                     {t("activity.undo")}
                   </Button>
                 )}

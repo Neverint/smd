@@ -18,6 +18,9 @@ Update this file whenever a crate, npm package, data file or bundled binary is a
 | windows | 0.62 | MIT OR Apache-2.0 | Win32 APIs: drives, memory, processes, Recycle Bin |
 | trash | 5.3 | MIT | Move to / restore from the Recycle Bin |
 | rayon | 1.12 | MIT OR Apache-2.0 | Parallel disk walk and rule scanning |
+| winreg | 0.56 | MIT | Registry: Run keys, StartupApproved, Uninstall keys |
+| sysinfo | 0.40 | MIT | Live CPU and memory per program (Performance) |
+| blake3 | 1.8 | CC0-1.0 OR Apache-2.0 | Content hash for duplicate files |
 | serde, serde_json | 1.0 | MIT OR Apache-2.0 | Serialization |
 | thiserror | 2.0 | MIT OR Apache-2.0 | Typed errors |
 | log | 0.4 | MIT OR Apache-2.0 | Logging facade |
@@ -52,7 +55,7 @@ vite (MIT), @vitejs/plugin-react (MIT), typescript (Apache-2.0), vitest (MIT), j
 
 | Item | License | Phase | Note |
 |---|---|---|---|
-| sysinfo | MIT | 2 | Live CPU / RAM per process (Performance). Phase 1 uses Win32 calls instead |
+| Microsoft.WinGet.Client (PowerShell module) | MIT | 2 | Not bundled: downloaded from the PowerShell Gallery for the current user when they click "Set up app updates" |
 | image_hasher | MIT OR Apache-2.0 | 2 | Similar images |
 | LibreHardwareMonitorLib | MPL-2.0 | 3 | Optional .NET sidecar; license file shipped with it |
 | winapp2.ini | CC BY-NC-SA 3.0 (to confirm) | later | Not used in Phase 1 (own rules in `rules/cleanup.json`). Likely **not** bundleable; download at runtime with consent if ever used |

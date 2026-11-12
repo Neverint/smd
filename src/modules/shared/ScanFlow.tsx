@@ -12,7 +12,7 @@ export function useStepLabel() {
   const { t } = useTranslation();
   return (step: string | undefined): string => {
     if (!step) return "";
-    if (step === "disks" || step === "memory" || step === "drive") return t(`smartCare.step.${step}`);
+    if (["disks", "memory", "drive", "startup", "updates"].includes(step)) return t(`smartCare.step.${step}`);
     return t("smartCare.step.rule", { name: t(`cleanup.cat.${step}.name`) });
   };
 }

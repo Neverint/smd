@@ -245,8 +245,11 @@ pub fn run(state: &AppState, scan_id: u64, selections: &[Selection]) -> AppResul
         && activity::save_undo(
             state,
             id,
-            started_ms / 1000,
-            outcome.removed.iter().map(|r| r.0.clone()).collect(),
+            &activity::UndoData {
+                started_unix_s: started_ms / 1000,
+                paths: outcome.removed.iter().map(|r| r.0.clone()).collect(),
+                ..Default::default()
+            },
         );
 
     let mut e = Entry::new(id, activity::Kind::Cleanup);

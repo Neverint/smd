@@ -153,6 +153,9 @@
 .page__action {
   position: sticky;
   bottom: 0;
+  z-index: 2;
+  /* Lists scroll under the action bar: fade them out behind it. */
+  background: linear-gradient(to top, color-mix(in srgb, var(--bg-solid) 94%, transparent) 70%, transparent);
   display: flex;
   flex-direction: column;
   align-items: center;

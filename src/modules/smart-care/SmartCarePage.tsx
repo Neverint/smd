@@ -44,6 +44,11 @@ function RecText({ rec }: { rec: Recommendation }) {
       return <>{t("smartCare.rec.closeApps", { percent: rec.loadPercent })}</>;
     case "cleanJunk":
       return <>{t("smartCare.rec.cleanJunk", { size: f.bytes(rec.bytes) })}</>;
+    case "installSecurityUpdates":
+    case "installWindowsUpdates":
+    case "updateApps":
+    case "reviewStartup":
+      return <>{t(`smartCare.rec.${rec.kind}`, { count: rec.count })}</>;
   }
 }
 
@@ -165,17 +170,31 @@ function Results({ result }: { result: SmartCareResult }) {
         >
           <StatusLine status={statusOf("maintenance")} />
         </Card>
-        {(
-          [
-            ["protection", ShieldCheckmark24Regular, "3"],
-            ["updates", Apps24Regular, "2"],
-            ["startup", TopSpeed24Regular, "2"],
-          ] as const
-        ).map(([key, Icon, phase]) => (
-          <div key={key} className="card--muted">
-            <Card module={key === "protection" ? "protection" : key === "updates" ? "applications" : "performance"} icon={<Icon />} title={t(`smartCare.card.${key}`)} description={t("smartCare.card.comingIn", { phase })} />
-          </div>
-        ))}
+        {result.startupEnabled !== null && (
+          <Card
+            module="performance"
+            icon={<TopSpeed24Regular />}
+            title={t("smartCare.card.startup")}
+            value={t("smartCare.card.startupValue", { count: result.startupEnabled })}
+            description={t("smartCare.card.startupDesc")}
+            actions={<Button onClick={() => navigate("/performance")}>{t("smartCare.card.open")}</Button>}
+          >
+            <StatusLine status={statusOf("startupLoad")} />
+          </Card>
+        )}
+        <Card
+          module="applications"
+          icon={<Apps24Regular />}
+          title={t("smartCare.card.updates")}
+          value={result.appUpdates !== null || result.windowsUpdates ? t("smartCare.card.updatesValue", { count: (result.appUpdates ?? 0) + (result.windowsUpdates?.total ?? 0) }) : undefined}
+          description={result.appUpdates === null ? t("smartCare.card.updatesNotSetUp") : t("smartCare.card.updatesDesc")}
+          actions={<Button onClick={() => navigate("/applications")}>{t("smartCare.card.open")}</Button>}
+        >
+          {result.windowsUpdates && <div className="row__sub">{t("smartCare.card.windowsUpdatesLine", { total: result.windowsUpdates.total, security: result.windowsUpdates.security })}</div>}
+        </Card>
+        <div className="card--muted">
+          <Card module="protection" icon={<ShieldCheckmark24Regular />} title={t("smartCare.card.protection")} description={t("smartCare.card.comingIn", { phase: "3" })} />
+        </div>
       </div>
     </div>
   );

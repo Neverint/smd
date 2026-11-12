@@ -4,7 +4,7 @@
 
 Une application d'entretien gratuite et open source pour Windows 10 et 11. Elle réunit les meilleurs outils gratuits de santé du PC, avec une analyse guidée et sereine et les matières de Windows 11 (Mica, Segoe UI Variable, icônes Fluent).
 
-> **État : phase 1.** Entretien express (score de santé), Nettoyage (vérification, puis Corbeille), Carte de l'espace (carte d'un disque) et Mon activité (historique avec annulation) fonctionnent. Les autres modules arrivent phase par phase (voir la feuille de route).
+> **État : phase 2.** Entretien express (score de santé), Nettoyage (vérification, puis Corbeille), Carte de l'espace (carte d'un disque), Performances (démarrage, programmes en cours, tâches d'arrière-plan), Applications (désinstallation avec examen des restes, mises à jour), Mes encombrants (gros et vieux fichiers, doublons) et Mon activité (historique avec annulation) fonctionnent. Les autres modules arrivent phase par phase (voir la feuille de route).
 
 ## Principes de sécurité
 

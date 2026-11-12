@@ -94,7 +94,7 @@ Falls back to Segoe UI on Windows 10.
 
 ## Components (all in the gallery)
 
-Button (primary / accent / secondary / subtle / danger, md / lg), IconButton (label required), ConfirmDialog (native `<dialog>`, Cancel focused first, for anything that can't be undone), ErrorNotice (friendly text + "Copy details"), UsageBar (`role=meter`, warning / critical tones), Card (icon tile, big value, actions), Badge (5 tones), ProgressRing (determinate / indeterminate, `role=progressbar`), ScanButton (round, module colors), ModuleHero, SideSheet (modal, Esc, focus trap, focus return), CheckList (select all with indeterminate state), Segmented (radio group, arrow keys), Toggle (`role=switch`), setting row.
+Button (primary / accent / secondary / subtle / danger, md / lg), IconButton (label required), ConfirmDialog (native `<dialog>`, Cancel focused first, for anything that can't be undone), ErrorNotice (friendly text + "Copy details"), UsageBar (`role=meter`, warning / critical tones), Tabs (ARIA tabs, arrow keys, optional count), list rows (`.rows` / `.row` in modules.css), Card (icon tile, big value, actions), Badge (5 tones), ProgressRing (determinate / indeterminate, `role=progressbar`), ScanButton (round, module colors), ModuleHero, SideSheet (modal, Esc, focus trap, focus return), CheckList (select all with indeterminate state), Segmented (radio group, arrow keys), Toggle (`role=switch`), setting row.
 
 ## Accessibility checklist
 

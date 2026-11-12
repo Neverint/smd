@@ -22,18 +22,21 @@ Hard "never" list (drive layout): never move or junction `C:\Users`, `C:\Program
 ```
 src/                 React frontend
   app/               shell: App (router), TitleBar, Sidebar, modules.ts (module registry)
-  modules/           one folder per page (smart-care, cleanup, space-lens, activity, settings); ModulePage = placeholder
+  modules/           one folder per page (smart-care, cleanup, space-lens, performance, applications, clutter, activity, settings); ModulePage = placeholder
                      shared/ScanFlow.tsx (progress ring, "done" summary), modules.css
   components/        shared UI (Button, Card, ProgressRing, SideSheet, CheckList, ConfirmDialog, ErrorNotice, UsageBar, ...)
   design/            tokens.css, module-accents.css, base.css (see docs/design-system.md)
   dev/gallery/       /#/dev/gallery: every component in both themes
   i18n/              en.json, fr.json (same keys, enforced by a test)
-  stores/            Zustand stores (settings, cleanup, smartCare, spaceLens)
-  lib/               backend.ts (typed `call()` / `stream()` + mocks outside Tauri), types.ts, mocks.ts, format.ts, useFormat.ts, theme.ts
+  stores/            Zustand stores (settings, cleanup, smartCare, spaceLens, clutter)
+  lib/               backend.ts (typed `call()` / `stream()` + mocks outside Tauri), types.ts, mocks.ts, mocks-phase2.ts, format.ts, useFormat.ts, theme.ts
 e2e/                 Playwright smoke tests (Edge, mocked backend; `__SMD_FAST_MOCKS__` skips mock delays)
-crates/core/         pure logic, no OS access: cleanup rules, safety checks, health score, Space Lens tree, formatting
-crates/win/          Windows access: drives, memory, processes, Recycle Bin, disk walk, cleanup scan/remove/restore
-src-tauri/           Tauri app: one file per module's commands (cleanup, smart_care, space_lens, activity, settings),
+crates/core/         pure logic, no OS access: cleanup rules, safety checks, health score, Space Lens tree,
+                     command-line parsing, startup values, app-name matching, formatting
+crates/win/          Windows access: drives, memory, Recycle Bin, disk walk, cleanup, startup items, processes,
+                     tasks/services, installed apps, winget, My Clutter
+src-tauri/           Tauri app: one file per module's commands (cleanup, smart_care, space_lens, performance, applications,
+                     clutter, activity, settings),
                      state.rs, store.rs (JSON files), error.rs (typed AppError), window_effect.rs
 rules/               cleanup.json (declarative cleanup rules); tweaks.json and the drive policy come later
 sidecars/hwmon/      .NET LibreHardwareMonitor sidecar (Phase 3)
@@ -64,7 +67,8 @@ $env:Path += ';G:\Documents\Dev\.rust\cargo\bin'; $env:RUSTUP_HOME='G:\Documents
 - Anything that removes files goes through `smd_win::cleanup::remove_items`, which re-checks `smd_core::safety::check_removal`. Never remove a path the UI sent: act on the backend's own scan, by id.
 - Long tasks take a `Channel<Progress>` (`on_progress`) and run in `spawn_blocking`; guard them with `AppState::begin` so two never overlap.
 - Debug the real app with Playwright: start it with `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=9333`, then `chromium.connectOverCDP("http://127.0.0.1:9333")`. Never click a destructive button on the developer's own PC.
-- PowerShell only where it is the cleanest official API (Defender, WinGet, scheduled tasks, Appx): `-NoProfile -NonInteractive -ExecutionPolicy Bypass`, output with `ConvertTo-Json -Depth 4`, parsed into typed structs. Never build commands by concatenating user input.
+- PowerShell only where it is the cleanest official API (Defender, WinGet, scheduled tasks, Appx): `-NoProfile -NonInteractive -ExecutionPolicy Bypass`, output with `ConvertTo-Json -Depth 4`, parsed into typed structs. Scripts are `&'static str`; values go in as `SMD_*` environment variables (`smd_win::powershell::run_json_with`). Never build commands by concatenating input.
+- External programs (uninstallers, msiexec, reg.exe) are started directly or through `ShellExecuteEx`, never through `cmd /c`.
 - All UI text goes through i18n (EN + FR). Plain, friendly wording: say what an item is and whether it is safe to remove. No fear-based copy.
 - Colors only through tokens. Text on a module color uses `--m-solid` / `--m-on` (AA contrast); `--m-from` / `--m-to` are decorative only.
 - Icon-only buttons need a label (`IconButton` enforces it). Respect `prefers-reduced-motion` (`MotionConfig reducedMotion="user"`).

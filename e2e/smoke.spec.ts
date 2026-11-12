@@ -58,7 +58,7 @@ test("Cleanup review, skip and confirm before emptying the Recycle Bin", async (
 
   // My Activity lists the cleanup with an Undo.
   await page.getByRole("link", { name: "Open My Activity" }).click();
-  await page.getByRole("button", { name: "Undo this cleanup" }).click();
+  await page.getByRole("button", { name: "Undo: Cleanup" }).click();
   await expect(page.getByRole("status")).toContainText("put back");
   await expect(page.getByText("Undone")).toBeVisible();
 });
@@ -72,6 +72,58 @@ test("Space Lens scans a drive and drills into folders", async ({ page }) => {
   await expect(crumbs.getByRole("button", { name: "Users" })).toHaveAttribute("aria-current", "location");
   await page.getByRole("button", { name: "Up one level" }).click();
   await expect(crumbs.getByRole("button", { name: "C:\\" })).toHaveAttribute("aria-current", "location");
+});
+
+test("Performance: turn a startup item off, machine-wide items stay locked, undo in My Activity", async ({ page }) => {
+  await page.goto("/#/performance");
+  const discord = page.getByRole("switch", { name: "Start Discord with Windows" });
+  await expect(discord).toHaveAttribute("aria-checked", "true");
+  await discord.click();
+  await expect(discord).toHaveAttribute("aria-checked", "false");
+  await expect(page.getByRole("switch", { name: "Start RtkAudUService with Windows" })).toBeDisabled();
+
+  await page.getByRole("tab", { name: "Running now" }).click();
+  await expect(page.getByRole("region", { name: "Using memory" })).toContainText("msedge.exe");
+  await page.getByRole("tab", { name: "Background" }).click();
+  await expect(page.getByText("Steam Client Service")).toBeVisible();
+
+  await page.goto("/#/activity");
+  await expect(page.getByText("Discord no longer starts with Windows")).toBeVisible();
+});
+
+test("Applications: uninstall asks first, then offers a leftovers review", async ({ page }) => {
+  await page.goto("/#/applications");
+  await page.getByRole("checkbox", { name: "Discord" }).check();
+  await page.getByRole("button", { name: "Uninstall 1 app" }).click();
+  const confirm = page.getByRole("dialog", { name: "Uninstall these apps?" });
+  await expect(confirm).toContainText("Discord");
+  await confirm.getByRole("button", { name: "Uninstall" }).click();
+  await expect(page.getByText("Uninstall finished")).toBeVisible();
+  await page.getByRole("button", { name: "Look for leftovers" }).click();
+  const sheet = page.getByRole("dialog", { name: "Leftovers of Discord" });
+  // Only the app's own folder is ticked by default.
+  await expect(sheet.getByRole("checkbox", { name: /Local\\Discord/ })).toBeChecked();
+  await expect(sheet.getByRole("checkbox", { name: /Roaming\\Discord/ })).not.toBeChecked();
+  await sheet.getByRole("button", { name: "Remove 1 item" }).click();
+  await expect(sheet.getByRole("status")).toContainText("Undo in My Activity");
+
+  await page.keyboard.press("Escape");
+  await page.getByRole("tab", { name: "Updates" }).click();
+  await expect(page.getByText("2 updates are waiting (1 security).")).toBeVisible();
+  await page.getByRole("button", { name: "Download and set up" }).click();
+  await expect(page.getByRole("button", { name: "Update 2 apps" })).toBeVisible();
+});
+
+test("My Clutter keeps at least one copy of each duplicate", async ({ page }) => {
+  await page.goto("/#/clutter");
+  await page.getByRole("button", { name: "Scan your folders" }).click();
+  await page.getByRole("tab", { name: /Duplicates/ }).click();
+  await page.getByRole("button", { name: "Select all but one copy" }).click();
+  const kept = page.getByRole("checkbox", { name: "G:\\Pictures\\trip\\IMG_0001.mov" });
+  await expect(kept).not.toBeChecked();
+  await expect(kept).toBeDisabled();
+  await page.getByRole("button", { name: /^Move 3 items to the Recycle Bin/ }).click();
+  await expect(page.getByRole("heading", { name: "Moved to the Recycle Bin" })).toBeVisible();
 });
 
 test("Settings: permanent delete shows a warning", async ({ page }) => {

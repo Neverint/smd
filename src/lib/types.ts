@@ -87,7 +87,11 @@ export type Recommendation =
   | { kind: "freeSpace"; drive: string; freePercent: number }
   | { kind: "restart"; uptimeDays: number }
   | { kind: "closeApps"; loadPercent: number }
-  | { kind: "cleanJunk"; bytes: number };
+  | { kind: "cleanJunk"; bytes: number }
+  | { kind: "installSecurityUpdates"; count: number }
+  | { kind: "installWindowsUpdates"; count: number }
+  | { kind: "updateApps"; count: number }
+  | { kind: "reviewStartup"; count: number };
 
 export interface Assessment {
   score: number;
@@ -135,6 +139,9 @@ export interface SmartCareResult {
   disks: PhysicalDisk[] | null;
   hasBattery: boolean;
   cleanup: CleanupScanResult;
+  startupEnabled: number | null;
+  appUpdates: number | null;
+  windowsUpdates: WindowsUpdates | null;
   durationMs: number;
   activityId: number;
 }
@@ -195,7 +202,19 @@ export interface SpaceProgress {
 }
 
 /* ---------- My Activity ---------- */
-export type ActivityKind = "smartCareScan" | "cleanupScan" | "cleanup" | "emptyRecycleBin" | "spaceLensScan" | "restore";
+export type ActivityKind =
+  | "smartCareScan"
+  | "cleanupScan"
+  | "cleanup"
+  | "emptyRecycleBin"
+  | "spaceLensScan"
+  | "restore"
+  | "startupChange"
+  | "uninstall"
+  | "leftoversRemoved"
+  | "appUpdate"
+  | "updatesSetup"
+  | "clutterRemoved";
 
 export interface ActivityEntry {
   id: number;
@@ -207,6 +226,7 @@ export interface ActivityEntry {
   score: number | null;
   target: string | null;
   mode: DeleteMode | null;
+  enabled?: boolean | null;
   undo: "none" | "available" | "done";
 }
 
@@ -214,4 +234,199 @@ export interface RestoreReport {
   restored: number;
   missing: number;
   failed: number;
+}
+
+/* ---------- Performance ---------- */
+export type StartupSource = "userRun" | "machineRun" | "machineRun32" | "userFolder" | "commonFolder";
+
+export interface StartupItem {
+  id: string;
+  name: string;
+  command: string;
+  program: string | null;
+  publisher: string | null;
+  microsoft: boolean;
+  source: StartupSource;
+  enabled: boolean;
+  needsAdmin: boolean;
+}
+
+export interface ProgramUsage {
+  name: string;
+  processes: number;
+  cpuPercent: number;
+  memoryBytes: number;
+}
+
+export interface ProcessSnapshot {
+  byCpu: ProgramUsage[];
+  byMemory: ProgramUsage[];
+  cpuPercent: number;
+  processCount: number;
+}
+
+export interface ScheduledTask {
+  name: string;
+  path: string;
+  state: string;
+  author: string;
+  program: string | null;
+  publisher: string | null;
+}
+
+export interface Service {
+  name: string;
+  displayName: string;
+  state: string;
+  startMode: string;
+  program: string | null;
+  publisher: string | null;
+}
+
+export interface BootInfo {
+  lastBootMs: number;
+  bootDurationMs: number | null;
+  mainPathMs: number | null;
+}
+
+export interface Background {
+  tasks: ScheduledTask[] | null;
+  services: Service[] | null;
+  boot: BootInfo | null;
+}
+
+export type SystemTool = "taskScheduler" | "services" | "windowsUpdate";
+
+/* ---------- Applications ---------- */
+export interface InstalledApp {
+  id: string;
+  kind: "desktop" | "store";
+  name: string;
+  publisher: string;
+  version: string;
+  installDate: string | null;
+  sizeBytes: number | null;
+  installLocation: string | null;
+  microsoft: boolean;
+  machineWide: boolean;
+}
+
+export interface UninstallResult {
+  exitCode: number | null;
+  stillInstalled: boolean;
+}
+
+export interface UninstallOutcome {
+  id: string;
+  name: string;
+  result: UninstallResult | null;
+  error: string | null;
+}
+
+export interface IndexProgress {
+  index: number;
+  total: number;
+  name?: string;
+  id?: string;
+}
+
+export type Confidence = "low" | "medium" | "high";
+
+export interface Leftover {
+  path: string;
+  kind: "folder" | "registryKey";
+  bytes: number;
+  confidence: Confidence;
+  needsAdmin: boolean;
+  selected: boolean;
+}
+
+export interface LeftoversView {
+  scanId: number;
+  appName: string;
+  items: Leftover[];
+}
+
+export interface RemovalReport {
+  removedBytes: number;
+  removedItems: number;
+  failures: { path: string; reason: FailReason }[];
+  undoAvailable: boolean;
+}
+
+export interface UpdatesStatus {
+  moduleInstalled: boolean;
+}
+
+export interface AppUpdate {
+  id: string;
+  name: string;
+  installed: string;
+  available: string;
+  source: string;
+}
+
+export interface UpdateOutcome {
+  id: string;
+  result: { status: string; rebootRequired: boolean; installerErrorCode: number | null } | null;
+  error: string | null;
+}
+
+export interface WindowsUpdates {
+  total: number;
+  security: number;
+  titles: string[];
+}
+
+/* ---------- My Clutter ---------- */
+export interface ClutterFile {
+  path: string;
+  name: string;
+  bytes: number;
+  modifiedMs: number | null;
+}
+
+export interface DuplicateGroup {
+  bytes: number;
+  files: ClutterFile[];
+}
+
+export interface ClutterResult {
+  large: ClutterFile[];
+  old: ClutterFile[];
+  duplicates: DuplicateGroup[];
+  duplicateBytes: number;
+  filesScanned: number;
+  bytesScanned: number;
+  cancelled: boolean;
+}
+
+export interface ClutterView {
+  scanId: number;
+  roots: string[];
+  result: ClutterResult;
+  durationMs: number;
+}
+
+export interface ClutterProgress {
+  stage: "walk" | "compare";
+  files: number;
+  bytes: number;
+  hashed: number;
+  toHash: number;
+}
+
+export interface FolderItem {
+  path: string;
+  name: string;
+  bytes: number;
+  files: number;
+  modifiedMs: number | null;
+  isDir: boolean;
+}
+
+export interface DownloadsView {
+  scanId: number;
+  path: string;
+  items: FolderItem[];
 }
