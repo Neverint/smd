@@ -15,6 +15,7 @@ pub struct PhysicalDisk {
     pub size_bytes: u64,
     pub health: DiskHealth,
     pub operational_status: String,
+    pub serial: String,
     /// Drive letters on this disk, like `["C:"]`.
     pub letters: Vec<String>,
 }
@@ -28,6 +29,7 @@ struct Raw {
     size: Option<u64>,
     health: Option<String>,
     operational: Option<String>,
+    serial: Option<String>,
     letters: Option<String>,
 }
 
@@ -43,6 +45,7 @@ $disks = @(Get-PhysicalDisk | Sort-Object { [int]$_.DeviceId } | ForEach-Object 
     size        = [uint64]$_.Size
     health      = [string]$_.HealthStatus
     operational = [string]($_.OperationalStatus -join ', ')
+    serial      = ([string]$_.SerialNumber).Trim()
     letters     = $letters
   }
 })
@@ -60,6 +63,7 @@ pub fn physical_disks() -> io::Result<Vec<PhysicalDisk>> {
             size_bytes: r.size.unwrap_or(0),
             health: DiskHealth::from_windows(r.health.as_deref().unwrap_or("")),
             operational_status: r.operational.unwrap_or_default(),
+            serial: r.serial.unwrap_or_default(),
             letters: r
                 .letters
                 .unwrap_or_default()

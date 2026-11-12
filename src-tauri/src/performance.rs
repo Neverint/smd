@@ -127,6 +127,9 @@ pub enum SystemTool {
     WindowsUpdate,
     WindowsSecurity,
     PrivacySettings,
+    SaveLocations,
+    InstalledApps,
+    Steam,
 }
 
 /// Opens a Windows tool. Only these, never an arbitrary path.
@@ -136,10 +139,18 @@ pub fn open_system_tool(tool: SystemTool) -> AppResult<()> {
     let file = match tool {
         SystemTool::TaskScheduler => "taskschd.msc",
         SystemTool::Services => "services.msc",
-        SystemTool::WindowsUpdate | SystemTool::WindowsSecurity | SystemTool::PrivacySettings => {
+        SystemTool::WindowsUpdate
+        | SystemTool::WindowsSecurity
+        | SystemTool::PrivacySettings
+        | SystemTool::SaveLocations
+        | SystemTool::InstalledApps
+        | SystemTool::Steam => {
             let url = match tool {
                 SystemTool::WindowsUpdate => "ms-settings:windowsupdate",
                 SystemTool::WindowsSecurity => "windowsdefender:",
+                SystemTool::SaveLocations => "ms-settings:savelocations",
+                SystemTool::InstalledApps => "ms-settings:appsfeatures",
+                SystemTool::Steam => "steam://open/main",
                 _ => "ms-settings:privacy",
             };
             return tauri_plugin_opener::open_url(url, None::<&str>)

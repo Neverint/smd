@@ -107,7 +107,8 @@
       "rule": "Looking for junk: {{name}}",
       "startup": "Counting startup items",
       "updates": "Checking for updates",
-      "protection": "Checking Microsoft Defender"
+      "protection": "Checking Microsoft Defender",
+      "layout": "Checking the drive layout"
     },
     "scoreLabel": "Health score: {{score}} out of 100",
     "outOf": "/ 100",
@@ -138,7 +139,8 @@
       "turnOnRealTimeProtection": "Turn real-time protection back on in Windows Security.",
       "updateSignatures_one": "Update Microsoft Defender: its virus definitions are {{count}} day old.",
       "updateSignatures_other": "Update Microsoft Defender: its virus definitions are {{count}} days old.",
-      "checkBattery": "Your battery holds {{percent}} % of its original charge. Plan a replacement if it runs out too fast."
+      "checkBattery": "Your battery holds {{percent}} % of its original charge. Plan a replacement if it runs out too fast.",
+      "reviewDriveLayout": "{{size}} sits on the wrong drive. Open Drive Organizer."
     },
     "card": {
       "junk": "Junk",
@@ -177,7 +179,11 @@
       "threats_other": "{{count}} threats",
       "defenderUnknown": "Microsoft Defender couldn't be read (another antivirus may be in charge).",
       "battery": "Battery health",
-      "batteryDesc": "Full charge compared with the original capacity."
+      "batteryDesc": "Full charge compared with the original capacity.",
+      "driveLayout": "Drive layout",
+      "driveLayoutDesc": "Each drive kept for its job.",
+      "misplaced": "{{size}} misplaced",
+      "layoutOk": "In order"
     },
     "status": {
       "good": "Good",
@@ -297,7 +303,9 @@
       "gone": "Already gone",
       "refused": "Protected"
     },
-    "unknownSize": "Not measured"
+    "unknownSize": "Not measured",
+    "doneQuarantine": "{{size}} moved to {{path}}. That space is free now; everything stays there for 30 days and can be put back from My Activity.",
+    "quarantineNote": "Removed items go to the quarantine on your disposable drive (kept {{days}} days), or to the Recycle Bin if that drive isn't there."
   },
   "spaceLens": {
     "pick": "Choose a drive or folder to scan",
@@ -346,7 +354,9 @@
       "clutterRemoved": "Files moved to the Recycle Bin",
       "defenderScan": "Microsoft Defender scan",
       "signatureUpdate": "Virus definitions update",
-      "permissionChange": "App permission changed"
+      "permissionChange": "App permission changed",
+      "migration": "Files moved to another drive",
+      "quarantinePurge": "Old quarantine purged"
     },
     "detail": {
       "smartCareScan": "Score {{score}} · {{size}} of junk found",
@@ -377,7 +387,10 @@
       "signatures": "Definitions updated",
       "signaturesFailed": "Update failed",
       "permissionOn": "{{app}} can use the {{what}} again",
-      "permissionOff": "{{app}} can no longer use the {{what}}"
+      "permissionOff": "{{app}} can no longer use the {{what}}",
+      "migration_one": "{{count}} item, {{size}}",
+      "migration_other": "{{count}} items, {{size}}",
+      "quarantinePurge": "{{size}} deleted for good"
     },
     "undo": "Undo",
     "undoLabel": "Undo: {{what}}",
@@ -419,7 +432,9 @@
       "none": "Solid (no window material)"
     },
     "gallery": "Open the component gallery",
-    "privacy": "No telemetry, no account. Logs stay on this PC."
+    "privacy": "No telemetry, no account. Logs stay on this PC.",
+    "quarantine": "Quarantine on the disposable drive",
+    "quarantineHint": "Items removed from your other drives go to the disposable drive's Quarantine folder for {{days}} days instead of the Recycle Bin. The space is freed at once. Off, or when that drive is missing or unhealthy: the Recycle Bin."
   },
   "errors": {
     "title": "That didn't work",
@@ -700,5 +715,151 @@
     "batteryLine": "{{full}} Wh now, {{design}} Wh when new",
     "cycles_one": "{{count}} charge cycle",
     "cycles_other": "{{count}} charge cycles"
+  },
+  "organizer": {
+    "tabs": {
+      "layout": "Layout",
+      "quarantine": "Quarantine & Scratch"
+    },
+    "auditing": "Checking your drives…",
+    "auditLine": "{{games}} games found · checked in {{seconds}} s",
+    "status": {
+      "good": "Every drive is used for its job.",
+      "warning": "Some things are on the wrong drive.",
+      "critical": "Your drive layout needs attention."
+    },
+    "role": {
+      "system": "Windows only",
+      "heavyGames": "Big games",
+      "lightGames": "Light games and documents",
+      "disposable": "Disposable (scratch, quarantine)",
+      "unassigned": "No role"
+    },
+    "severity": {
+      "info": "Could fit better",
+      "warning": "Worth moving",
+      "problem": "Wrong drive"
+    },
+    "reason": {
+      "bigGameOnLightDrive": "A big game on {{from}}. Big games belong on {{to}}.",
+      "gameOnSystemDrive": "A game on the Windows drive ({{from}}). It belongs on {{to}}.",
+      "gameOnDisposableDrive": "A game on the disposable drive ({{from}}). It belongs on {{to}}.",
+      "smallGameOnHeavyDrive": "A light game on {{from}}. It would fit on {{to}} and leave room for big ones.",
+      "personalFilesOnSystemDrive": "A large personal file on the Windows drive ({{from}}). It belongs on {{to}}.",
+      "cacheOnSystemDrive": "A large tool cache on the Windows drive ({{from}}). It can live on {{to}}.",
+      "maybeOnlyCopyOnDisposable": "Data on the disposable drive ({{from}}), maybe the only copy. Keep a copy on {{to}}."
+    },
+    "launcher": {
+      "steam": "Steam",
+      "epic": "Epic Games",
+      "xbox": "the Xbox app",
+      "gog": "GOG Galaxy"
+    },
+    "method": {
+      "launcherMove": {
+        "steam": "Move it with Steam (guided)",
+        "xbox": "Move it with the Xbox app (guided)",
+        "epic": "Move it with Epic",
+        "gog": "Move it with GOG"
+      },
+      "reinstall": "{{launcher}} can't move games: uninstall, then install to the new library (guided)",
+      "copyVerify": "Copy, check, then the original goes to the Recycle Bin",
+      "relocateCache": "Point {{variable}} to the new place, copy, check, then the old copy goes to the Recycle Bin"
+    },
+    "notice": {
+      "letterChanged": "The drive that was {{from}} is now {{to}}. Its role followed it.",
+      "missing": "{{letter}} isn't connected right now."
+    },
+    "unfinished": "A move stopped before the end ({{done}} of {{total}} done, {{size}}). Nothing was lost: resume it to finish.",
+    "resume": "Resume",
+    "editRoles": "Edit drive roles",
+    "saveLocations": "Where new apps and games are saved",
+    "misplaced_one": "{{count}} item on the wrong drive ({{size}})",
+    "misplaced_other": "{{count}} items on the wrong drive ({{size}})",
+    "allGood": "Nothing is on the wrong drive.",
+    "couldFitBetter": "Could fit better (information only)",
+    "plan_one": "Plan {{count}} move",
+    "plan_other": "Plan {{count}} moves",
+    "selectToPlan": "Select items to plan",
+    "planNote": "Planning is a dry run: it only checks. Nothing moves until you confirm.",
+    "planTitle": "Dry run: what would happen",
+    "planHint": "In this order. Steps marked guided are done in the launcher; the app runs the others after your OK.",
+    "estimate": "about {{minutes}} min",
+    "estimateTotal": "About {{minutes}} min in all. You can pause and resume later.",
+    "guided": "guided step",
+    "check": {
+      "targetRole": "Target drive's role allows it",
+      "freeSpace": "Room on the target ({{detail}} needed)",
+      "sourceHealth": "Source drive healthy",
+      "targetHealth": "Target drive healthy",
+      "targetFree": "Nothing already at the target",
+      "filesInUse": "No file in use",
+      "programsClosed": "No program to close",
+      "pluggedIn": "Plugged in"
+    },
+    "guide": {
+      "steam": "In Steam: Settings > Storage, pick the game, then Move and choose the library on {{target}}. Steam moves it and checks it.",
+      "xbox": "In Settings > Apps > Installed apps, open the game's menu, Move, and choose {{target}}.",
+      "reinstall": "Uninstall it in its launcher, then install it again into a library on {{target}}. Your saves usually stay in the cloud or in Documents."
+    },
+    "openSteam": "Open Steam",
+    "openApps": "Open Installed apps",
+    "move_one": "Move {{count}} item ({{size}})",
+    "move_other": "Move {{count}} items ({{size}})",
+    "nothingToRun": "Nothing for the app to move",
+    "confirmTitle": "Move these items?",
+    "confirmBody": "Each file is copied, then checked byte for byte. Only then do the originals go to the Recycle Bin of their drive. You can pause, resume after a restart, and undo from My Activity.",
+    "confirm": "Move",
+    "moving": "Moving…",
+    "movingLine": "{{done}} of {{total}} copied and checked",
+    "movingHint": "You can pause: the journal keeps track, nothing is lost.",
+    "pause": "Pause",
+    "paused": "Paused. Resume it from the Layout tab when you want.",
+    "doneTitle": "Moves finished",
+    "stepDone": "Copied, checked, original in the Recycle Bin",
+    "state": {
+      "pending": "Not started",
+      "copying": "Copying (resume to finish)",
+      "verified": "Copied and checked",
+      "done": "Done",
+      "failed": "Failed"
+    },
+    "undoHint": "Changed your mind? Undo it from My Activity.",
+    "auditAgain": "Check again",
+    "rolesTitle": "Drive roles",
+    "rolesHint": "Each drive is recognized by its volume ID, so a changed letter is noticed. Changing a role changes what counts as misplaced.",
+    "roleFor": "Role of {{letter}}",
+    "threshold": "A game is big from (GB)",
+    "saveRoles": "Save",
+    "quarantineTitle": "Quarantine on {{drive}}",
+    "quarantineOn": "On: what the app removes from your other drives waits here {{days}} days before it can be purged.",
+    "quarantineOff": "Off, or the drive isn't available: removed items go to the Recycle Bin.",
+    "quarantineSize_one": "{{size}} in {{count}} batch.",
+    "quarantineSize_other": "{{size}} in {{count}} batches.",
+    "purgeQuestion": "{{size}} has been in quarantine for more than {{days}} days. Delete batches automatically once they are {{days}} days old? This can't be undone.",
+    "purgeYes": "Yes, purge old batches",
+    "purgeNo": "No, keep them",
+    "purged": "{{size}} freed.",
+    "restore": "Put back",
+    "restored_one": "{{count}} item put back where it was.",
+    "restored_other": "{{count}} items put back where they were.",
+    "conflicts_one": "{{count}} stayed in quarantine: something new has the same name.",
+    "conflicts_other": "{{count}} stayed in quarantine: something new has the same names.",
+    "scratchTitle": "Scratch folder {{path}}",
+    "scratchHint": "For temporary work: exports, unzipped files. Things older than 14 days are listed here.",
+    "scratchEmpty": "Nothing old in the scratch folder.",
+    "scratchRemove_one": "Remove {{count}} item",
+    "scratchRemove_other": "Remove {{count}} items",
+    "scratchRemoved": "{{size}} moved to the Recycle Bin.",
+    "checkBad": {
+      "targetRole": "The target drive's role doesn't allow it, or the drive isn't connected",
+      "freeSpace": "Not enough room on the target ({{detail}} needed)",
+      "sourceHealth": "The source drive isn't healthy",
+      "targetHealth": "The target drive isn't healthy",
+      "targetFree": "Something already exists at the target",
+      "filesInUse": "Files in use by: {{detail}}",
+      "programsClosed": "Close first: {{detail}}",
+      "pluggedIn": "Plug in your laptop first"
+    }
   }
 }

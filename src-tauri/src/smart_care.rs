@@ -26,6 +26,14 @@ const UPDATES_TIMEOUT: Duration = Duration::from_secs(25);
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct DriveLayoutSummary {
+    pub status: smd_core::health::Status,
+    pub misplaced_bytes: u64,
+    pub findings: usize,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SmartCareResult {
     pub assessment: Assessment,
     pub system_drive: Option<DriveInfo>,
@@ -45,6 +53,8 @@ pub struct SmartCareResult {
     pub active_threats: Option<u32>,
     /// Lowest battery health in percent (laptops only).
     pub battery_health: Option<f64>,
+    /// Drive Organizer status and bytes in the wrong place.
+    pub drive_layout: Option<DriveLayoutSummary>,
     pub duration_ms: u64,
     pub activity_id: u64,
 }
@@ -67,7 +77,7 @@ fn sample_memory() -> (Option<MemoryInfo>, Option<f64>) {
 
 pub fn scan(state: &AppState, on_progress: &Channel<ScanProgress>) -> SmartCareResult {
     let started = now_ms();
-    let total = rule_count() + 6;
+    let total = rule_count() + 7;
     let done = AtomicU32::new(0);
     let report = |step: &str| {
         let n = done.fetch_add(1, Ordering::Relaxed) + 1;
@@ -85,7 +95,19 @@ pub fn scan(state: &AppState, on_progress: &Channel<ScanProgress>) -> SmartCareR
         startup_enabled,
         (app_updates, windows_updates),
         (defender, active_threats, battery_health),
+        drive_layout,
     ) = std::thread::scope(|s| {
+        let layout = s.spawn(|| {
+            let a = crate::organizer::run_audit(state)
+                .ok()
+                .map(|v| DriveLayoutSummary {
+                    status: v.status,
+                    misplaced_bytes: v.misplaced_bytes,
+                    findings: v.findings.len(),
+                });
+            report("layout");
+            a
+        });
         let protection = s.spawn(|| {
             let d = smd_win::protection::defender_status().ok();
             let t = smd_win::protection::threats()
@@ -141,6 +163,7 @@ pub fn scan(state: &AppState, on_progress: &Channel<ScanProgress>) -> SmartCareR
             startup.join().ok(),
             updates.join().unwrap_or((None, None)),
             protection.join().unwrap_or((None, None, None)),
+            layout.join().ok().flatten(),
         )
     });
 
@@ -175,6 +198,7 @@ pub fn scan(state: &AppState, on_progress: &Channel<ScanProgress>) -> SmartCareR
             active_threats: active_threats.unwrap_or(0),
         }),
         battery_health_percent: battery_health,
+        drive_layout: drive_layout.as_ref().map(|d| (d.status, d.misplaced_bytes)),
     };
     let assessment = assess(&facts);
 
@@ -204,6 +228,7 @@ pub fn scan(state: &AppState, on_progress: &Channel<ScanProgress>) -> SmartCareR
         defender,
         active_threats,
         battery_health,
+        drive_layout,
         duration_ms: (now_ms() - started).max(0) as u64,
         activity_id: id,
     }

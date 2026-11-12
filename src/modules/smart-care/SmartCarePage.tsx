@@ -57,6 +57,8 @@ function RecText({ rec }: { rec: Recommendation }) {
       return <>{t("smartCare.rec.updateSignatures", { count: rec.days })}</>;
     case "checkBattery":
       return <>{t("smartCare.rec.checkBattery", { percent: f.percent(rec.healthPercent) })}</>;
+    case "reviewDriveLayout":
+      return <>{t("smartCare.rec.reviewDriveLayout", { size: f.bytes(rec.bytes) })}</>;
   }
 }
 
@@ -218,6 +220,18 @@ function Results({ result }: { result: SmartCareResult }) {
         >
           <StatusLine status={statusOf("protection")} />
         </Card>
+        {result.driveLayout && (
+          <Card
+            module="drive-organizer"
+            icon={<Storage24Regular />}
+            title={t("smartCare.card.driveLayout")}
+            value={result.driveLayout.misplacedBytes > 0 ? t("smartCare.card.misplaced", { size: f.bytes(result.driveLayout.misplacedBytes) }) : t("smartCare.card.layoutOk")}
+            description={t("smartCare.card.driveLayoutDesc")}
+            actions={<Button onClick={() => navigate("/drive-organizer")}>{t("smartCare.card.open")}</Button>}
+          >
+            <StatusLine status={statusOf("driveLayout")} />
+          </Card>
+        )}
         {result.batteryHealth !== null && (
           <Card
             module="hardware"

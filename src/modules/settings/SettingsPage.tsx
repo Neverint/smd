@@ -2,7 +2,7 @@ import { Delete20Regular, FolderOpen20Regular } from "@fluentui/react-icons";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { Button, ErrorNotice, IconButton, Segmented } from "../../components";
+import { Button, ErrorNotice, IconButton, Segmented, Toggle } from "../../components";
 import { call, toBackendError, type AppInfo, type BackendError } from "../../lib/backend";
 import type { BackendSettings, DeleteMode } from "../../lib/types";
 import { useSettings, type LanguagePref, type ThemePref } from "../../stores/settings";
@@ -51,6 +51,13 @@ function CleanupSettings() {
             {t("settings.permanentWarning")}
           </p>
         )}
+      </div>
+      <div className="smd-setting">
+        <div>
+          <div className="smd-setting__label">{t("settings.quarantine")}</div>
+          <div className="smd-setting__hint">{t("settings.quarantineHint", { days: s.quarantineDays })}</div>
+        </div>
+        <Toggle checked={s.quarantine} onChange={(quarantine) => save({ ...s, quarantine })} label={t("settings.quarantine")} />
       </div>
       <div className="smd-setting smd-setting--stack">
         <div>

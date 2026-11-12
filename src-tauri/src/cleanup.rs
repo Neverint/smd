@@ -6,7 +6,7 @@ use std::sync::atomic::{AtomicU32, Ordering};
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use smd_core::cleanup::builtin_rules;
-use smd_win::cleanup::{Category, DeleteMode, Failure, ScanEnv, remove_items, scan_rule};
+use smd_win::cleanup::{Category, DeleteMode, Failure, ScanEnv, scan_rule};
 use tauri::ipc::Channel;
 use tauri::{AppHandle, Manager};
 
@@ -184,6 +184,8 @@ pub struct CleanupReport {
     /// Size of the Recycle Bin when it was emptied (`None` if it was not selected).
     pub bin_emptied_bytes: Option<u64>,
     pub undo_available: bool,
+    /// Items went to this quarantine folder on the disposable drive (not the Recycle Bin).
+    pub quarantine: Option<String>,
     pub activity_id: u64,
 }
 
@@ -201,7 +203,6 @@ pub fn run(state: &AppState, scan_id: u64, selections: &[Selection]) -> AppResul
         )));
     }
     let mode = lock(&state.settings)?.delete_mode;
-    let started_ms = now_ms();
 
     let mut items = Vec::new();
     let mut empty_bin = false;
@@ -237,20 +238,11 @@ pub fn run(state: &AppState, scan_id: u64, selections: &[Selection]) -> AppResul
         log::info!("emptied the Recycle Bin ({bytes} bytes)");
     }
 
-    let outcome = remove_items(&items, mode);
-    let removed_bytes = outcome.removed.iter().map(|r| r.1).sum();
     let id = state.next_id();
-    let undo_available = mode == DeleteMode::RecycleBin
-        && !outcome.removed.is_empty()
-        && activity::save_undo(
-            state,
-            id,
-            &activity::UndoData {
-                started_unix_s: started_ms / 1000,
-                paths: outcome.removed.iter().map(|r| r.0.clone()).collect(),
-                ..Default::default()
-            },
-        );
+    let removal = crate::removal::remove(state, id, &items, true);
+    let outcome = removal.outcome;
+    let removed_bytes = outcome.removed.iter().map(|r| r.1).sum();
+    let undo_available = removal.undoable && activity::save_undo(state, id, &removal.undo);
 
     let mut e = Entry::new(id, activity::Kind::Cleanup);
     e.bytes = removed_bytes;
@@ -279,6 +271,7 @@ pub fn run(state: &AppState, scan_id: u64, selections: &[Selection]) -> AppResul
         failures: outcome.failed.into_iter().take(100).collect(),
         bin_emptied_bytes,
         undo_available,
+        quarantine: removal.quarantine,
         activity_id: id,
     })
 }

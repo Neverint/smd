@@ -39,6 +39,8 @@ const ICONS: Record<ActivityKind, typeof Broom20Regular> = {
   defenderScan: ShieldCheckmark20Regular,
   signatureUpdate: ArrowDownload20Regular,
   permissionChange: LockClosed20Regular,
+  migration: FolderArrowRight20Regular,
+  quarantinePurge: Delete20Regular,
 };
 
 function Detail({ e }: { e: ActivityEntry }) {
@@ -83,6 +85,15 @@ function Detail({ e }: { e: ActivityEntry }) {
       return <>{t(e.failed > 0 ? "activity.detail.updateFailed" : "activity.detail.update", { name: e.target ?? "" })}</>;
     case "updatesSetup":
       return <>{t(e.failed > 0 ? "activity.detail.setupFailed" : "activity.detail.setup")}</>;
+    case "migration":
+      return (
+        <>
+          {t("activity.detail.migration", { count: e.items, size: f.bytes(e.bytes) })}
+          {skipped}
+        </>
+      );
+    case "quarantinePurge":
+      return <>{t("activity.detail.quarantinePurge", { size: f.bytes(e.bytes) })}</>;
     case "defenderScan":
       return <>{t(e.failed > 0 ? "activity.detail.scanStopped" : e.items > 0 ? "activity.detail.scanFound" : "activity.detail.scanClean", { kind: t(`protection.scanKind.${e.target ?? "quick"}`) })}</>;
     case "signatureUpdate":

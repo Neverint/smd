@@ -264,6 +264,76 @@ pub struct Outcome {
 
 const RECYCLE_BATCH: usize = 100;
 
+/// Where removed items go.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Destination {
+    RecycleBin,
+    Permanent,
+    /// `S:\Quarantine` (items already on that drive go to its Recycle Bin instead).
+    Quarantine {
+        root: std::path::PathBuf,
+        batch_id: u64,
+        now_ms: i64,
+    },
+}
+
+/// Like `remove_items`, with quarantine. Returns the quarantine manifest when one was written.
+pub fn remove_items_to(
+    items: &[Item],
+    dest: &Destination,
+) -> (Outcome, Option<std::path::PathBuf>) {
+    match dest {
+        Destination::RecycleBin => (remove_items(items, DeleteMode::RecycleBin), None),
+        Destination::Permanent => (remove_items(items, DeleteMode::Permanent), None),
+        Destination::Quarantine {
+            root,
+            batch_id,
+            now_ms,
+        } => {
+            let drive = |p: &str| p.get(0..2).map(|s| s.to_ascii_uppercase());
+            let qdrive = drive(&root.to_string_lossy());
+            let (local, away): (Vec<Item>, Vec<Item>) = items
+                .iter()
+                .cloned()
+                .partition(|i| drive(&i.path) == qdrive);
+            let mut out = remove_items(&local, DeleteMode::RecycleBin);
+            let (checked, ready) = check_all(&away);
+            out.failed.extend(checked.failed);
+            let (q, manifest) = crate::quarantine::put(root, *batch_id, *now_ms, &ready);
+            out.removed.extend(q.removed);
+            out.failed.extend(q.failed);
+            (out, manifest)
+        }
+    }
+}
+
+/// The checks every removal goes through: safety rules, no links, still there.
+fn check_all(items: &[Item]) -> (Outcome, Vec<&Item>) {
+    let mut out = Outcome::default();
+    let mut ready = Vec::new();
+    for item in items {
+        if safety::check_removal(&item.path, &item.root, item.item_is_root).is_err() {
+            out.failed.push(Failure {
+                path: item.path.clone(),
+                reason: FailReason::Refused,
+            });
+            continue;
+        }
+        match fs::symlink_metadata(&item.path) {
+            Ok(m) if m.file_type().is_symlink() => out.failed.push(Failure {
+                path: item.path.clone(),
+                reason: FailReason::Refused,
+            }),
+            Ok(_) => ready.push(item),
+            Err(_) => out.failed.push(Failure {
+                path: item.path.clone(),
+                reason: FailReason::Gone,
+            }),
+        }
+    }
+    (out, ready)
+}
+
 /// Removes items after checking each one again. Recycle Bin by default.
 pub fn remove_items(items: &[Item], mode: DeleteMode) -> Outcome {
     let mut out = Outcome::default();

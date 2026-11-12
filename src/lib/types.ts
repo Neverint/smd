@@ -13,6 +13,10 @@ export type DeleteMode = "recycleBin" | "permanent";
 export interface BackendSettings {
   exclusions: string[];
   deleteMode: DeleteMode;
+  quarantine: boolean;
+  quarantineDays: number;
+  purgeConsent: boolean | null;
+  scratchDays: number;
 }
 
 /* ---------- Cleanup ---------- */
@@ -73,6 +77,8 @@ export interface CleanupReport {
   failures: { path: string; reason: FailReason }[];
   binEmptiedBytes: number | null;
   undoAvailable: boolean;
+  /** Items went to this quarantine folder instead of the Recycle Bin. */
+  quarantine: string | null;
   activityId: number;
 }
 
@@ -95,7 +101,8 @@ export type Recommendation =
   | { kind: "resolveThreats"; count: number }
   | { kind: "turnOnRealTimeProtection" }
   | { kind: "updateSignatures"; days: number }
-  | { kind: "checkBattery"; healthPercent: number };
+  | { kind: "checkBattery"; healthPercent: number }
+  | { kind: "reviewDriveLayout"; bytes: number };
 
 export interface Assessment {
   score: number;
@@ -149,6 +156,7 @@ export interface SmartCareResult {
   defender: DefenderStatus | null;
   activeThreats: number | null;
   batteryHealth: number | null;
+  driveLayout: { status: Status; misplacedBytes: number; findings: number } | null;
   durationMs: number;
   activityId: number;
 }
@@ -224,7 +232,9 @@ export type ActivityKind =
   | "clutterRemoved"
   | "defenderScan"
   | "signatureUpdate"
-  | "permissionChange";
+  | "permissionChange"
+  | "migration"
+  | "quarantinePurge";
 
 export interface ActivityEntry {
   id: number;
@@ -305,7 +315,7 @@ export interface Background {
   boot: BootInfo | null;
 }
 
-export type SystemTool = "taskScheduler" | "services" | "windowsUpdate" | "windowsSecurity" | "privacySettings";
+export type SystemTool = "taskScheduler" | "services" | "windowsUpdate" | "windowsSecurity" | "privacySettings" | "saveLocations" | "installedApps" | "steam";
 
 /* ---------- Applications ---------- */
 export interface InstalledApp {
@@ -362,6 +372,7 @@ export interface RemovalReport {
   removedItems: number;
   failures: { path: string; reason: FailReason }[];
   undoAvailable: boolean;
+  quarantine?: string | null;
 }
 
 export interface UpdatesStatus {
@@ -559,4 +570,161 @@ export interface SensorsView {
   running: boolean;
   exitCode: number | null;
   snapshot: { elevated: boolean; hardware: HardwareReading[]; error: string | null } | null;
+}
+
+/* ---------- Drive Organizer ---------- */
+export type Role = "system" | "heavyGames" | "lightGames" | "disposable" | "unassigned";
+
+export interface DriveRule {
+  letter: string;
+  role: Role;
+  volumeGuid?: string;
+  diskSerial?: string;
+}
+
+export interface Policy {
+  version: number;
+  gameThresholdGb: number;
+  drives: DriveRule[];
+}
+
+export type Launcher = "steam" | "epic" | "xbox" | "gog";
+export type Severity = "info" | "warning" | "problem";
+export type Reason =
+  | "bigGameOnLightDrive"
+  | "gameOnSystemDrive"
+  | "gameOnDisposableDrive"
+  | "smallGameOnHeavyDrive"
+  | "personalFilesOnSystemDrive"
+  | "cacheOnSystemDrive"
+  | "maybeOnlyCopyOnDisposable";
+
+export type Method =
+  | { kind: "launcherMove"; launcher: Launcher }
+  | { kind: "reinstall"; launcher: Launcher }
+  | { kind: "copyVerify" }
+  | { kind: "relocateCache"; envVar: string };
+
+export interface Finding {
+  id: string;
+  name: string;
+  path: string;
+  drive: string;
+  bytes: number;
+  severity: Severity;
+  reason: Reason;
+  targetDrive: string | null;
+  method: Method;
+}
+
+export type PolicyNotice = { kind: "letterChanged"; from: string; to: string } | { kind: "missing"; letter: string };
+
+export interface OrgDrive {
+  letter: string;
+  label: string;
+  role: Role;
+  totalBytes: number;
+  freeBytes: number;
+  diskName: string | null;
+  mediaType: string | null;
+  busType: string | null;
+  serial: string | null;
+  health: DiskHealth | null;
+}
+
+export interface JournalSummary {
+  id: number;
+  createdMs: number;
+  steps: number;
+  done: number;
+  failed: number;
+  bytes: number;
+}
+
+export interface QuarantineSummary {
+  drive: string | null;
+  active: boolean;
+  bytes: number;
+  batches: number;
+  oldBytes: number;
+  purgeConsent: boolean | null;
+  days: number;
+}
+
+export interface AuditView {
+  auditId: number;
+  policy: Policy;
+  drives: OrgDrive[];
+  notices: PolicyNotice[];
+  findings: Finding[];
+  status: Status;
+  misplacedBytes: number;
+  games: number;
+  unfinished: JournalSummary[];
+  quarantine: QuarantineSummary;
+  durationMs: number;
+}
+
+export type CheckKind = "targetRole" | "freeSpace" | "sourceHealth" | "targetHealth" | "filesInUse" | "programsClosed" | "pluggedIn" | "targetFree";
+
+export interface Check {
+  kind: CheckKind;
+  ok: boolean;
+  detail: string;
+}
+
+export interface PlanStep {
+  finding: Finding;
+  target: string | null;
+  estSeconds: number;
+  checks: Check[];
+  runsInApp: boolean;
+  ready: boolean;
+}
+
+export interface PlanView {
+  planId: number;
+  steps: PlanStep[];
+  readyBytes: number;
+  estSeconds: number;
+}
+
+export interface MoveProgress {
+  step: number;
+  steps: number;
+  bytesDone: number;
+  bytesTotal: number;
+}
+
+export interface JournalStep {
+  findingId: string;
+  name: string;
+  source: string;
+  target: string;
+  bytes: number;
+  state: "pending" | "copying" | "verified" | "done" | "failed";
+  error: string | null;
+  skippedLinks: number;
+}
+
+export interface MoveResult {
+  journal: JournalSummary;
+  steps: JournalStep[];
+  cancelled: boolean;
+  undoAvailable: boolean;
+}
+
+export interface QuarantineBatch {
+  id: number;
+  manifest: string;
+  createdMs: number;
+  bytes: number;
+  items: number;
+  sample: string[];
+}
+
+export interface QuarantineRestore {
+  restored: number;
+  conflicts: number;
+  failed: number;
 }

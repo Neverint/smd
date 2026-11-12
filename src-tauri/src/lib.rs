@@ -5,8 +5,10 @@ mod clutter;
 mod commands;
 mod error;
 mod hardware;
+mod organizer;
 mod performance;
 mod protection;
+mod removal;
 mod settings;
 mod smart_care;
 mod space_lens;
@@ -50,6 +52,11 @@ pub fn run() {
             let state = state::AppState::new(effect, data_dir);
             *state.settings.lock().expect("fresh mutex") = settings::load(&state);
             app.manage(state);
+            // Purge old quarantine batches in the background (only after the user said yes once).
+            let handle = app.handle().clone();
+            std::thread::spawn(move || {
+                organizer::purge_old(&handle.state::<state::AppState>());
+            });
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -96,6 +103,16 @@ pub fn run() {
             hardware::hardware_info,
             hardware::sensors_poll,
             hardware::sensors_stop,
+            organizer::organizer_audit,
+            organizer::organizer_policy_set,
+            organizer::organizer_plan,
+            organizer::organizer_run,
+            organizer::organizer_resume,
+            organizer::organizer_cancel,
+            organizer::quarantine_list,
+            organizer::quarantine_restore,
+            organizer::quarantine_purge_consent,
+            clutter::clutter_scratch,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Scrub My Disks");

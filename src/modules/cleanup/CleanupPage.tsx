@@ -219,7 +219,7 @@ export function CleanupPage() {
           <Button variant="primary" size="lg" disabled={total === 0} onClick={onRun}>
             {total > 0 ? t("cleanup.clean", { size: f.bytes(total) }) : t("cleanup.nothingSelected")}
           </Button>
-          <p className="inline-note">{permanentMode ? t("cleanup.permanentNote") : t("cleanup.recycleNote")}</p>
+          <p className="inline-note">{permanentMode ? t("cleanup.permanentNote") : settings?.quarantine ? t("cleanup.quarantineNote", { days: settings.quarantineDays }) : t("cleanup.recycleNote")}</p>
         </div>
         <ReviewSheet category={reviewCat} onClose={() => setReviewing(null)} />
         <ConfirmDialog

@@ -72,6 +72,10 @@ pub struct AppState {
     pub sensors: Mutex<Option<SensorHelper>>,
     /// A Defender scan in progress (killed to cancel).
     pub defender_scan: Mutex<Option<std::process::Child>>,
+    /// Drive Organizer: last audit, the plan waiting for a go, and the cancel switch of a running move.
+    pub organizer_audit: Mutex<Option<crate::organizer::AuditState>>,
+    pub organizer_plan: Mutex<Option<crate::organizer::PlanState>>,
+    pub organizer_cancel: AtomicBool,
     next_id: AtomicU64,
 }
 
@@ -97,6 +101,9 @@ impl AppState {
             monitor: Mutex::new(None),
             sensors: Mutex::new(None),
             defender_scan: Mutex::new(None),
+            organizer_audit: Mutex::new(None),
+            organizer_plan: Mutex::new(None),
+            organizer_cancel: AtomicBool::new(false),
             next_id: AtomicU64::new(crate::store::now_ms() as u64),
         }
     }

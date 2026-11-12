@@ -9,6 +9,7 @@ pub mod cmdline;
 pub mod format;
 pub mod hardware;
 pub mod health;
+pub mod organizer;
 pub mod safety;
 pub mod space;
 pub mod startup;

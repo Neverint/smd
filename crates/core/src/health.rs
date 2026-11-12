@@ -215,6 +215,8 @@ pub struct Facts {
     pub protection: Option<ProtectionFacts>,
     /// Lowest battery health (full charge vs design), laptops only.
     pub battery_health_percent: Option<f64>,
+    /// Drive Organizer: layout status and bytes in the wrong place.
+    pub drive_layout: Option<(Status, u64)>,
 }
 
 /// One suggestion, ranked by impact. The UI words it from `kind`.
@@ -238,6 +240,7 @@ pub enum Recommendation {
     TurnOnRealTimeProtection,
     UpdateSignatures { days: u32 },
     CheckBattery { health_percent: f64 },
+    ReviewDriveLayout { bytes: u64 },
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -379,6 +382,15 @@ pub fn assess(f: &Facts) -> Assessment {
                     health_percent: health,
                 },
             ));
+        }
+    }
+    if let Some((status, bytes)) = f.drive_layout {
+        areas.push(AreaResult {
+            area: Area::DriveLayout,
+            status,
+        });
+        if status != Status::Good {
+            recs.push((rank(status), Recommendation::ReviewDriveLayout { bytes }));
         }
     }
     if let Some(n) = f.startup_enabled_third_party {

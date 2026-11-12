@@ -6,7 +6,7 @@ use std::time::Duration;
 use serde::Serialize;
 use smd_core::safety;
 use smd_win::apps::{InstalledApp, Leftover, LeftoverKind, UninstallResult};
-use smd_win::cleanup::{DeleteMode, Failure, Item, remove_items};
+use smd_win::cleanup::{Failure, Item};
 use smd_win::winget::{AppUpdate, UpdateResult, WindowsUpdates};
 use tauri::ipc::Channel;
 use tauri::{AppHandle, Manager};
@@ -14,7 +14,6 @@ use tauri::{AppHandle, Manager};
 use crate::activity::{self, Entry, RegBackup, Undo, UndoData};
 use crate::error::{AppError, AppResult};
 use crate::state::{AppState, LeftoverScan, lock};
-use crate::store::now_ms;
 
 async fn blocking<T: Send + 'static>(
     f: impl FnOnce() -> AppResult<T> + Send + 'static,
@@ -146,6 +145,7 @@ pub struct LeftoversReport {
     pub removed_items: u64,
     pub failures: Vec<Failure>,
     pub undo_available: bool,
+    pub quarantine: Option<String>,
 }
 
 /// Removes the leftovers the user kept ticked: folders to the Recycle Bin, registry keys after a backup.
@@ -172,7 +172,6 @@ pub async fn apps_remove_leftovers(
             .iter()
             .filter(|l| wanted.contains(&safety::normalize(&l.path)) && !l.needs_admin)
             .collect();
-        let started = now_ms();
         let id = state.next_id();
 
         let folders: Vec<Item> = chosen
@@ -189,7 +188,8 @@ pub async fn apps_remove_leftovers(
                 item_is_root: false,
             })
             .collect();
-        let outcome = remove_items(&folders, DeleteMode::RecycleBin);
+        let removal = crate::removal::remove(&state, id, &folders, false);
+        let outcome = removal.outcome;
         let mut failures = outcome.failed;
 
         let mut registry = Vec::new();
@@ -218,11 +218,8 @@ pub async fn apps_remove_leftovers(
         let removed_items = (outcome.removed.len() + registry.len()) as u64;
         let removed_bytes = outcome.removed.iter().map(|r| r.1).sum();
         let undo = UndoData {
-            started_unix_s: started / 1000,
-            paths: outcome.removed.iter().map(|r| r.0.clone()).collect(),
             registry,
-            startup: None,
-            permission: None,
+            ..removal.undo
         };
         let undo_available = removed_items > 0 && activity::save_undo(&state, id, &undo);
         let mut e = Entry::new(id, activity::Kind::LeftoversRemoved);
@@ -241,6 +238,7 @@ pub async fn apps_remove_leftovers(
             removed_items,
             failures,
             undo_available,
+            quarantine: removal.quarantine,
         })
     })
     .await

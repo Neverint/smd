@@ -22,7 +22,8 @@ test("Smart Care scans, scores and cleans the default junk", async ({ page }) =>
   await expect(page.getByText("Restart your PC: it has been on for 34 days.")).toBeVisible();
   await page.getByRole("button", { name: /^Clean / }).click();
   await expect(page.getByRole("heading", { name: "All done" })).toBeVisible();
-  await expect(page.getByText(/moved to the Recycle Bin/)).toBeVisible();
+  // Quarantine is on by default: junk goes to the disposable drive, not the Recycle Bin.
+  await expect(page.getByText(/moved to S:\\Quarantine/)).toBeVisible();
 });
 
 test("Cleanup review, skip and confirm before emptying the Recycle Bin", async ({ page }) => {
@@ -156,6 +157,33 @@ test("Hardware Health: live sensors, drives and memory", async ({ page }) => {
   await expect(page.getByText("X: Samsung SSD 990 PRO with Heatsink 1TB")).toBeVisible();
   await expect(page.getByText("2 of 4 slots used")).toBeVisible();
   await expect(page.getByText("Battery", { exact: true })).toHaveCount(0);
+});
+
+test("Drive Organizer: audit, dry run with checks, move, quarantine", async ({ page }) => {
+  await page.goto("/#/drive-organizer");
+  await expect(page.getByRole("region", { name: "X: Big games" })).toBeVisible();
+  await expect(page.getByText("4 items on the wrong drive")).toBeVisible();
+
+  await page.getByRole("checkbox", { name: "holiday-2019.mp4" }).check();
+  await page.getByRole("checkbox", { name: "Hugging Face models" }).check();
+  await page.getByRole("checkbox", { name: "Elden Ring" }).check();
+  await page.getByRole("button", { name: "Plan 3 moves" }).click();
+  await expect(page.getByText("Dry run: what would happen")).toBeVisible();
+  // A blocked step says why; a guided step explains what to do in Steam.
+  await expect(page.getByText("Close first: python.exe")).toBeVisible();
+  await expect(page.getByText(/In Steam: Settings > Storage/)).toBeVisible();
+
+  await page.getByRole("button", { name: /^Move 1 item/ }).click();
+  const confirm = page.getByRole("dialog", { name: "Move these items?" });
+  await expect(confirm).toContainText("holiday-2019.mp4");
+  await confirm.getByRole("button", { name: "Move" }).click();
+  await expect(page.getByText("Moves finished")).toBeVisible();
+  await expect(page.getByText("Copied, checked, original in the Recycle Bin")).toBeVisible();
+
+  await page.getByRole("tab", { name: "Quarantine & Scratch" }).click();
+  await expect(page.getByText(/in quarantine for more than 30 days/)).toBeVisible();
+  await page.getByRole("button", { name: "No, keep them" }).click();
+  await expect(page.getByText(/in quarantine for more than 30 days/)).toBeHidden();
 });
 
 test("Settings: permanent delete shows a warning", async ({ page }) => {

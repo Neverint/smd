@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "gameThresholdGb": 50,
+  "drives": [
+    { "letter": "C:", "role": "system" },
+    { "letter": "X:", "role": "heavyGames" },
+    { "letter": "G:", "role": "lightGames" },
+    { "letter": "S:", "role": "disposable" }
+  ]
+}

@@ -9,6 +9,13 @@ import type {
   CleanupReport,
   CleanupScanResult,
   CleanupSelection,
+  AuditView,
+  MoveProgress,
+  MoveResult,
+  PlanView,
+  Policy,
+  QuarantineBatch,
+  QuarantineRestore,
   Capability,
   CapabilityState,
   DefenderScanResult,
@@ -94,6 +101,14 @@ export interface Commands {
   hardware_info: { args: NoArgs; result: HardwareView };
   sensors_poll: { args: NoArgs; result: SensorsView };
   sensors_stop: { args: NoArgs; result: null };
+  organizer_audit: { args: NoArgs; result: AuditView };
+  organizer_policy_set: { args: { policy: Policy }; result: AuditView };
+  organizer_plan: { args: { ids: string[] }; result: PlanView };
+  organizer_cancel: { args: NoArgs; result: null };
+  quarantine_list: { args: NoArgs; result: QuarantineBatch[] };
+  quarantine_restore: { args: { manifest: string }; result: QuarantineRestore };
+  quarantine_purge_consent: { args: { allow: boolean }; result: number };
+  clutter_scratch: { args: NoArgs; result: DownloadsView };
 }
 
 /** Commands that stream progress through a channel (`on_progress` in Rust). */
@@ -105,6 +120,8 @@ export interface StreamCommands {
   updates_apply: { args: { ids: string[] }; progress: IndexProgress; result: UpdateOutcome[] };
   clutter_scan: { args: { path: string | null }; progress: ClutterProgress; result: ClutterView };
   protection_scan: { args: { kind: ScanKind }; progress: { elapsedMs: number }; result: DefenderScanResult };
+  organizer_run: { args: { planId: number; findingIds: string[] }; progress: MoveProgress; result: MoveResult };
+  organizer_resume: { args: { journalId: number }; progress: MoveProgress; result: MoveResult };
 }
 
 export type CommandName = keyof Commands;

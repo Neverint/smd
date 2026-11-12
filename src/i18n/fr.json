@@ -107,7 +107,8 @@
       "rule": "Recherche de fichiers inutiles : {{name}}",
       "startup": "Comptage des éléments au démarrage",
       "updates": "Recherche des mises à jour",
-      "protection": "Vérification de Microsoft Defender"
+      "protection": "Vérification de Microsoft Defender",
+      "layout": "Vérification de l'organisation des disques"
     },
     "scoreLabel": "Score de santé : {{score}} sur 100",
     "outOf": "/ 100",
@@ -138,7 +139,8 @@
       "turnOnRealTimeProtection": "Réactivez la protection en temps réel dans Sécurité Windows.",
       "updateSignatures_one": "Mettez à jour Microsoft Defender : ses définitions de virus ont {{count}} jour.",
       "updateSignatures_other": "Mettez à jour Microsoft Defender : ses définitions de virus ont {{count}} jours.",
-      "checkBattery": "Votre batterie garde {{percent}} % de sa charge d'origine. Prévoyez son remplacement si elle se vide trop vite."
+      "checkBattery": "Votre batterie garde {{percent}} % de sa charge d'origine. Prévoyez son remplacement si elle se vide trop vite.",
+      "reviewDriveLayout": "{{size}} se trouvent sur le mauvais disque. Ouvrez Organisation des disques."
     },
     "card": {
       "junk": "Fichiers inutiles",
@@ -177,7 +179,11 @@
       "threats_other": "{{count}} menaces",
       "defenderUnknown": "Impossible de lire Microsoft Defender (un autre antivirus est peut-être en charge).",
       "battery": "Santé de la batterie",
-      "batteryDesc": "Charge complète comparée à la capacité d'origine."
+      "batteryDesc": "Charge complète comparée à la capacité d'origine.",
+      "driveLayout": "Organisation des disques",
+      "driveLayoutDesc": "Chaque disque garde son rôle.",
+      "misplaced": "{{size}} mal placés",
+      "layoutOk": "En ordre"
     },
     "status": {
       "good": "Bon",
@@ -297,7 +303,9 @@
       "gone": "N'existe plus",
       "refused": "Protégé"
     },
-    "unknownSize": "Non mesuré"
+    "unknownSize": "Non mesuré",
+    "doneQuarantine": "{{size}} déplacés dans {{path}}. L'espace est libéré ; tout y reste 30 jours et peut être remis en place depuis Mon activité.",
+    "quarantineNote": "Les éléments supprimés vont dans la quarantaine de votre disque jetable (gardés {{days}} jours), ou dans la Corbeille si ce disque n'est pas là."
   },
   "spaceLens": {
     "pick": "Choisissez un disque ou un dossier à analyser",
@@ -346,7 +354,9 @@
       "clutterRemoved": "Fichiers mis à la Corbeille",
       "defenderScan": "Analyse Microsoft Defender",
       "signatureUpdate": "Mise à jour des définitions de virus",
-      "permissionChange": "Autorisation d'application modifiée"
+      "permissionChange": "Autorisation d'application modifiée",
+      "migration": "Fichiers déplacés vers un autre disque",
+      "quarantinePurge": "Ancienne quarantaine purgée"
     },
     "detail": {
       "smartCareScan": "Score {{score}} · {{size}} de fichiers inutiles trouvés",
@@ -377,7 +387,10 @@
       "signatures": "Définitions mises à jour",
       "signaturesFailed": "Échec de la mise à jour",
       "permissionOn": "{{app}} peut de nouveau utiliser : {{what}}",
-      "permissionOff": "{{app}} ne peut plus utiliser : {{what}}"
+      "permissionOff": "{{app}} ne peut plus utiliser : {{what}}",
+      "migration_one": "{{count}} élément, {{size}}",
+      "migration_other": "{{count}} éléments, {{size}}",
+      "quarantinePurge": "{{size}} supprimés définitivement"
     },
     "undo": "Annuler",
     "undoLabel": "Annuler : {{what}}",
@@ -419,7 +432,9 @@
       "none": "Opaque (sans matière)"
     },
     "gallery": "Ouvrir la galerie de composants",
-    "privacy": "Pas de télémétrie, pas de compte. Les journaux restent sur ce PC."
+    "privacy": "Pas de télémétrie, pas de compte. Les journaux restent sur ce PC.",
+    "quarantine": "Quarantaine sur le disque jetable",
+    "quarantineHint": "Les éléments supprimés de vos autres disques vont dans le dossier Quarantaine du disque jetable pendant {{days}} jours au lieu de la Corbeille. L'espace est libéré tout de suite. Désactivée, ou si ce disque manque ou n'est pas en bonne santé : la Corbeille."
   },
   "errors": {
     "title": "Ça n'a pas marché",
@@ -700,5 +715,151 @@
     "batteryLine": "{{full}} Wh aujourd'hui, {{design}} Wh neuve",
     "cycles_one": "{{count}} cycle de charge",
     "cycles_other": "{{count}} cycles de charge"
+  },
+  "organizer": {
+    "tabs": {
+      "layout": "Organisation",
+      "quarantine": "Quarantaine et brouillon"
+    },
+    "auditing": "Vérification de vos disques…",
+    "auditLine": "{{games}} jeux trouvés · vérifié en {{seconds}} s",
+    "status": {
+      "good": "Chaque disque sert à son rôle.",
+      "warning": "Certaines choses sont sur le mauvais disque.",
+      "critical": "L'organisation de vos disques demande votre attention."
+    },
+    "role": {
+      "system": "Windows seulement",
+      "heavyGames": "Gros jeux",
+      "lightGames": "Petits jeux et documents",
+      "disposable": "Jetable (brouillon, quarantaine)",
+      "unassigned": "Sans rôle"
+    },
+    "severity": {
+      "info": "Pourrait être mieux placé",
+      "warning": "À déplacer",
+      "problem": "Mauvais disque"
+    },
+    "reason": {
+      "bigGameOnLightDrive": "Un gros jeu sur {{from}}. Les gros jeux vont sur {{to}}.",
+      "gameOnSystemDrive": "Un jeu sur le disque Windows ({{from}}). Il va sur {{to}}.",
+      "gameOnDisposableDrive": "Un jeu sur le disque jetable ({{from}}). Il va sur {{to}}.",
+      "smallGameOnHeavyDrive": "Un petit jeu sur {{from}}. Il tiendrait sur {{to}} et laisserait la place aux gros.",
+      "personalFilesOnSystemDrive": "Un gros fichier personnel sur le disque Windows ({{from}}). Il va sur {{to}}.",
+      "cacheOnSystemDrive": "Un gros cache d'outil sur le disque Windows ({{from}}). Il peut vivre sur {{to}}.",
+      "maybeOnlyCopyOnDisposable": "Des données sur le disque jetable ({{from}}), peut-être la seule copie. Gardez-en une copie sur {{to}}."
+    },
+    "launcher": {
+      "steam": "Steam",
+      "epic": "Epic Games",
+      "xbox": "l'application Xbox",
+      "gog": "GOG Galaxy"
+    },
+    "method": {
+      "launcherMove": {
+        "steam": "À déplacer avec Steam (guidé)",
+        "xbox": "À déplacer avec l'application Xbox (guidé)",
+        "epic": "À déplacer avec Epic",
+        "gog": "À déplacer avec GOG"
+      },
+      "reinstall": "{{launcher}} ne sait pas déplacer les jeux : désinstaller, puis installer dans la nouvelle bibliothèque (guidé)",
+      "copyVerify": "Copie, vérification, puis l'original va dans la Corbeille",
+      "relocateCache": "{{variable}} pointé vers le nouvel endroit, copie, vérification, puis l'ancienne copie va dans la Corbeille"
+    },
+    "notice": {
+      "letterChanged": "Le disque qui était {{from}} est maintenant {{to}}. Son rôle l'a suivi.",
+      "missing": "{{letter}} n'est pas connecté en ce moment."
+    },
+    "unfinished": "Un déplacement s'est arrêté avant la fin ({{done}} sur {{total}} faits, {{size}}). Rien n'est perdu : reprenez-le pour le terminer.",
+    "resume": "Reprendre",
+    "editRoles": "Modifier les rôles des disques",
+    "saveLocations": "Où enregistrer les nouvelles applications et jeux",
+    "misplaced_one": "{{count}} élément sur le mauvais disque ({{size}})",
+    "misplaced_other": "{{count}} éléments sur le mauvais disque ({{size}})",
+    "allGood": "Rien n'est sur le mauvais disque.",
+    "couldFitBetter": "Pourrait être mieux placé (pour information)",
+    "plan_one": "Préparer {{count}} déplacement",
+    "plan_other": "Préparer {{count}} déplacements",
+    "selectToPlan": "Sélectionnez des éléments à préparer",
+    "planNote": "La préparation est une simulation : elle ne fait que vérifier. Rien ne bouge avant votre confirmation.",
+    "planTitle": "Simulation : ce qui se passerait",
+    "planHint": "Dans cet ordre. Les étapes guidées se font dans le lanceur ; l'application fait les autres après votre accord.",
+    "estimate": "environ {{minutes}} min",
+    "estimateTotal": "Environ {{minutes}} min au total. Vous pouvez mettre en pause et reprendre plus tard.",
+    "guided": "étape guidée",
+    "check": {
+      "targetRole": "Le rôle du disque cible le permet",
+      "freeSpace": "Place sur la cible ({{detail}} nécessaires)",
+      "sourceHealth": "Disque source en bonne santé",
+      "targetHealth": "Disque cible en bonne santé",
+      "targetFree": "Rien n'existe déjà à la cible",
+      "filesInUse": "Aucun fichier utilisé",
+      "programsClosed": "Aucun programme à fermer",
+      "pluggedIn": "Sur secteur"
+    },
+    "guide": {
+      "steam": "Dans Steam : Paramètres > Stockage, choisissez le jeu, puis Déplacer et la bibliothèque sur {{target}}. Steam le déplace et le vérifie.",
+      "xbox": "Dans Paramètres > Applications > Applications installées, ouvrez le menu du jeu, Déplacer, puis choisissez {{target}}.",
+      "reinstall": "Désinstallez-le dans son lanceur, puis réinstallez-le dans une bibliothèque sur {{target}}. Vos sauvegardes restent en général dans le cloud ou dans Documents."
+    },
+    "openSteam": "Ouvrir Steam",
+    "openApps": "Ouvrir Applications installées",
+    "move_one": "Déplacer {{count}} élément ({{size}})",
+    "move_other": "Déplacer {{count}} éléments ({{size}})",
+    "nothingToRun": "Rien que l'application puisse déplacer",
+    "confirmTitle": "Déplacer ces éléments ?",
+    "confirmBody": "Chaque fichier est copié, puis vérifié octet par octet. Seulement ensuite, les originaux vont dans la Corbeille de leur disque. Vous pouvez mettre en pause, reprendre après un redémarrage, et annuler depuis Mon activité.",
+    "confirm": "Déplacer",
+    "moving": "Déplacement…",
+    "movingLine": "{{done}} sur {{total}} copiés et vérifiés",
+    "movingHint": "Vous pouvez mettre en pause : le journal garde la trace, rien n'est perdu.",
+    "pause": "Pause",
+    "paused": "En pause. Reprenez-le depuis l'onglet Organisation quand vous voulez.",
+    "doneTitle": "Déplacements terminés",
+    "stepDone": "Copié, vérifié, original dans la Corbeille",
+    "state": {
+      "pending": "Pas commencé",
+      "copying": "Copie en cours (reprenez pour terminer)",
+      "verified": "Copié et vérifié",
+      "done": "Terminé",
+      "failed": "Échec"
+    },
+    "undoHint": "Vous avez changé d'avis ? Annulez depuis Mon activité.",
+    "auditAgain": "Vérifier à nouveau",
+    "rolesTitle": "Rôles des disques",
+    "rolesHint": "Chaque disque est reconnu par son identifiant de volume : un changement de lettre est remarqué. Changer un rôle change ce qui compte comme mal placé.",
+    "roleFor": "Rôle de {{letter}}",
+    "threshold": "Un jeu est gros à partir de (Go)",
+    "saveRoles": "Enregistrer",
+    "quarantineTitle": "Quarantaine sur {{drive}}",
+    "quarantineOn": "Activée : ce que l'application supprime de vos autres disques attend ici {{days}} jours avant de pouvoir être purgé.",
+    "quarantineOff": "Désactivée, ou le disque n'est pas disponible : les éléments supprimés vont dans la Corbeille.",
+    "quarantineSize_one": "{{size}} dans {{count}} lot.",
+    "quarantineSize_other": "{{size}} dans {{count}} lots.",
+    "purgeQuestion": "{{size}} sont en quarantaine depuis plus de {{days}} jours. Supprimer automatiquement les lots une fois qu'ils ont {{days}} jours ? C'est irréversible.",
+    "purgeYes": "Oui, purger les anciens lots",
+    "purgeNo": "Non, les garder",
+    "purged": "{{size}} libérés.",
+    "restore": "Remettre en place",
+    "restored_one": "{{count}} élément remis à sa place.",
+    "restored_other": "{{count}} éléments remis à leur place.",
+    "conflicts_one": "{{count}} est resté en quarantaine : un nouvel élément porte le même nom.",
+    "conflicts_other": "{{count}} sont restés en quarantaine : de nouveaux éléments portent les mêmes noms.",
+    "scratchTitle": "Dossier brouillon {{path}}",
+    "scratchHint": "Pour le travail temporaire : exports, fichiers décompressés. Ce qui a plus de 14 jours est listé ici.",
+    "scratchEmpty": "Rien d'ancien dans le dossier brouillon.",
+    "scratchRemove_one": "Supprimer {{count}} élément",
+    "scratchRemove_other": "Supprimer {{count}} éléments",
+    "scratchRemoved": "{{size}} mis à la Corbeille.",
+    "checkBad": {
+      "targetRole": "Le rôle du disque cible ne le permet pas, ou le disque n'est pas connecté",
+      "freeSpace": "Pas assez de place sur la cible ({{detail}} nécessaires)",
+      "sourceHealth": "Le disque source n'est pas en bonne santé",
+      "targetHealth": "Le disque cible n'est pas en bonne santé",
+      "targetFree": "Quelque chose existe déjà à la cible",
+      "filesInUse": "Fichiers utilisés par : {{detail}}",
+      "programsClosed": "À fermer d'abord : {{detail}}",
+      "pluggedIn": "Branchez d'abord votre portable"
+    }
   }
 }

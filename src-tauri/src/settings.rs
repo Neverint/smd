@@ -8,13 +8,34 @@ use crate::error::{AppError, AppResult};
 use crate::state::AppState;
 use crate::store;
 
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct Settings {
     /// Files and folders Cleanup never touches.
     pub exclusions: Vec<String>,
     /// Recycle Bin by default. Permanent delete is an explicit opt-in.
     pub delete_mode: DeleteMode,
+    /// Removed items go to the disposable drive's quarantine (when it is there and healthy).
+    pub quarantine: bool,
+    /// Days quarantined items are kept.
+    pub quarantine_days: u32,
+    /// Purge old quarantine batches automatically: not asked yet (`None`), yes, or no.
+    pub purge_consent: Option<bool>,
+    /// Files in the scratch folder older than this are listed for cleanup.
+    pub scratch_days: u32,
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Settings {
+            exclusions: Vec::new(),
+            delete_mode: DeleteMode::RecycleBin,
+            quarantine: true,
+            quarantine_days: 30,
+            purge_consent: None,
+            scratch_days: 14,
+        }
+    }
 }
 
 pub const FILE: &str = "settings.json";
@@ -31,6 +52,9 @@ pub fn load(state: &AppState) -> Settings {
 }
 
 fn validate(s: &Settings) -> AppResult<()> {
+    if !(1..=365).contains(&s.quarantine_days) || !(1..=365).contains(&s.scratch_days) {
+        return Err(AppError::Internal("days must be between 1 and 365".into()));
+    }
     for path in &s.exclusions {
         let p = std::path::Path::new(path);
         if !p.is_absolute() {

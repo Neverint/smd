@@ -12,7 +12,7 @@ export function useStepLabel() {
   const { t } = useTranslation();
   return (step: string | undefined): string => {
     if (!step) return "";
-    if (["disks", "memory", "drive", "startup", "updates", "protection"].includes(step)) return t(`smartCare.step.${step}`);
+    if (["disks", "memory", "drive", "startup", "updates", "protection", "layout"].includes(step)) return t(`smartCare.step.${step}`);
     return t("smartCare.step.rule", { name: t(`cleanup.cat.${step}.name`) });
   };
 }
@@ -63,7 +63,13 @@ export function CleanupDone({ report, title, children }: { report: CleanupReport
         {f.bytes(report.removedBytes + (report.binEmptiedBytes ?? 0))}
       </div>
       <div className="flow-lines">
-        {removed && <p>{t(report.mode === "permanent" ? "cleanup.donePermanent" : "cleanup.doneRecycled", { size: f.bytes(report.removedBytes) })}</p>}
+        {removed && (
+          <p>
+            {report.quarantine
+              ? t("cleanup.doneQuarantine", { size: f.bytes(report.removedBytes), path: report.quarantine })
+              : t(report.mode === "permanent" ? "cleanup.donePermanent" : "cleanup.doneRecycled", { size: f.bytes(report.removedBytes) })}
+          </p>
+        )}
         {report.binEmptiedBytes !== null && <p>{t("cleanup.doneBin", { size: f.bytes(report.binEmptiedBytes) })}</p>}
         {!removed && report.binEmptiedBytes === null && <p>{t("cleanup.doneNothing")}</p>}
         {report.failedCount > 0 && <p className="flow-muted">{t("cleanup.doneSkipped", { count: report.failedCount })}</p>}

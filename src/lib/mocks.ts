@@ -2,6 +2,7 @@ import type { MockHandlers, MockStreams } from "./backend";
 import { formatBytes } from "./format";
 import { phase2Handlers, phase2Streams, resetPhase2Mocks } from "./mocks-phase2";
 import { phase3Handlers, phase3Streams, resetPhase3Mocks } from "./mocks-phase3";
+import { phase3bHandlers, phase3bStreams, resetPhase3bMocks } from "./mocks-phase3b";
 import type {
   ActivityEntry,
   BackendSettings,
@@ -26,7 +27,7 @@ const fast = () => typeof window !== "undefined" && (window as unknown as { __SM
 const pause = (ms: number) => (fast() ? Promise.resolve() : sleep(ms));
 
 let nextId = 1000;
-let settings: BackendSettings = { exclusions: [], deleteMode: "recycleBin" };
+let settings: BackendSettings = { exclusions: [], deleteMode: "recycleBin", quarantine: true, quarantineDays: 30, purgeConsent: null, scratchDays: 14 };
 let activity: ActivityEntry[] = [];
 let lastScanId = 0;
 
@@ -261,6 +262,7 @@ export const mockHandlers: MockHandlers = {
       failures: failedCount ? [{ path: "C:\\Users\\you\\AppData\\Local\\Microsoft\\Windows\\Explorer\\thumbcache_idx.db", reason: "inUse" as const }] : [],
       binEmptiedBytes,
       undoAvailable: e.undo === "available",
+      quarantine: settings.quarantine && settings.deleteMode === "recycleBin" ? "S:\\Quarantine" : null,
       activityId: e.id,
     };
   },
@@ -277,6 +279,7 @@ export const mockHandlers: MockHandlers = {
   space_reveal: () => null,
   ...phase2Handlers(log),
   ...phase3Handlers(log),
+  ...phase3bHandlers(log),
 };
 
 export const mockStreams: MockStreams = {
@@ -322,6 +325,7 @@ export const mockStreams: MockStreams = {
       defender: null,
       activeThreats: 0,
       batteryHealth: null,
+      driveLayout: { status: "warning" as const, misplacedBytes: 99 * GB, findings: 4 },
       activityId: 0,
     };
     const e = log({ ...blank, kind: "smartCareScan", score: result.assessment.score, bytes: lastCleanup.reclaimableBytes });
@@ -362,15 +366,17 @@ export const mockStreams: MockStreams = {
   },
   ...phase2Streams(log),
   ...phase3Streams(log),
+  ...phase3bStreams(log),
 };
 
 /** Test helper: start every mock session from a clean state. */
 export function resetMocks(): void {
   nextId = 1000;
-  settings = { exclusions: [], deleteMode: "recycleBin" };
+  settings = { exclusions: [], deleteMode: "recycleBin", quarantine: true, quarantineDays: 30, purgeConsent: null, scratchDays: 14 };
   activity = [];
   lastCleanup = null;
   lastScanId = 0;
   resetPhase2Mocks();
   resetPhase3Mocks();
+  resetPhase3bMocks();
 }

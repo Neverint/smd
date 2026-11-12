@@ -154,7 +154,7 @@ export function ClutterPage() {
           <h1 className="flow-title">{t("clutter.doneTitle")}</h1>
           <div className="flow-big">{f.bytes(report.removedBytes)}</div>
           <div className="flow-lines">
-            <p>{t("clutter.doneBody", { size: f.bytes(report.removedBytes) })}</p>
+            <p>{report.quarantine ? t("cleanup.doneQuarantine", { size: f.bytes(report.removedBytes), path: report.quarantine }) : t("clutter.doneBody", { size: f.bytes(report.removedBytes) })}</p>
             {report.failures.length > 0 && <p className="flow-muted">{t("cleanup.doneSkipped", { count: report.failures.length })}</p>}
             {report.undoAvailable && (
               <p className="flow-muted">

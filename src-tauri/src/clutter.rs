@@ -7,13 +7,13 @@ use std::time::Duration;
 
 use serde::Serialize;
 use smd_core::safety;
-use smd_win::cleanup::{DeleteMode, Failure, Item, remove_items};
+use smd_win::cleanup::{Failure, Item};
 use smd_win::clutter::{ClutterOptions, ClutterProgress, ClutterResult, FolderItem};
 use smd_win::shell::KnownFolder;
 use tauri::ipc::Channel;
 use tauri::{AppHandle, Manager};
 
-use crate::activity::{self, Entry, Undo, UndoData};
+use crate::activity::{self, Entry, Undo};
 use crate::error::{AppError, AppResult};
 use crate::state::{AppState, ClutterScan, DownloadsList, lock};
 use crate::store::now_ms;
@@ -189,6 +189,46 @@ pub async fn clutter_downloads(app: AppHandle) -> AppResult<DownloadsView> {
     .await
 }
 
+/// Files in the disposable drive's `Scratch` folder older than the setting (14 days). Read-only.
+/// Creates `S:\Scratch` if the drive is there, so it can be used for temporary work.
+#[tauri::command]
+pub async fn clutter_scratch(app: AppHandle) -> AppResult<DownloadsView> {
+    blocking(move || {
+        let state = app.state::<AppState>();
+        let policy = crate::organizer::load_policy(&state);
+        let letter = policy
+            .drive_for(smd_core::organizer::Role::Disposable)
+            .ok_or_else(|| AppError::NotFound("no disposable drive in the policy".into()))?
+            .to_string();
+        if !smd_win::system::drives()
+            .iter()
+            .any(|d| d.letter.eq_ignore_ascii_case(&letter))
+        {
+            return Err(AppError::NotFound(format!("{letter} is not connected")));
+        }
+        let root = PathBuf::from(format!(r"{letter}\Scratch"));
+        std::fs::create_dir_all(&root)?;
+        let days = lock(&state.settings)?.scratch_days;
+        let cutoff = now_ms() - i64::from(days) * 86_400_000;
+        let items: Vec<FolderItem> = smd_win::clutter::folder_items(&root)?
+            .into_iter()
+            .filter(|i| i.modified_ms.is_some_and(|m| m < cutoff))
+            .collect();
+        let scan_id = state.next_id();
+        *lock(&state.downloads)? = Some(DownloadsList {
+            id: scan_id,
+            root: root.clone(),
+            items: items.clone(),
+        });
+        Ok(DownloadsView {
+            scan_id,
+            path: root.to_string_lossy().into_owned(),
+            items,
+        })
+    })
+    .await
+}
+
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ClutterReport {
@@ -196,6 +236,7 @@ pub struct ClutterReport {
     pub removed_items: u64,
     pub failures: Vec<Failure>,
     pub undo_available: bool,
+    pub quarantine: Option<String>,
 }
 
 /// Checks a removal request against a scan: every path must be in it, and no duplicate group may lose all its copies.
@@ -243,16 +284,11 @@ pub fn plan_removal(result: &ClutterResult, paths: &[String]) -> AppResult<Vec<I
 }
 
 fn finish(state: &AppState, items: &[Item], kind_target: &str) -> ClutterReport {
-    let started = now_ms();
-    let outcome = remove_items(items, DeleteMode::RecycleBin);
     let id = state.next_id();
+    let removal = crate::removal::remove(state, id, items, false);
+    let outcome = removal.outcome;
     let removed_bytes = outcome.removed.iter().map(|r| r.1).sum();
-    let undo = UndoData {
-        started_unix_s: started / 1000,
-        paths: outcome.removed.iter().map(|r| r.0.clone()).collect(),
-        ..Default::default()
-    };
-    let undo_available = !outcome.removed.is_empty() && activity::save_undo(state, id, &undo);
+    let undo_available = removal.undoable && activity::save_undo(state, id, &removal.undo);
     let mut e = Entry::new(id, activity::Kind::ClutterRemoved);
     e.target = Some(kind_target.to_string());
     e.bytes = removed_bytes;
@@ -269,6 +305,7 @@ fn finish(state: &AppState, items: &[Item], kind_target: &str) -> ClutterReport 
         removed_items: outcome.removed.len() as u64,
         failures: outcome.failed,
         undo_available,
+        quarantine: removal.quarantine,
     }
 }
 

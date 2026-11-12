@@ -4,7 +4,7 @@
 
 A free, open-source maintenance app for Windows 10 and 11. It brings the best free PC-health tools together in one place, with a calm, guided scan flow and Windows 11 materials (Mica, Segoe UI Variable, Fluent icons).
 
-> **Status: Phase 3.** Protection (Microsoft Defender, firewall, app permissions), Hardware Health (live sensors, drives, memory, battery), Smart Care (complete health score), Cleanup (review, then Recycle Bin), Space Lens (drive map), Performance (startup items, live programs, background tasks), Applications (uninstall with leftovers review, app updates), My Clutter (large, old and duplicate files) and My Activity (history with undo) work. The other modules arrive phase by phase; see the roadmap below.
+> **Status: Phase 3b.** Drive Organizer (drive roles, misplaced games and files, dry-run moves with a journal, S: quarantine), Protection (Microsoft Defender, firewall, app permissions), Hardware Health (live sensors, drives, memory, battery), Smart Care (complete health score), Cleanup (review, then Recycle Bin), Space Lens (drive map), Performance (startup items, live programs, background tasks), Applications (uninstall with leftovers review, app updates), My Clutter (large, old and duplicate files) and My Activity (history with undo) work. The other modules arrive phase by phase; see the roadmap below.
 
 ## Safety principles
 

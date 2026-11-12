@@ -200,6 +200,12 @@ mod imp {
         .map_err(io::Error::other)
     }
 
+    /// Running on battery right now (a laptop unplugged).
+    pub fn on_battery() -> bool {
+        let mut s = SYSTEM_POWER_STATUS::default();
+        unsafe { GetSystemPowerStatus(&mut s) }.is_ok() && s.ACLineStatus == 0
+    }
+
     /// True when Windows reports a system battery (laptops, tablets).
     pub fn has_battery() -> bool {
         let mut s = SYSTEM_POWER_STATUS::default();
@@ -233,6 +239,9 @@ mod imp {
         Err(io::Error::new(io::ErrorKind::Unsupported, "Windows only"))
     }
     pub fn has_battery() -> bool {
+        false
+    }
+    pub fn on_battery() -> bool {
         false
     }
 }

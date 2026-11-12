@@ -38,7 +38,7 @@ crates/win/          Windows access: drives, memory, Recycle Bin, disk walk, cle
 src-tauri/           Tauri app: one file per module's commands (cleanup, smart_care, space_lens, performance, applications,
                      clutter, activity, settings),
                      state.rs, store.rs (JSON files), error.rs (typed AppError), window_effect.rs
-rules/               cleanup.json (declarative cleanup rules); tweaks.json and the drive policy come later
+rules/               cleanup.json (cleanup rules), drive-policy.json (default drive roles); tweaks.json comes in Phase 4
 sidecars/hwmon/      .NET 8 LibreHardwareMonitor helper; `npm run hwmon` builds it into src-tauri/resources/hwmon (not committed)
 docs/                DECISIONS.md, design-system.md
 ```
@@ -65,7 +65,8 @@ $env:Path += ';G:\Documents\Dev\.rust\cargo\bin'; $env:RUSTUP_HOME='G:\Documents
 
 - Every backend command returns `AppResult<T>`; errors serialize as `{ code, message, details }`. Add each command to `Commands` in `src/lib/backend.ts` and a mock in `src/lib/mocks.ts`.
 - Pure logic goes in `crates/core` with unit tests. Windows API and file system code goes in `crates/win`.
-- Anything that removes files goes through `smd_win::cleanup::remove_items`, which re-checks `smd_core::safety::check_removal`. Never remove a path the UI sent: act on the backend's own scan, by id.
+- Anything that removes files goes through `crate::removal::remove` (Recycle Bin, S: quarantine or opt-in permanent delete), which ends in `smd_win::cleanup::remove_items_to` and re-checks `smd_core::safety::check_removal`. Never remove a path the UI sent: act on the backend's own scan, by id.
+- Moving data between drives only through `smd_win::migrate` (journal, copy-verify, originals to the Recycle Bin). Never move game folders behind a launcher's back, program folders, or anything on the hard "never" list. Test migrations on temporary folders only; on the developer's PC, stop at the dry-run plan.
 - Long tasks take a `Channel<Progress>` (`on_progress`) and run in `spawn_blocking`; guard them with `AppState::begin` so two never overlap.
 - Debug the real app with Playwright: start it with `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=9333`, then `chromium.connectOverCDP("http://127.0.0.1:9333")`. Never click a destructive button on the developer's own PC.
 - PowerShell only where it is the cleanest official API (Defender, WinGet, scheduled tasks, Appx): `-NoProfile -NonInteractive -ExecutionPolicy Bypass`, output with `ConvertTo-Json -Depth 4`, parsed into typed structs. Scripts are `&'static str`; values go in as `SMD_*` environment variables (`smd_win::powershell::run_json_with`). Never build commands by concatenating input.

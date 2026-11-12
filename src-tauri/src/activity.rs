@@ -34,6 +34,8 @@ pub enum Kind {
     DefenderScan,
     SignatureUpdate,
     PermissionChange,
+    Migration,
+    QuarantinePurge,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -121,6 +123,12 @@ pub struct UndoData {
     pub startup: Option<StartupUndo>,
     #[serde(default)]
     pub permission: Option<PermissionUndo>,
+    /// Quarantine batch manifests (S:\Quarantine\...\manifest.json).
+    #[serde(default)]
+    pub quarantine: Vec<String>,
+    /// Migration journal to roll back.
+    #[serde(default)]
+    pub migration: Option<String>,
 }
 
 /// An app permission before it was changed.
@@ -209,6 +217,24 @@ pub async fn activity_undo(app: tauri::AppHandle, id: u64) -> AppResult<RestoreR
                     report.failed += 1;
                 }
             }
+        }
+        for m in &undo.quarantine {
+            match smd_win::quarantine::restore(std::path::Path::new(m)) {
+                Ok(r) => {
+                    report.restored += r.restored;
+                    report.failed += r.failed + r.conflicts;
+                }
+                Err(e) => {
+                    log::warn!("could not restore quarantine batch {m}: {e}");
+                    report.failed += 1;
+                }
+            }
+        }
+        if let Some(j) = &undo.migration {
+            let r = crate::organizer::undo_migration(std::path::Path::new(j))?;
+            report.restored += r.restored;
+            report.missing += r.missing;
+            report.failed += r.failed;
         }
         if let Some(p) = &undo.permission {
             match smd_win::protection::set_permission(p.capability, &p.id, p.was_allowed) {
