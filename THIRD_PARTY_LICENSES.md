@@ -86,7 +86,7 @@ The Toolbox installs these with winget only when the user clicks Install; nothin
 
 ## Development only (not shipped)
 
-vite (MIT), @vitejs/plugin-react (MIT), typescript (Apache-2.0), vitest (MIT), jsdom (MIT), @testing-library/* (MIT), @playwright/test (Apache-2.0), eslint and plugins (MIT), @tauri-apps/cli (Apache-2.0 OR MIT), @types/d3-hierarchy (MIT), tempfile crate (MIT OR Apache-2.0, Rust tests only). Their own dependencies include a few ISC, BSD, BlueOak-1.0.0, MPL-2.0 and CC-BY-4.0 (browser compatibility data) packages, none of which end up in the installer.
+vite (MIT), @vitejs/plugin-react (MIT), typescript (Apache-2.0), vitest (MIT), jsdom (MIT), @testing-library/* (MIT), @playwright/test (Apache-2.0), @axe-core/playwright and axe-core (MPL-2.0, accessibility tests only), eslint and plugins (MIT), @tauri-apps/cli (Apache-2.0 OR MIT), @types/d3-hierarchy (MIT), tempfile crate (MIT OR Apache-2.0, Rust tests only). Their own dependencies include a few ISC, BSD, BlueOak-1.0.0, MPL-2.0 and CC-BY-4.0 (browser compatibility data) packages, none of which end up in the installer.
 
 ## Planned (to verify when added)
 

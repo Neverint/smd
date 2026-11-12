@@ -113,9 +113,13 @@ export function Treemap({ node, onOpen }: TreemapProps) {
         });
         const title = `${label(data)} · ${f.bytes(data.size)}`;
         if (data.kind === "dir") {
+          // A labelled tile is named by its own text ("Open" is added for screen readers only),
+          // so speech users can say what they see; tiny tiles without text get an aria-label.
+          const shown = tileLabel(data, w, h);
           return (
-            <button key={data.id} type="button" className="tile" style={style} title={title} aria-label={t("spaceLens.open", { name: data.name })} onClick={() => onOpen(data.id)}>
-              {tileLabel(data, w, h)}
+            <button key={data.id} type="button" className="tile" style={style} title={title} aria-label={shown ? undefined : t("spaceLens.open", { name: data.name, size: f.bytes(data.size) })} onClick={() => onOpen(data.id)}>
+              {shown && <span className="sr-only">{t("spaceLens.openPrefix")} </span>}
+              {shown}
               <span aria-hidden="true">{inner}</span>
             </button>
           );

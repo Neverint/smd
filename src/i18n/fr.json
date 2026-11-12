@@ -337,8 +337,9 @@
     "rescan": "Analyser à nouveau",
     "largest": "Plus gros éléments",
     "treemapLabel": "Carte de {{name}} : chaque case est un fichier ou un dossier, à la taille de l'espace qu'il occupe.",
-    "open": "Ouvrir {{name}}",
-    "path": "Emplacement"
+    "open": "Ouvrir {{name}} {{size}}",
+    "path": "Emplacement",
+    "openPrefix": "Ouvrir"
   },
   "activity": {
     "empty": "Rien pour l'instant. Les analyses et nettoyages apparaîtront ici.",
@@ -581,7 +582,11 @@
     "windowsUpdateNone": "Aucune mise à jour de Windows en attente au dernier contrôle.",
     "windowsUpdateHint": "D'après le dernier contrôle de Windows. Installez-les dans les Paramètres.",
     "openWindowsUpdate": "Ouvrir Windows Update",
-    "version": "{{installed}} → {{available}}"
+    "version": "{{installed}} → {{available}}",
+    "leftoverAdmin": "droits administrateur",
+    "leftoversAdminHint": "Les dossiers sous Program Files ou ProgramData demandent les droits administrateur : cochez-les et Windows demande une fois. Les dossiers partagés et ceux des programmes installés ne sont jamais touchés.",
+    "leftoversAdminPicked": "Windows va demander les droits administrateur pour les dossiers cochés de Program Files ou ProgramData. Ils vont dans la Corbeille.",
+    "leftoversAdminDone": "{{size}} de dossiers de programmes sont partis dans la Corbeille (restaurez-les depuis la Corbeille si besoin)."
   },
   "clutter": {
     "scanYourFolders": "Analyser vos dossiers",

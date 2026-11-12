@@ -26,7 +26,9 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
-      # Smoke tests use the Edge already installed on the runner (no browser download).
+      # Startup JavaScript and CSS sizes (docs/PERFORMANCE.md).
+      - run: npm run budget
+      # Smoke and accessibility tests use the Edge already installed on the runner (no browser download).
       - run: npm run e2e
 
   rust:

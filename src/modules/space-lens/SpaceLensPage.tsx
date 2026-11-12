@@ -90,7 +90,8 @@ function SidePanel({ view, summary }: { view: SpaceView; summary: SpaceSummary }
             return (
               <li key={c.id} className="node-item">
                 {c.kind === "dir" && c.childCount > 0 ? (
-                  <button type="button" className="node-row" onClick={() => void open(c.id)} aria-label={`${t("spaceLens.open", { name: c.name })}, ${f.bytes(c.size)}`}>
+                  <button type="button" className="node-row" onClick={() => void open(c.id)}>
+                    <span className="sr-only">{t("spaceLens.openPrefix")} </span>
                     {row}
                   </button>
                 ) : (

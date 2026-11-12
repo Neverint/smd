@@ -1,5 +1,4 @@
 import { Channel, invoke } from "@tauri-apps/api/core";
-import { mockHandlers, mockStreams } from "./mocks";
 import type {
   ActivityEntry,
   AppInfo,
@@ -58,6 +57,10 @@ import type {
 } from "./types";
 
 export type * from "./types";
+
+/** The fake backend, loaded only outside Tauri so it never ships in the app's main bundle. */
+let mocks: Promise<typeof import("./mocks")> | null = null;
+const loadMocks = () => (mocks ??= import("./mocks"));
 
 /** True inside the Tauri window; false in a plain browser (Vite dev server, Playwright, gallery). */
 export function isTauri(): boolean {
@@ -180,7 +183,7 @@ export async function call<K extends CommandName>(
 ): Promise<Commands[K]["result"]> {
   const payload = (args[0] ?? {}) as Commands[K]["args"];
   try {
-    if (!isTauri()) return await mockHandlers[cmd](payload);
+    if (!isTauri()) return await (await loadMocks()).mockHandlers[cmd](payload);
     return await invoke<Commands[K]["result"]>(cmd, payload);
   } catch (err) {
     throw toBackendError(err);
@@ -194,7 +197,7 @@ export async function stream<K extends StreamName>(
   onProgress: (p: StreamCommands[K]["progress"]) => void,
 ): Promise<StreamCommands[K]["result"]> {
   try {
-    if (!isTauri()) return await mockStreams[cmd](args, onProgress);
+    if (!isTauri()) return await (await loadMocks()).mockStreams[cmd](args, onProgress);
     const channel = new Channel<StreamCommands[K]["progress"]>();
     channel.onmessage = onProgress;
     return await invoke<StreamCommands[K]["result"]>(cmd, { ...args, onProgress: channel });

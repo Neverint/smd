@@ -128,6 +128,7 @@ pub async fn apps_leftovers(app: AppHandle, id: String) -> AppResult<LeftoversVi
             id: scan_id,
             app_name: target.name.clone(),
             items: items.clone(),
+            app: target.clone(),
         });
         Ok(LeftoversView {
             scan_id,
@@ -146,6 +147,8 @@ pub struct LeftoversReport {
     pub failures: Vec<Failure>,
     pub undo_available: bool,
     pub quarantine: Option<String>,
+    /// Program Files / ProgramData folders removed by the admin helper (to the Recycle Bin).
+    pub admin_bytes: u64,
 }
 
 /// Removes the leftovers the user kept ticked: folders to the Recycle Bin, registry keys after a backup.
@@ -171,6 +174,16 @@ pub async fn apps_remove_leftovers(
             .items
             .iter()
             .filter(|l| wanted.contains(&safety::normalize(&l.path)) && !l.needs_admin)
+            .collect();
+        let admin_paths: Vec<String> = scan
+            .items
+            .iter()
+            .filter(|l| {
+                l.needs_admin
+                    && l.kind == LeftoverKind::Folder
+                    && wanted.contains(&safety::normalize(&l.path))
+            })
+            .map(|l| l.path.clone())
             .collect();
         let id = state.next_id();
 
@@ -215,13 +228,29 @@ pub async fn apps_remove_leftovers(
             }
         }
 
-        let removed_items = (outcome.removed.len() + registry.len()) as u64;
-        let removed_bytes = outcome.removed.iter().map(|r| r.1).sum();
+        let mut admin_bytes = 0;
+        let mut admin_items = 0;
+        if !admin_paths.is_empty() {
+            let o: smd_win::cleanup::Outcome = crate::helper::call(
+                &state,
+                &smd_win::helper::Op::LeftoversRemove {
+                    app: scan.app.clone(),
+                    paths: admin_paths,
+                },
+            )?;
+            admin_bytes = o.removed.iter().map(|r| r.1).sum::<u64>();
+            admin_items = o.removed.len();
+            failures.extend(o.failed);
+        }
+
+        let removed_items = (outcome.removed.len() + registry.len() + admin_items) as u64;
+        let removed_bytes = outcome.removed.iter().map(|r| r.1).sum::<u64>() + admin_bytes;
         let undo = UndoData {
             registry,
             ..removal.undo
         };
-        let undo_available = removed_items > 0 && activity::save_undo(&state, id, &undo);
+        let undo_available =
+            removed_items > admin_items as u64 && activity::save_undo(&state, id, &undo);
         let mut e = Entry::new(id, activity::Kind::LeftoversRemoved);
         e.target = Some(scan.app_name);
         e.bytes = removed_bytes;
@@ -239,6 +268,7 @@ pub async fn apps_remove_leftovers(
             failures,
             undo_available,
             quarantine: removal.quarantine,
+            admin_bytes,
         })
     })
     .await

@@ -12,7 +12,7 @@ pub enum AppKind {
     Store,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct InstalledApp {
     /// `hklm:<key>`, `hklm32:<key>`, `hkcu:<key>` or `appx:<PackageFullName>`.
@@ -453,6 +453,112 @@ pub fn uninstall(app: &InstalledApp) -> io::Result<UninstallResult> {
     })
 }
 
+/// Folders directly under Program Files or ProgramData that many programs share.
+const SHARED_FOLDERS: &[&str] = &[
+    "common files",
+    "windowsapps",
+    "modifiablewindowsapps",
+    "windows defender",
+    "windows defender advanced threat protection",
+    "windows nt",
+    "windows mail",
+    "windows media player",
+    "windows photo viewer",
+    "windows sidebar",
+    "windowspowershell",
+    "windows kits",
+    "microsoft",
+    "microsoft office",
+    "microsoft sdks",
+    "microsoft visual studio",
+    "microsoft.net",
+    "microsoft update health tools",
+    "dotnet",
+    "internet explorer",
+    "package cache",
+    "packages",
+    "reference assemblies",
+    "msbuild",
+    "ssh",
+    "usoshared",
+    "usoprivate",
+];
+
+/// May the elevated helper move this leftover folder to the Recycle Bin?
+/// Refuses anything in Windows, shared folders right under Program Files or ProgramData,
+/// and any folder that holds, or sits inside, an installed program's folder.
+pub fn admin_leftover_allowed(
+    path: &str,
+    protected: &[String],
+    windir: Option<&str>,
+    installed_locations: &[String],
+) -> bool {
+    use smd_core::safety::{is_inside, normalize, same_path};
+    if windir.is_some_and(|w| same_path(path, w) || is_inside(path, w)) {
+        return false;
+    }
+    let n = normalize(path);
+    for root in protected {
+        let r = normalize(root);
+        if same_path(&n, &r) {
+            return false;
+        }
+        if is_inside(&n, &r) {
+            let rest = &n[r.len() + 1..];
+            if !rest.contains('\\') && SHARED_FOLDERS.contains(&rest) {
+                return false;
+            }
+        }
+    }
+    !installed_locations
+        .iter()
+        .filter(|l| !l.trim().is_empty())
+        .any(|l| same_path(path, l) || is_inside(path, l) || is_inside(l, path))
+}
+
+/// Admin leftovers of an uninstalled app that the helper may remove (its own new search).
+pub fn admin_leftovers(
+    app: &InstalledApp,
+    paths: &[String],
+) -> io::Result<Vec<crate::cleanup::Item>> {
+    let installed = list()?;
+    if installed.iter().any(|a| a.id == app.id) {
+        return Err(io::Error::new(
+            io::ErrorKind::PermissionDenied,
+            format!("{} is still installed", app.name),
+        ));
+    }
+    let locations: Vec<String> = installed
+        .iter()
+        .filter_map(|a| a.install_location.clone())
+        .collect();
+    let protected = protected_roots();
+    let windir = std::env::var("WINDIR").ok();
+    let wanted: std::collections::HashSet<String> = paths
+        .iter()
+        .map(|p| smd_core::safety::normalize(p))
+        .collect();
+    Ok(find_leftovers(app)
+        .into_iter()
+        .filter(|l| {
+            l.kind == LeftoverKind::Folder
+                && l.needs_admin
+                && wanted.contains(&smd_core::safety::normalize(&l.path))
+                && admin_leftover_allowed(&l.path, &protected, windir.as_deref(), &locations)
+        })
+        .map(|l| crate::cleanup::Item {
+            name: l.path.clone(),
+            path: l.path,
+            bytes: l.bytes,
+            files: 0,
+            modified_ms: None,
+            is_dir: true,
+            root: l.root,
+            item_is_root: false,
+        })
+        .collect())
+}
+
 /// Folders and registry keys that look like they belong to `app`. Read-only.
 pub fn find_leftovers(app: &InstalledApp) -> Vec<Leftover> {
     let mut out: Vec<Leftover> = Vec::new();
@@ -544,6 +650,35 @@ pub fn find_leftovers(app: &InstalledApp) -> Vec<Leftover> {
 #[cfg(all(test, windows))]
 mod tests {
     use super::*;
+
+    #[test]
+    fn admin_leftovers_refuse_shared_and_installed_folders() {
+        let protected = vec![
+            r"C:\Program Files".to_string(),
+            r"C:\ProgramData".to_string(),
+        ];
+        let win = Some(r"C:\Windows");
+        let installed = vec![r"C:\Program Files\Vendor\Still Here".to_string()];
+        let ok = |p: &str| admin_leftover_allowed(p, &protected, win, &installed);
+        assert!(ok(r"C:\Program Files\Discord"));
+        assert!(ok(r"C:\ProgramData\Old App"));
+        assert!(!ok(r"C:\Program Files"), "a protected root itself");
+        assert!(!ok(r"C:\Program Files\Common Files"), "shared folder");
+        assert!(!ok(r"C:\ProgramData\Microsoft"), "shared folder");
+        assert!(
+            ok(r"C:\Program Files\Common Files\Old App"),
+            "an app folder inside a shared one is fine"
+        );
+        assert!(!ok(r"C:\Windows\Temp\x"), "inside Windows");
+        assert!(
+            !ok(r"C:\Program Files\Vendor"),
+            "holds an installed program"
+        );
+        assert!(
+            !ok(r"C:\Program Files\Vendor\Still Here\data"),
+            "inside an installed program"
+        );
+    }
 
     #[test]
     fn lists_installed_apps_read_only() {

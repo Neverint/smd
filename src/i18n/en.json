@@ -337,8 +337,9 @@
     "rescan": "Scan again",
     "largest": "Largest items",
     "treemapLabel": "Map of {{name}}: each box is a file or folder, sized by the space it uses.",
-    "open": "Open {{name}}",
-    "path": "Location"
+    "open": "Open {{name}} {{size}}",
+    "path": "Location",
+    "openPrefix": "Open"
   },
   "activity": {
     "empty": "Nothing here yet. Scans and cleanups will show up here.",
@@ -581,7 +582,11 @@
     "windowsUpdateNone": "No Windows update waiting at the last check.",
     "windowsUpdateHint": "From Windows' last check. Install them in Settings.",
     "openWindowsUpdate": "Open Windows Update",
-    "version": "{{installed}} → {{available}}"
+    "version": "{{installed}} → {{available}}",
+    "leftoverAdmin": "needs admin rights",
+    "leftoversAdminHint": "Folders under Program Files or ProgramData need admin rights: tick them and Windows asks once. Shared folders and folders of installed programs are always left alone.",
+    "leftoversAdminPicked": "Windows will ask for admin rights for the ticked Program Files or ProgramData folders. They go to the Recycle Bin.",
+    "leftoversAdminDone": "{{size}} of program folders went to the Recycle Bin (restore them from there if needed)."
   },
   "clutter": {
     "scanYourFolders": "Scan your folders",

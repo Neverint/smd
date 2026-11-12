@@ -389,6 +389,8 @@ export interface RemovalReport {
   failures: { path: string; reason: FailReason }[];
   undoAvailable: boolean;
   quarantine?: string | null;
+  /** Program Files / ProgramData folders removed by the admin helper. */
+  adminBytes?: number;
 }
 
 export interface UpdatesStatus {

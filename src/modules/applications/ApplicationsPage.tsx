@@ -1,4 +1,4 @@
-import { ArrowDownload20Regular, CheckmarkCircle20Regular, LockClosed16Regular, Open20Regular, Warning20Regular } from "@fluentui/react-icons";
+import { ArrowDownload20Regular, CheckmarkCircle20Regular, Open20Regular, Shield16Regular, Warning20Regular } from "@fluentui/react-icons";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, CheckList, ConfirmDialog, ErrorNotice, ProgressRing, Segmented, SideSheet, Tabs } from "../../components";
@@ -13,10 +13,11 @@ type Kind = "all" | "desktop" | "store";
 function LeftoversSheet({ view, onClose }: { view: LeftoversView | null; onClose: () => void }) {
   const { t } = useTranslation();
   const f = useFormat();
-  const selectable = useMemo(() => view?.items.filter((i) => !i.needsAdmin) ?? [], [view]);
-  const locked = view?.items.filter((i) => i.needsAdmin) ?? [];
+  const items = useMemo(() => view?.items ?? [], [view]);
+  const adminCount = items.filter((i) => i.needsAdmin).length;
   // The parent keys this sheet by scan id, so these start fresh for every scan.
-  const [selected, setSelected] = useState<Set<string>>(() => new Set(selectable.filter((i) => i.selected).map((i) => i.path)));
+  const [selected, setSelected] = useState<Set<string>>(() => new Set(items.filter((i) => i.selected && !i.needsAdmin).map((i) => i.path)));
+  const adminPicked = items.some((i) => i.needsAdmin && selected.has(i.path));
   const [report, setReport] = useState<RemovalReport | null>(null);
   const [error, setError] = useState<BackendError | null>(null);
 
@@ -48,7 +49,10 @@ function LeftoversSheet({ view, onClose }: { view: LeftoversView | null; onClose
     >
       {error && <ErrorNotice error={error} />}
       {report ? (
-        <p role="status">{t("applications.leftoversDone", { count: report.removedItems, size: f.bytes(report.removedBytes) })}</p>
+        <>
+          <p role="status">{t("applications.leftoversDone", { count: report.removedItems, size: f.bytes(report.removedBytes) })}</p>
+          {(report.adminBytes ?? 0) > 0 && <p>{t("applications.leftoversAdminDone", { size: f.bytes(report.adminBytes ?? 0) })}</p>}
+        </>
       ) : view && view.items.length === 0 ? (
         <p>{t("applications.leftoversNone")}</p>
       ) : (
@@ -56,28 +60,25 @@ function LeftoversSheet({ view, onClose }: { view: LeftoversView | null; onClose
           <p className="review-more">{t("applications.leftoversHint")}</p>
           <CheckList
             label={t("applications.leftoversTitle", { name: view?.appName ?? "" })}
-            items={selectable.map((i) => ({
+            items={items.map((i) => ({
               id: i.path,
               label: i.path,
               size: i.kind === "folder" ? f.bytes(i.bytes) : undefined,
-              description: `${t(`applications.confidence.${i.confidence}`)}${i.kind === "registryKey" ? ` · ${t("applications.registryKey")}` : ""}`,
+              description: [
+                t(`applications.confidence.${i.confidence}`),
+                i.kind === "registryKey" ? t("applications.registryKey") : null,
+                i.needsAdmin ? t("applications.leftoverAdmin") : null,
+              ]
+                .filter(Boolean)
+                .join(" · "),
             }))}
             selected={selected}
             onChange={setSelected}
           />
-          {locked.length > 0 && (
-            <>
-              <h3 className="section-title" style={{ marginTop: 16 }}>
-                <LockClosed16Regular aria-hidden="true" /> {t("applications.leftoversLocked")}
-              </h3>
-              <ul className="rows rows--plain">
-                {locked.map((i) => (
-                  <li key={i.path} className="row__sub">
-                    {i.path} · {f.bytes(i.bytes)}
-                  </li>
-                ))}
-              </ul>
-            </>
+          {adminCount > 0 && (
+            <p className="cat-row__note">
+              <Shield16Regular aria-hidden="true" /> {adminPicked ? t("applications.leftoversAdminPicked") : t("applications.leftoversAdminHint")}
+            </p>
           )}
         </>
       )}

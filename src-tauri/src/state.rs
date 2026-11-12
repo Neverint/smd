@@ -45,6 +45,8 @@ pub struct LeftoverScan {
     pub id: u64,
     pub app_name: String,
     pub items: Vec<Leftover>,
+    /// The uninstalled app (the admin helper searches again from it).
+    pub app: InstalledApp,
 }
 
 pub struct AppState {

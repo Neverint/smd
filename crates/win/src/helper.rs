@@ -42,6 +42,12 @@ pub enum Op {
         paths: Vec<String>,
         exclusions: Vec<String>,
     },
+    /// Moves leftover folders of an uninstalled app (Program Files, ProgramData) to the Recycle
+    /// Bin. Only folders the helper's own new search finds, never shared or installed ones.
+    LeftoversRemove {
+        app: crate::apps::InstalledApp,
+        paths: Vec<String>,
+    },
     /// Turns a machine-wide startup item off or on (`StartupApproved`, like Task Manager).
     StartupSet {
         id: String,
@@ -264,6 +270,10 @@ fn dispatch(s: &mut Session, op: Op) -> Result<serde_json::Value, String> {
             paths,
             exclusions,
         } => json(cleanup_remove(&rule_id, &paths, &exclusions)),
+        Op::LeftoversRemove { app, paths } => json(
+            crate::apps::admin_leftovers(&app, &paths)
+                .map(|items| remove_items_to(&items, &Destination::RecycleBin).0),
+        ),
         Op::StartupSet { id, enabled } => json(crate::startup::set_enabled_any(
             &id,
             enabled,

@@ -56,7 +56,9 @@ $env:Path += ';G:\Documents\Dev\.rust\cargo\bin'; $env:RUSTUP_HOME='G:\Documents
 | Run the desktop app | `npm run tauri dev` |
 | Frontend only (mocked backend) | `npm run dev` then http://localhost:1420 |
 | Lint / types / unit tests | `npm run lint`, `npm run typecheck`, `npm test` |
-| Smoke tests | `npm run e2e` |
+| Smoke and accessibility tests (axe, WCAG 2.1 AA, light and dark) | `npm run e2e` |
+| Startup size budget (also in CI) | `npm run budget` (see docs/PERFORMANCE.md) |
+| README screenshots (mocked data) | `npm run dev`, then `node scripts/screenshots.mjs` |
 | Rust checks | `cargo fmt --all --check`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo test --workspace` |
 | Sensor helper | `npm run hwmon` (needs the .NET 8 SDK; on this PC it is in `G:\Documents\Dev\.dotnet`: add it to PATH first). Required before any Rust build: tauri-build checks the bundled resources. |
 | Release build | `npm run hwmon`, then `npm run tauri build` (NSIS + MSI in `target/release/bundle`) |

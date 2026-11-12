@@ -138,7 +138,8 @@ export function phase2Handlers(log: Log): Omit<MockHandlers, "app_info" | "forma
       if (scanId !== leftoverScan) throw { code: "stale", message: "scan again", details: "" };
       leftoverScan = 0;
       log({ ...blank, kind: "leftoversRemoved", items: paths.length, bytes: 15 * MB, undo: "available" });
-      return { removedBytes: 15 * MB, removedItems: paths.length, failures: [], undoAvailable: paths.length > 0 };
+      const adminBytes = paths.some((p) => p.startsWith("C:\\Program")) ? 210 * MB : 0;
+      return { removedBytes: 15 * MB + adminBytes, removedItems: paths.length, failures: [], undoAvailable: paths.length > 0, adminBytes };
     },
     updates_status: () => ({ moduleInstalled }),
     updates_setup: async () => {

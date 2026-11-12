@@ -103,6 +103,7 @@
   --lens-file: #64748b;
   --lens-others: #475569;
   --lens-on: #ffffff;
+  --lens-child-mix: #000000;
 }
 
 [data-theme="dark"] {
@@ -162,6 +163,7 @@
   --lens-file: #cbd5e1;
   --lens-others: #94a3b8;
   --lens-on: #000000;
+  --lens-child-mix: #1c1c1c;
 }
 
 /* With the Mica/acrylic window material the content layer becomes translucent. */

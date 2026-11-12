@@ -15,6 +15,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
+    "budget": "vite build && node scripts/check-budget.mjs",
     "check:rust": "cargo fmt --all --check && cargo clippy --workspace --all-targets -- -D warnings && cargo test --workspace",
     "hwmon": "dotnet publish sidecars/hwmon -c Release -o src-tauri/resources/hwmon --nologo"
   },
@@ -31,6 +32,7 @@
     "zustand": "^5.1.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.65.0",
     "@tauri-apps/cli": "^2",

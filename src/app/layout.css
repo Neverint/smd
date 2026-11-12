@@ -140,7 +140,8 @@
   flex-direction: column;
   min-height: 100%;
   padding: var(--space-5) var(--space-6);
-  overflow: hidden;
+  /* clip, not hidden: hidden makes .page a scroll box and breaks the sticky action bar. */
+  overflow: clip;
 }
 .page__body {
   flex: 1;
