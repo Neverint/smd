@@ -45,6 +45,16 @@ import type {
   UpdateOutcome,
   UpdatesStatus,
   WindowsUpdates,
+  ApplyReport,
+  DiskReliability,
+  Schedule,
+  ScheduleView,
+  ToolboxView,
+  TrayAction,
+  TrayInfo,
+  TraySample,
+  TweaksView,
+  WingetResult,
 } from "./types";
 
 export type * from "./types";
@@ -109,6 +119,24 @@ export interface Commands {
   quarantine_restore: { args: { manifest: string }; result: QuarantineRestore };
   quarantine_purge_consent: { args: { allow: boolean }; result: number };
   clutter_scratch: { args: NoArgs; result: DownloadsView };
+  cleanup_admin_scan: { args: { scanId: number }; result: CleanupScanResult };
+  disk_reliability: { args: NoArgs; result: DiskReliability[] };
+  sensors_admin_poll: { args: NoArgs; result: SensorsView };
+  sensors_admin_stop: { args: NoArgs; result: null };
+  tweaks_list: { args: NoArgs; result: TweaksView };
+  tweaks_apply: { args: { ids: string[]; withoutRestorePoint: boolean; enableRestore: boolean }; result: ApplyReport };
+  tweak_undo: { args: { id: string }; result: TweaksView };
+  restart_explorer: { args: NoArgs; result: null };
+  admin_session_end: { args: NoArgs; result: null };
+  toolbox_list: { args: { refreshNow: boolean }; result: ToolboxView };
+  toolbox_install: { args: { id: string; update: boolean }; result: { result: WingetResult; view: ToolboxView } };
+  toolbox_open: { args: { id: string }; result: null };
+  tray_info: { args: NoArgs; result: TrayInfo };
+  tray_sample: { args: NoArgs; result: TraySample };
+  tray_action: { args: { action: TrayAction }; result: null };
+  tray_hide: { args: NoArgs; result: null };
+  schedule_get: { args: NoArgs; result: ScheduleView };
+  schedule_set: { args: { schedule: Schedule }; result: ScheduleView };
 }
 
 /** Commands that stream progress through a channel (`on_progress` in Rust). */

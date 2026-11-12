@@ -6,7 +6,8 @@ use std::sync::atomic::{AtomicU32, Ordering};
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use smd_core::cleanup::builtin_rules;
-use smd_win::cleanup::{Category, DeleteMode, Failure, ScanEnv, scan_rule};
+use smd_win::cleanup::{Category, DeleteMode, Failure, Outcome, ScanEnv, scan_rule};
+use smd_win::helper::Op;
 use tauri::ipc::Channel;
 use tauri::{AppHandle, Manager};
 
@@ -45,6 +46,8 @@ pub struct CleanupScanResult {
     /// Space that can be freed now (selectable categories, without the Recycle Bin).
     pub reclaimable_bytes: u64,
     pub duration_ms: u64,
+    /// The admin categories were scanned with admin rights and can be selected.
+    pub admin_scanned: bool,
 }
 
 /// Lower-case environment lookup for rule variables.
@@ -88,22 +91,82 @@ pub fn scan_all(state: &AppState, mut progress: impl FnMut(&str)) -> CleanupScan
         worker.join().unwrap_or_default()
     });
 
-    let reclaimable = categories
+    let id = state.next_id();
+    let scan = CleanupScan {
+        id,
+        categories,
+        admin_scanned: false,
+    };
+    let result = result_of(&scan, (now_ms() - started).max(0) as u64);
+    if let Ok(mut slot) = lock(&state.cleanup) {
+        *slot = Some(scan);
+    }
+    result
+}
+
+fn result_of(scan: &CleanupScan, duration_ms: u64) -> CleanupScanResult {
+    let reclaimable = scan
+        .categories
         .iter()
-        .filter(|c| !c.admin && !c.permanent)
+        .filter(|c| (!c.admin || scan.admin_scanned) && !c.permanent)
         .map(|c| c.bytes)
         .sum();
-    let id = state.next_id();
-    let views = categories.iter().cloned().map(to_view).collect();
-    if let Ok(mut slot) = lock(&state.cleanup) {
-        *slot = Some(CleanupScan { id, categories });
-    }
     CleanupScanResult {
-        scan_id: id,
-        categories: views,
+        scan_id: scan.id,
+        categories: scan.categories.iter().cloned().map(to_view).collect(),
         reclaimable_bytes: reclaimable,
-        duration_ms: (now_ms() - started).max(0) as u64,
+        duration_ms,
+        admin_scanned: scan.admin_scanned,
     }
+}
+
+/// Scans the admin categories again with the elevated helper (one UAC prompt), into the current scan.
+pub fn admin_scan(state: &AppState, scan_id: u64) -> AppResult<CleanupScanResult> {
+    let started = now_ms();
+    let ids: Vec<String> = {
+        let slot = lock(&state.cleanup)?;
+        let scan = slot
+            .as_ref()
+            .filter(|s| s.id == scan_id)
+            .ok_or_else(|| AppError::Stale("scan again".into()))?;
+        scan.categories
+            .iter()
+            .filter(|c| c.admin)
+            .map(|c| c.id.clone())
+            .collect()
+    };
+    let exclusions = lock(&state.settings)?.exclusions.clone();
+    let cats: Vec<Category> = crate::helper::call(
+        state,
+        &Op::CleanupScan {
+            rule_ids: ids,
+            exclusions,
+        },
+    )?;
+    let mut slot = lock(&state.cleanup)?;
+    let scan = slot
+        .as_mut()
+        .filter(|s| s.id == scan_id)
+        .ok_or_else(|| AppError::Stale("scan again".into()))?;
+    for c in cats {
+        if let Some(old) = scan.categories.iter_mut().find(|o| o.id == c.id) {
+            *old = c;
+        }
+    }
+    scan.admin_scanned = true;
+    log::info!("cleanup scan {scan_id}: admin categories scanned");
+    Ok(result_of(scan, (now_ms() - started).max(0) as u64))
+}
+
+#[tauri::command]
+pub async fn cleanup_admin_scan(app: AppHandle, scan_id: u64) -> AppResult<CleanupScanResult> {
+    tauri::async_runtime::spawn_blocking(move || {
+        let state = app.state::<AppState>();
+        let _busy = state.begin("an admin cleanup scan")?;
+        admin_scan(&state, scan_id)
+    })
+    .await
+    .map_err(|e| AppError::Internal(e.to_string()))?
 }
 
 fn to_view(mut category: Category) -> CategoryView {
@@ -186,10 +249,13 @@ pub struct CleanupReport {
     pub undo_available: bool,
     /// Items went to this quarantine folder on the disposable drive (not the Recycle Bin).
     pub quarantine: Option<String>,
+    /// Removed by the admin helper (Windows files: in the Recycle Bin, not undone from here).
+    pub admin_bytes: u64,
     pub activity_id: u64,
 }
 
-/// Runs a cleanup on the current scan. Admin categories are refused (elevated helper: Phase 4).
+/// Runs a cleanup on the current scan. Admin categories run in the elevated helper, and only
+/// once they were scanned with admin rights.
 pub fn run(state: &AppState, scan_id: u64, selections: &[Selection]) -> AppResult<CleanupReport> {
     let scan = lock(&state.cleanup)?
         .take()
@@ -205,12 +271,25 @@ pub fn run(state: &AppState, scan_id: u64, selections: &[Selection]) -> AppResul
     let mode = lock(&state.settings)?.delete_mode;
 
     let mut items = Vec::new();
+    let mut admin: Vec<(String, Vec<String>)> = Vec::new();
     let mut empty_bin = false;
     for sel in selections {
         let Some(cat) = scan.categories.iter().find(|c| c.id == sel.id) else {
             continue;
         };
         if cat.admin {
+            if scan.admin_scanned {
+                let skip: HashSet<&str> = sel.skip.iter().map(String::as_str).collect();
+                let paths: Vec<String> = cat
+                    .items
+                    .iter()
+                    .filter(|i| !skip.contains(i.path.as_str()))
+                    .map(|i| i.path.clone())
+                    .collect();
+                if !paths.is_empty() {
+                    admin.push((cat.id.clone(), paths));
+                }
+            }
             continue;
         }
         if cat.permanent {
@@ -240,7 +319,24 @@ pub fn run(state: &AppState, scan_id: u64, selections: &[Selection]) -> AppResul
 
     let id = state.next_id();
     let removal = crate::removal::remove(state, id, &items, true);
-    let outcome = removal.outcome;
+    let mut outcome = removal.outcome;
+    let mut admin_bytes = 0;
+    if !admin.is_empty() {
+        let exclusions = lock(&state.settings)?.exclusions.clone();
+        for (rule_id, paths) in admin {
+            let o: Outcome = crate::helper::call(
+                state,
+                &Op::CleanupRemove {
+                    rule_id,
+                    paths,
+                    exclusions: exclusions.clone(),
+                },
+            )?;
+            admin_bytes += o.removed.iter().map(|r| r.1).sum::<u64>();
+            outcome.removed.extend(o.removed);
+            outcome.failed.extend(o.failed);
+        }
+    }
     let removed_bytes = outcome.removed.iter().map(|r| r.1).sum();
     let undo_available = removal.undoable && activity::save_undo(state, id, &removal.undo);
 
@@ -254,7 +350,7 @@ pub fn run(state: &AppState, scan_id: u64, selections: &[Selection]) -> AppResul
     } else {
         Undo::None
     };
-    if !items.is_empty() {
+    if !items.is_empty() || admin_bytes > 0 {
         activity::record(state, e);
     }
     log::info!(
@@ -272,6 +368,7 @@ pub fn run(state: &AppState, scan_id: u64, selections: &[Selection]) -> AppResul
         bin_emptied_bytes,
         undo_available,
         quarantine: removal.quarantine,
+        admin_bytes,
         activity_id: id,
     })
 }
@@ -352,6 +449,7 @@ mod tests {
         *st.cleanup.lock().unwrap() = Some(CleanupScan {
             id: 42,
             categories: vec![category("t", vec![a.clone(), b.clone()]), admin],
+            admin_scanned: false,
         });
 
         // A stale scan id is refused and the current scan is kept.
@@ -379,7 +477,7 @@ mod tests {
         );
         assert!(
             std::path::Path::new(&c.path).exists(),
-            "admin categories are refused"
+            "admin categories need an admin scan first"
         );
 
         // The scan is used up: running again needs a new scan.

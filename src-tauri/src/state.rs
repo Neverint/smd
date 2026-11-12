@@ -19,6 +19,8 @@ use crate::window_effect::WindowEffect;
 pub struct CleanupScan {
     pub id: u64,
     pub categories: Vec<Category>,
+    /// The admin categories were scanned again by the elevated helper (and can be cleaned).
+    pub admin_scanned: bool,
 }
 
 pub struct SpaceScan {
@@ -76,6 +78,16 @@ pub struct AppState {
     pub organizer_audit: Mutex<Option<crate::organizer::AuditState>>,
     pub organizer_plan: Mutex<Option<crate::organizer::PlanState>>,
     pub organizer_cancel: AtomicBool,
+    /// The elevated helper session (UAC once per batch; exits after 10 idle minutes).
+    pub helper: Mutex<Option<smd_win::elevate::Client>>,
+    /// Last reading of the sensor helper running with admin rights.
+    pub admin_sensors: Mutex<Option<smd_win::hardware::SensorSnapshot>>,
+    pub toolbox: Mutex<crate::toolbox::ToolboxCache>,
+    /// The tray popover's live numbers.
+    pub sampler: Mutex<Option<smd_win::perf::Sampler>>,
+    pub popover_hidden: Mutex<Option<std::time::Instant>>,
+    /// The window was hidden while a task runs: a thread waits to notify when it ends.
+    pub watching_task: AtomicBool,
     next_id: AtomicU64,
 }
 
@@ -104,6 +116,12 @@ impl AppState {
             organizer_audit: Mutex::new(None),
             organizer_plan: Mutex::new(None),
             organizer_cancel: AtomicBool::new(false),
+            helper: Mutex::new(None),
+            admin_sensors: Mutex::new(None),
+            toolbox: Mutex::new(Default::default()),
+            sampler: Mutex::new(None),
+            popover_hidden: Mutex::new(None),
+            watching_task: AtomicBool::new(false),
             next_id: AtomicU64::new(crate::store::now_ms() as u64),
         }
     }
@@ -128,6 +146,19 @@ impl AppState {
 
     pub fn begin_apps(&self, what: &str) -> AppResult<BusyGuard<'_>> {
         guard(&self.apps_busy, what)
+    }
+
+    /// Any scan, cleanup, move, install or Defender scan is running.
+    pub fn any_busy(&self) -> bool {
+        [
+            &self.busy,
+            &self.space_busy,
+            &self.clutter_busy,
+            &self.apps_busy,
+        ]
+        .iter()
+        .any(|f| f.load(Ordering::Acquire))
+            || self.defender_scan.lock().is_ok_and(|d| d.is_some())
     }
 }
 

@@ -66,10 +66,11 @@ export function CleanupDone({ report, title, children }: { report: CleanupReport
         {removed && (
           <p>
             {report.quarantine
-              ? t("cleanup.doneQuarantine", { size: f.bytes(report.removedBytes), path: report.quarantine })
-              : t(report.mode === "permanent" ? "cleanup.donePermanent" : "cleanup.doneRecycled", { size: f.bytes(report.removedBytes) })}
+              ? t("cleanup.doneQuarantine", { size: f.bytes(report.removedBytes - (report.adminBytes ?? 0)), path: report.quarantine })
+              : t(report.mode === "permanent" ? "cleanup.donePermanent" : "cleanup.doneRecycled", { size: f.bytes(report.removedBytes - (report.adminBytes ?? 0)) })}
           </p>
         )}
+        {(report.adminBytes ?? 0) > 0 && <p>{t("cleanup.doneAdmin", { size: f.bytes(report.adminBytes) })}</p>}
         {report.binEmptiedBytes !== null && <p>{t("cleanup.doneBin", { size: f.bytes(report.binEmptiedBytes) })}</p>}
         {!removed && report.binEmptiedBytes === null && <p>{t("cleanup.doneNothing")}</p>}
         {report.failedCount > 0 && <p className="flow-muted">{t("cleanup.doneSkipped", { count: report.failedCount })}</p>}

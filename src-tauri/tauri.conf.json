@@ -22,7 +22,8 @@
         "center": true,
         "decorations": false,
         "transparent": true,
-        "shadow": true
+        "shadow": true,
+        "visible": false
       }
     ],
     "security": {
@@ -49,6 +50,13 @@
     "windows": {
       "webviewInstallMode": {
         "type": "downloadBootstrapper"
+      },
+      "nsis": {
+        "installerHooks": "windows/hooks.nsh"
+      },
+      "wix": {
+        "fragmentPaths": ["windows/uninstall-task.wxs"],
+        "componentGroupRefs": ["SmdUninstallCleanup"]
       }
     },
     "resources": {

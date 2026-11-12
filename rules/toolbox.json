@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "tools": [
+    {
+      "id": "bcuninstaller",
+      "wingetId": "Klocman.BulkCrapUninstaller",
+      "name": "Bulk Crap Uninstaller",
+      "category": "apps",
+      "license": "Apache-2.0",
+      "openSource": true,
+      "homepage": "https://www.bcuninstaller.com/",
+      "description": {
+        "en": "Removes many programs at once, including stubborn ones, and finds their leftovers.",
+        "fr": "Désinstalle plusieurs programmes à la fois, même les récalcitrants, et trouve leurs restes."
+      },
+      "open": { "startApp": "BCUninstaller", "exe": ["BCUninstaller.exe"] }
+    },
+    {
+      "id": "unigetui",
+      "wingetId": "Devolutions.UniGetUI",
+      "name": "UniGetUI",
+      "category": "apps",
+      "license": "MIT",
+      "openSource": true,
+      "homepage": "https://devolutions.net/unigetui/",
+      "description": {
+        "en": "A friendly window over winget, Scoop and Chocolatey: install and update apps in bulk.",
+        "fr": "Une interface simple pour winget, Scoop et Chocolatey : installe et met à jour vos applications en lot."
+      },
+      "open": { "startApp": "UniGetUI", "exe": ["UniGetUI.exe"] }
+    },
+    {
+      "id": "krokiet",
+      "wingetId": "qarmin.krokiet",
+      "name": "Krokiet",
+      "category": "files",
+      "license": "GPL-3.0",
+      "openSource": true,
+      "homepage": "https://github.com/qarmin/czkawka",
+      "description": {
+        "en": "Finds duplicate files, similar photos and videos, empty folders and broken files.",
+        "fr": "Trouve les fichiers en double, les photos et vidéos similaires, les dossiers vides et les fichiers abîmés."
+      },
+      "open": { "exe": ["krokiet.exe", "krokiet_*.exe"] }
+    },
+    {
+      "id": "windirstat",
+      "wingetId": "WinDirStat.WinDirStat",
+      "name": "WinDirStat",
+      "category": "files",
+      "license": "GPL-3.0",
+      "openSource": true,
+      "homepage": "https://windirstat.net/",
+      "description": {
+        "en": "A detailed map of what fills your disks, file by file.",
+        "fr": "Une carte détaillée de ce qui remplit vos disques, fichier par fichier."
+      },
+      "open": { "startApp": "WinDirStat", "exe": ["WinDirStat.exe"] }
+    },
+    {
+      "id": "bleachbit",
+      "wingetId": "BleachBit.BleachBit",
+      "name": "BleachBit",
+      "category": "files",
+      "license": "GPL-3.0",
+      "openSource": true,
+      "homepage": "https://www.bleachbit.org/",
+      "description": {
+        "en": "Cleans the caches of hundreds of programs. Check what it lists before you delete.",
+        "fr": "Nettoie les caches de centaines de programmes. Vérifiez la liste avant de supprimer."
+      },
+      "open": { "startApp": "BleachBit", "exe": ["bleachbit.exe"] }
+    },
+    {
+      "id": "crystaldiskinfo",
+      "wingetId": "CrystalDewWorld.CrystalDiskInfo",
+      "name": "CrystalDiskInfo",
+      "category": "hardware",
+      "license": "MIT",
+      "openSource": true,
+      "homepage": "https://crystalmark.info/en/software/crystaldiskinfo/",
+      "description": {
+        "en": "Reads your disks' SMART data: health, temperature and hours of use.",
+        "fr": "Lit les données SMART de vos disques : santé, température et heures d'utilisation."
+      },
+      "open": { "startApp": "CrystalDiskInfo", "exe": ["DiskInfo64.exe", "DiskInfo32.exe"] }
+    },
+    {
+      "id": "librehardwaremonitor",
+      "wingetId": "LibreHardwareMonitor.LibreHardwareMonitor",
+      "name": "LibreHardwareMonitor",
+      "category": "hardware",
+      "license": "MPL-2.0",
+      "openSource": true,
+      "homepage": "https://github.com/LibreHardwareMonitor/LibreHardwareMonitor",
+      "description": {
+        "en": "Every temperature, fan speed, voltage and load your PC reports. The same library powers Hardware Health.",
+        "fr": "Toutes les températures, vitesses de ventilateur, tensions et charges de votre PC. La même bibliothèque alimente Santé du matériel."
+      },
+      "open": { "exe": ["LibreHardwareMonitor.exe"] }
+    },
+    {
+      "id": "pawnio",
+      "wingetId": "namazso.PawnIO",
+      "name": "PawnIO",
+      "category": "hardware",
+      "license": "Freeware",
+      "openSource": false,
+      "homepage": "https://pawnio.eu/",
+      "description": {
+        "en": "A signed driver that lets LibreHardwareMonitor read CPU temperatures and fans. Hardware Health uses it when you allow admin rights.",
+        "fr": "Un pilote signé qui permet à LibreHardwareMonitor de lire les températures du processeur et les ventilateurs. Santé du matériel l'utilise quand vous autorisez les droits administrateur."
+      },
+      "open": { "exe": [] }
+    },
+    {
+      "id": "autoruns",
+      "wingetId": "Microsoft.Sysinternals.Autoruns",
+      "name": "Autoruns",
+      "category": "system",
+      "license": "Freeware (Microsoft Sysinternals)",
+      "openSource": false,
+      "homepage": "https://learn.microsoft.com/sysinternals/downloads/autoruns",
+      "description": {
+        "en": "Everything that starts with Windows, in one list: services, drivers, tasks, shell extensions. For experts.",
+        "fr": "Tout ce qui démarre avec Windows, dans une seule liste : services, pilotes, tâches, extensions. Pour les experts."
+      },
+      "open": { "exe": ["Autoruns64.exe", "autoruns.exe"] }
+    },
+    {
+      "id": "powertoys",
+      "wingetId": "Microsoft.PowerToys",
+      "name": "PowerToys",
+      "category": "system",
+      "license": "MIT",
+      "openSource": true,
+      "homepage": "https://github.com/microsoft/PowerToys",
+      "description": {
+        "en": "Microsoft's power-user extras: window layouts, bulk rename, color picker, file locksmith and more.",
+        "fr": "Les outils avancés de Microsoft : dispositions de fenêtres, renommage en lot, pipette, verrous de fichiers et plus."
+      },
+      "open": { "startApp": "PowerToys", "exe": ["PowerToys.exe"] }
+    },
+    {
+      "id": "shutup10",
+      "wingetId": "OO-Software.ShutUp10",
+      "name": "O&O ShutUp10++",
+      "category": "privacy",
+      "license": "Freeware",
+      "openSource": false,
+      "homepage": "https://www.oo-software.com/shutup10",
+      "description": {
+        "en": "Hundreds of privacy settings with recommendations. Create a restore point first: it can change a lot at once.",
+        "fr": "Des centaines de réglages de confidentialité avec recommandations. Créez d'abord un point de restauration : il peut changer beaucoup de choses d'un coup."
+      },
+      "open": { "exe": ["OOSU10.exe"] }
+    },
+    {
+      "id": "malwarebytes",
+      "wingetId": "Malwarebytes.Malwarebytes",
+      "name": "Malwarebytes",
+      "category": "security",
+      "license": "Freeware (paid options)",
+      "openSource": false,
+      "homepage": "https://www.malwarebytes.com/",
+      "description": {
+        "en": "A second-opinion malware scanner. The free version scans on demand; it offers a paid trial you can ignore.",
+        "fr": "Un second avis contre les logiciels malveillants. La version gratuite analyse à la demande ; elle propose un essai payant que vous pouvez ignorer."
+      },
+      "open": { "startApp": "Malwarebytes", "exe": ["mbam.exe"] }
+    },
+    {
+      "id": "adwcleaner",
+      "wingetId": "Malwarebytes.AdwCleaner",
+      "name": "AdwCleaner",
+      "category": "security",
+      "license": "Freeware",
+      "openSource": false,
+      "homepage": "https://www.malwarebytes.com/adwcleaner",
+      "description": {
+        "en": "Finds adware, unwanted toolbars and browser hijackers. Nothing to install: it runs and leaves.",
+        "fr": "Trouve les logiciels publicitaires, barres d'outils indésirables et pirates de navigateur. Rien à installer : il s'exécute et repart."
+      },
+      "open": { "exe": ["adwcleaner.exe", "adwcleaner_*.exe"] }
+    }
+  ]
+}

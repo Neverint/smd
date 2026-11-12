@@ -16,10 +16,12 @@ crate-type = ["rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+tauri = { version = "2", features = ["tray-icon"] }
 tauri-plugin-log = "2"
 tauri-plugin-dialog = "2"
 tauri-plugin-opener = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-single-instance = "2"
 log.workspace = true
 rayon.workspace = true
 serde.workspace = true
@@ -33,3 +35,4 @@ tempfile.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 window-vibrancy = "0.8"
+winreg = "0.56"

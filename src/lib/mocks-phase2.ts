@@ -74,7 +74,7 @@ function clutterView(id: number): ClutterView {
   };
 }
 
-export function phase2Handlers(log: Log): Omit<MockHandlers, "app_info" | "format_bytes" | "settings_get" | "settings_set" | "open_log_folder" | "activity_list" | "activity_undo" | "cleanup_run" | "drives_list" | "pick_folder" | "space_cancel" | "space_view" | "space_reveal" | "protection_status" | "protection_cancel_scan" | "protection_update_signatures" | "permission_set" | "hardware_info" | "sensors_poll" | "sensors_stop" | "organizer_audit" | "organizer_policy_set" | "organizer_plan" | "organizer_cancel" | "quarantine_list" | "quarantine_restore" | "quarantine_purge_consent" | "clutter_scratch"> {
+export function phase2Handlers(log: Log): Omit<MockHandlers, "app_info" | "format_bytes" | "settings_get" | "settings_set" | "open_log_folder" | "activity_list" | "activity_undo" | "cleanup_run" | "drives_list" | "pick_folder" | "space_cancel" | "space_view" | "space_reveal" | "protection_status" | "protection_cancel_scan" | "protection_update_signatures" | "permission_set" | "hardware_info" | "sensors_poll" | "sensors_stop" | "organizer_audit" | "organizer_policy_set" | "organizer_plan" | "organizer_cancel" | "quarantine_list" | "quarantine_restore" | "quarantine_purge_consent" | "clutter_scratch" | "cleanup_admin_scan" | "disk_reliability" | "sensors_admin_poll" | "sensors_admin_stop" | "tweaks_list" | "tweaks_apply" | "tweak_undo" | "restart_explorer" | "admin_session_end" | "toolbox_list" | "toolbox_install" | "toolbox_open" | "tray_info" | "tray_sample" | "tray_action" | "tray_hide" | "schedule_get" | "schedule_set"> {
   return {
     startup_list: () => startup,
     startup_set: ({ id, enabled }) => {

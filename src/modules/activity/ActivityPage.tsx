@@ -9,10 +9,13 @@ import {
   Delete20Regular,
   DocumentCopy20Regular,
   FolderArrowRight20Regular,
+  History20Regular,
   LockClosed20Regular,
+  Options20Regular,
   ShieldCheckmark20Regular,
   Search20Regular,
   Sparkle20Regular,
+  Toolbox20Regular,
   TopSpeed20Regular,
 } from "@fluentui/react-icons";
 import { useCallback, useEffect, useState } from "react";
@@ -41,6 +44,10 @@ const ICONS: Record<ActivityKind, typeof Broom20Regular> = {
   permissionChange: LockClosed20Regular,
   migration: FolderArrowRight20Regular,
   quarantinePurge: Delete20Regular,
+  tweaksApplied: Options20Regular,
+  restorePoint: History20Regular,
+  toolInstall: Toolbox20Regular,
+  toolUpdate: Toolbox20Regular,
 };
 
 function Detail({ e }: { e: ActivityEntry }) {
@@ -92,6 +99,18 @@ function Detail({ e }: { e: ActivityEntry }) {
           {skipped}
         </>
       );
+    case "tweaksApplied":
+      return (
+        <>
+          {t("activity.detail.tweaks", { count: e.items })}
+          {skipped}
+        </>
+      );
+    case "restorePoint":
+      return <>{t("activity.detail.restorePoint")}</>;
+    case "toolInstall":
+    case "toolUpdate":
+      return <>{t(e.failed > 0 ? "activity.detail.toolFailed" : "activity.detail.tool", { name: e.target ?? "" })}</>;
     case "quarantinePurge":
       return <>{t("activity.detail.quarantinePurge", { size: f.bytes(e.bytes) })}</>;
     case "defenderScan":

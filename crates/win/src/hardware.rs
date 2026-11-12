@@ -106,7 +106,7 @@ pub fn batteries(temp_dir: &Path) -> io::Result<Vec<BatteryInfo>> {
     Ok(parse_battery_report(&text))
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SensorSnapshot {
     /// The helper runs with admin rights (CPU temperatures and fans available).

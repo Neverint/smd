@@ -36,6 +36,10 @@ pub enum Kind {
     PermissionChange,
     Migration,
     QuarantinePurge,
+    TweaksApplied,
+    RestorePoint,
+    ToolInstall,
+    ToolUpdate,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -106,6 +110,9 @@ pub struct RegBackup {
 pub struct StartupUndo {
     pub id: String,
     pub was_enabled: bool,
+    /// Machine-wide item: the undo needs the admin helper.
+    #[serde(default)]
+    pub machine: bool,
 }
 
 /// What an undo needs. Phase 1 files (paths only) still load.
@@ -129,6 +136,9 @@ pub struct UndoData {
     /// Migration journal to roll back.
     #[serde(default)]
     pub migration: Option<String>,
+    /// Tweaks to put back (their undo data is in tweaks-undo.json).
+    #[serde(default)]
+    pub tweaks: Vec<String>,
 }
 
 /// An app permission before it was changed.
@@ -172,6 +182,12 @@ fn undo_path(dir: &Path, id: u64) -> PathBuf {
 }
 
 /// Saves the recycled paths so the action can be undone later.
+/// The newest entry of a kind (the tray shows the last Smart Care score).
+pub fn latest(state: &AppState, kind: Kind) -> Option<Entry> {
+    let _guard = lock(&state.activity_lock).ok()?;
+    load(&state.data_dir).into_iter().find(|e| e.kind == kind)
+}
+
 pub fn save_undo(state: &AppState, id: u64, data: &UndoData) -> bool {
     store::write_json(&undo_path(&state.data_dir, id), data).is_ok()
 }
@@ -245,8 +261,30 @@ pub async fn activity_undo(app: tauri::AppHandle, id: u64) -> AppResult<RestoreR
                 }
             }
         }
+        for t in &undo.tweaks {
+            match crate::tweaks::revert(&app, &state, t) {
+                Ok(true) => report.restored += 1,
+                Ok(false) => report.missing += 1,
+                Err(e) => {
+                    log::warn!("could not undo tweak {t}: {e}");
+                    report.failed += 1;
+                }
+            }
+        }
         if let Some(s) = &undo.startup {
-            match smd_win::startup::set_enabled(&s.id, s.was_enabled, store::now_ms()) {
+            let result = if s.machine {
+                crate::helper::call::<bool>(
+                    &state,
+                    &smd_win::helper::Op::StartupSet {
+                        id: s.id.clone(),
+                        enabled: s.was_enabled,
+                    },
+                )
+                .map_err(|e| std::io::Error::other(e.to_string()))
+            } else {
+                smd_win::startup::set_enabled(&s.id, s.was_enabled, store::now_ms())
+            };
+            match result {
                 Ok(_) => report.restored += 1,
                 Err(e) => {
                     log::warn!("could not undo startup change {}: {e}", s.id);

@@ -3,6 +3,7 @@ import { formatBytes } from "./format";
 import { phase2Handlers, phase2Streams, resetPhase2Mocks } from "./mocks-phase2";
 import { phase3Handlers, phase3Streams, resetPhase3Mocks } from "./mocks-phase3";
 import { phase3bHandlers, phase3bStreams, resetPhase3bMocks } from "./mocks-phase3b";
+import { phase4Handlers, resetPhase4Mocks } from "./mocks-phase4";
 import type {
   ActivityEntry,
   BackendSettings,
@@ -27,7 +28,7 @@ const fast = () => typeof window !== "undefined" && (window as unknown as { __SM
 const pause = (ms: number) => (fast() ? Promise.resolve() : sleep(ms));
 
 let nextId = 1000;
-let settings: BackendSettings = { exclusions: [], deleteMode: "recycleBin", quarantine: true, quarantineDays: 30, purgeConsent: null, scratchDays: 14 };
+let settings: BackendSettings = { exclusions: [], deleteMode: "recycleBin", quarantine: true, quarantineDays: 30, purgeConsent: null, scratchDays: 14, closeToTray: false, guard: true, language: "en", schedule: { frequency: "off", day: 6, hour: 10 } };
 let activity: ActivityEntry[] = [];
 let lastScanId = 0;
 
@@ -106,6 +107,7 @@ function fakeCleanup(): CleanupScanResult {
     categories,
     reclaimableBytes: categories.filter((c) => !c.admin && !c.permanent).reduce((s, c) => s + c.bytes, 0),
     durationMs: 1840,
+    adminScanned: false,
   };
 }
 
@@ -236,9 +238,11 @@ export const mockHandlers: MockHandlers = {
     let removedBytes = 0;
     let removedItems = 0;
     let binEmptiedBytes: number | null = null;
+    let adminBytes = 0;
     for (const sel of selections) {
       const c = lastCleanup.categories.find((x) => x.id === sel.id);
-      if (!c || c.admin) continue;
+      if (!c || (c.admin && !lastCleanup.adminScanned)) continue;
+      if (c.admin) adminBytes += c.items.filter((i) => !sel.skip.includes(i.path)).reduce((s, i) => s + i.bytes, 0);
       if (c.permanent) {
         binEmptiedBytes = c.bytes;
         log({ ...blank, kind: "emptyRecycleBin", bytes: c.bytes });
@@ -263,8 +267,22 @@ export const mockHandlers: MockHandlers = {
       binEmptiedBytes,
       undoAvailable: e.undo === "available",
       quarantine: settings.quarantine && settings.deleteMode === "recycleBin" ? "S:\\Quarantine" : null,
+      adminBytes,
       activityId: e.id,
     };
+  },
+  cleanup_admin_scan: async ({ scanId }) => {
+    if (!lastCleanup || scanId !== lastScanId) throw { code: "stale", message: "scan again", details: "" };
+    await pause(500);
+    const cats = lastCleanup.categories.map((c) =>
+      c.id === "delivery-optimization"
+        ? { ...c, unreadable: false, items: [{ path: "C:\\Windows\\ServiceProfiles\\NetworkService\\AppData\\Local\\Microsoft\\Windows\\DeliveryOptimization\\Cache", name: "Cache", bytes: 3.2 * GB, files: 41, modifiedMs: Date.now(), isDir: true }], bytes: 3.2 * GB, files: 41 }
+        : c.admin
+          ? { ...c, unreadable: false }
+          : c,
+    );
+    lastCleanup = { ...lastCleanup, categories: cats, adminScanned: true, reclaimableBytes: cats.filter((c) => !c.permanent).reduce((s, c) => s + c.bytes, 0) };
+    return lastCleanup;
   },
   drives_list: () => MOCK_DRIVES,
   pick_folder: () => "C:\\",
@@ -280,6 +298,7 @@ export const mockHandlers: MockHandlers = {
   ...phase2Handlers(log),
   ...phase3Handlers(log),
   ...phase3bHandlers(log),
+  ...phase4Handlers(log),
 };
 
 export const mockStreams: MockStreams = {
@@ -372,11 +391,12 @@ export const mockStreams: MockStreams = {
 /** Test helper: start every mock session from a clean state. */
 export function resetMocks(): void {
   nextId = 1000;
-  settings = { exclusions: [], deleteMode: "recycleBin", quarantine: true, quarantineDays: 30, purgeConsent: null, scratchDays: 14 };
+  settings = { exclusions: [], deleteMode: "recycleBin", quarantine: true, quarantineDays: 30, purgeConsent: null, scratchDays: 14, closeToTray: false, guard: true, language: "en", schedule: { frequency: "off", day: 6, hour: 10 } };
   activity = [];
   lastCleanup = null;
   lastScanId = 0;
   resetPhase2Mocks();
   resetPhase3Mocks();
   resetPhase3bMocks();
+  resetPhase4Mocks();
 }

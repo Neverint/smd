@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Scrub My Disks: the MSI uninstall removes the scheduled Smart Care task. -->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <ComponentGroup Id="SmdUninstallCleanup" />
+    <CustomAction Id="SmdRemoveScheduledTask" Directory="TARGETDIR" Execute="deferred" Impersonate="yes" Return="ignore"
+      ExeCommand="&quot;[SystemFolder]schtasks.exe&quot; /Delete /TN &quot;Scrub My Disks Smart Care&quot; /F" />
+    <InstallExecuteSequence>
+      <Custom Action="SmdRemoveScheduledTask" Before="RemoveFiles">REMOVE="ALL"</Custom>
+    </InstallExecuteSequence>
+  </Fragment>
+</Wix>

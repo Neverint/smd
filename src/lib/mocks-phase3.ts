@@ -98,6 +98,7 @@ export function phase3Handlers(log: Log): Pick<MockHandlers, "protection_status"
         memory: { loadPercent: 64, totalBytes: 16 * GB, availableBytes: 5.8 * GB, commitPercent: 51 },
         batteries: [],
         hasBattery: false,
+        pawnio: false,
       };
     },
     sensors_poll: (): SensorsView => {

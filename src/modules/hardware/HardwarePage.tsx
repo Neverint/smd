@@ -1,9 +1,10 @@
-import { Info16Regular } from "@fluentui/react-icons";
+import { Info16Regular, Shield20Regular } from "@fluentui/react-icons";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ErrorNotice, UsageBar } from "../../components";
+import { Link } from "react-router";
+import { Button, ErrorNotice, UsageBar } from "../../components";
 import { call, toBackendError, type BackendError } from "../../lib/backend";
-import type { HardwareReading, HardwareView, SensorsView } from "../../lib/types";
+import type { DiskReliability, HardwareReading, HardwareView, PhysicalDisk, SensorsView } from "../../lib/types";
 import { useFormat } from "../../lib/useFormat";
 import "../modules.css";
 
@@ -51,25 +52,33 @@ function SensorCard({ h }: { h: HardwareReading }) {
   );
 }
 
-function Sensors() {
+function Sensors({ pawnio }: { pawnio: boolean }) {
   const { t } = useTranslation();
   const [view, setView] = useState<SensorsView | null>(null);
   const [error, setError] = useState<BackendError | null>(null);
+  const [admin, setAdmin] = useState(false);
+  const [adminError, setAdminError] = useState<BackendError | null>(null);
 
   useEffect(() => {
     let alive = true;
     const tick = () =>
-      call("sensors_poll")
+      (admin ? call("sensors_admin_poll") : call("sensors_poll"))
         .then((v) => alive && setView(v))
-        .catch((e) => alive && setError(toBackendError(e)));
+        .catch((e) => {
+          if (!alive) return;
+          if (admin) {
+            setAdmin(false);
+            setAdminError(toBackendError(e));
+          } else setError(toBackendError(e));
+        });
     void tick();
     const timer = setInterval(tick, 2000);
     return () => {
       alive = false;
       clearInterval(timer);
-      void call("sensors_stop").catch(() => undefined);
+      void call(admin ? "sensors_admin_stop" : "sensors_stop").catch(() => undefined);
     };
-  }, []);
+  }, [admin]);
 
   if (error) {
     return (
@@ -84,10 +93,17 @@ function Sensors() {
   return (
     <>
       {!view.snapshot.elevated && (
-        <p className="cat-row__note">
-          <Info16Regular aria-hidden="true" /> {t("hardware.adminForCpu")}
-        </p>
+        <div className="admin-offer">
+          <Button icon={<Shield20Regular />} onClick={() => setAdmin(true)}>
+            {t("hardware.adminSensors")}
+          </Button>
+          <p className="inline-note">
+            {pawnio ? t("hardware.adminSensorsWhy") : t("hardware.pawnioNeeded")} {!pawnio && <Link to="/toolbox">{t("hardware.openToolbox")}</Link>}
+          </p>
+        </div>
       )}
+      {view.snapshot.elevated && <p className="tool-meta">{t("hardware.adminOn")}</p>}
+      {adminError && <ErrorNotice error={adminError} />}
       <div className="two-col">
         {view.snapshot.hardware.map((h) => (
           <SensorCard key={h.kind + h.name} h={h} />
@@ -97,11 +113,44 @@ function Sensors() {
   );
 }
 
+function SmartLine({ r }: { r: DiskReliability | undefined }) {
+  const { t } = useTranslation();
+  if (!r) return null;
+  const errors = (r.readErrors ?? 0) + (r.writeErrors ?? 0);
+  const parts = [
+    r.temperature !== null ? t("hardware.smart.temp", { now: r.temperature, max: r.temperatureMax ?? "?" }) : null,
+    r.powerOnHours !== null ? t("hardware.smart.hours", { count: r.powerOnHours }) : null,
+    r.wear !== null ? t("hardware.smart.wear", { percent: r.wear }) : null,
+    errors > 0 ? t("hardware.smart.errors", { count: errors }) : t("hardware.smart.noErrors"),
+  ].filter(Boolean);
+  return <span className="row__sub">{parts.join(" · ")}</span>;
+}
+
+function reliabilityFor(d: PhysicalDisk, list: DiskReliability[] | null): DiskReliability | undefined {
+  if (!list) return undefined;
+  return list.find((r) => (d.serial && r.serial && r.serial === d.serial.trim()) || r.name === d.name);
+}
+
 export function HardwarePage() {
   const { t } = useTranslation();
   const f = useFormat();
   const [view, setView] = useState<HardwareView | null>(null);
   const [error, setError] = useState<BackendError | null>(null);
+  const [smart, setSmart] = useState<DiskReliability[] | null>(null);
+  const [smartBusy, setSmartBusy] = useState(false);
+  const [smartError, setSmartError] = useState<BackendError | null>(null);
+
+  const readSmart = async () => {
+    setSmartBusy(true);
+    setSmartError(null);
+    try {
+      setSmart(await call("disk_reliability"));
+    } catch (e) {
+      setSmartError(toBackendError(e));
+    } finally {
+      setSmartBusy(false);
+    }
+  };
 
   useEffect(() => {
     call("hardware_info")
@@ -123,7 +172,7 @@ export function HardwarePage() {
         <h2 id="sensors-title" className="section-title">
           {t("hardware.live")}
         </h2>
-        <Sensors />
+        <Sensors pawnio={!!view?.pawnio} />
       </section>
 
       {!view ? (
@@ -146,6 +195,7 @@ export function HardwarePage() {
                       <span className="row__sub">
                         {[d.mediaType, d.busType, f.bytes(d.sizeBytes), t(`hardware.health.${d.health}`)].filter(Boolean).join(" · ")}
                       </span>
+                      <SmartLine r={reliabilityFor(d, smart)} />
                     </div>
                   </li>
                 ))}
@@ -153,9 +203,15 @@ export function HardwarePage() {
             ) : (
               <p className="flow-muted">{t("smartCare.card.disksUnknown")}</p>
             )}
-            <p className="cat-row__note">
-              <Info16Regular aria-hidden="true" /> {t("hardware.smartAdmin")}
-            </p>
+            {!smart && (
+              <div className="admin-offer">
+                <Button icon={<Shield20Regular />} disabled={smartBusy} onClick={() => void readSmart()}>
+                  {smartBusy ? t("admin.waiting") : t("hardware.readSmart")}
+                </Button>
+                <p className="inline-note">{t("hardware.smartAdmin")}</p>
+              </div>
+            )}
+            {smartError && <ErrorNotice error={smartError} />}
           </section>
 
           <div className="two-col">

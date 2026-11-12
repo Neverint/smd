@@ -75,13 +75,13 @@ fn sample_memory() -> (Option<MemoryInfo>, Option<f64>) {
     (last, min_load)
 }
 
-pub fn scan(state: &AppState, on_progress: &Channel<ScanProgress>) -> SmartCareResult {
+pub fn scan(state: &AppState, on_progress: &(dyn Fn(ScanProgress) + Sync)) -> SmartCareResult {
     let started = now_ms();
     let total = rule_count() + 7;
     let done = AtomicU32::new(0);
     let report = |step: &str| {
         let n = done.fetch_add(1, Ordering::Relaxed) + 1;
-        let _ = on_progress.send(ScanProgress {
+        on_progress(ScanProgress {
             step: step.to_string(),
             done: n,
             total,
@@ -242,7 +242,9 @@ pub async fn smart_care_scan(
     tauri::async_runtime::spawn_blocking(move || {
         let state = app.state::<AppState>();
         let _busy = state.begin("Smart Care")?;
-        Ok(scan(&state, &on_progress))
+        Ok(scan(&state, &|p| {
+            let _ = on_progress.send(p);
+        }))
     })
     .await
     .map_err(|e| AppError::Internal(e.to_string()))?

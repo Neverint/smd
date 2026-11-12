@@ -305,7 +305,11 @@
     },
     "unknownSize": "Non mesuré",
     "doneQuarantine": "{{size}} déplacés dans {{path}}. L'espace est libéré ; tout y reste 30 jours et peut être remis en place depuis Mon activité.",
-    "quarantineNote": "Les éléments supprimés vont dans la quarantaine de votre disque jetable (gardés {{days}} jours), ou dans la Corbeille si ce disque n'est pas là."
+    "quarantineNote": "Les éléments supprimés vont dans la quarantaine de votre disque jetable (gardés {{days}} jours), ou dans la Corbeille si ce disque n'est pas là.",
+    "adminScan": "Vérifier aussi les fichiers de Windows",
+    "adminScanWhy": "Les fichiers temporaires de Windows, le cache des mises à jour et les vidages mémoire appartiennent au système. Windows demande une fois les droits administrateur pour que l'assistant puisse les lire et les nettoyer. Ils vont dans la Corbeille.",
+    "adminReady": "Vérifié avec les droits administrateur : nettoyé par l'assistant administrateur, vers la Corbeille.",
+    "doneAdmin": "{{size}} de fichiers de Windows sont partis dans la Corbeille."
   },
   "spaceLens": {
     "pick": "Choisissez un disque ou un dossier à analyser",
@@ -356,7 +360,11 @@
       "signatureUpdate": "Mise à jour des définitions de virus",
       "permissionChange": "Autorisation d'application modifiée",
       "migration": "Fichiers déplacés vers un autre disque",
-      "quarantinePurge": "Ancienne quarantaine purgée"
+      "quarantinePurge": "Ancienne quarantaine purgée",
+      "tweaksApplied": "Confidentialité et réglages",
+      "restorePoint": "Point de restauration créé",
+      "toolInstall": "Outil installé",
+      "toolUpdate": "Outil mis à jour"
     },
     "detail": {
       "smartCareScan": "Score {{score}} · {{size}} de fichiers inutiles trouvés",
@@ -390,7 +398,12 @@
       "permissionOff": "{{app}} ne peut plus utiliser : {{what}}",
       "migration_one": "{{count}} élément, {{size}}",
       "migration_other": "{{count}} éléments, {{size}}",
-      "quarantinePurge": "{{size}} supprimés définitivement"
+      "quarantinePurge": "{{size}} supprimés définitivement",
+      "tweaks_one": "{{count}} réglage",
+      "tweaks_other": "{{count}} réglages",
+      "restorePoint": "Avant des modifications du système",
+      "tool": "{{name}}",
+      "toolFailed": "{{name}} · échec"
     },
     "undo": "Annuler",
     "undoLabel": "Annuler : {{what}}",
@@ -434,7 +447,30 @@
     "gallery": "Ouvrir la galerie de composants",
     "privacy": "Pas de télémétrie, pas de compte. Les journaux restent sur ce PC.",
     "quarantine": "Quarantaine sur le disque jetable",
-    "quarantineHint": "Les éléments supprimés de vos autres disques vont dans le dossier Quarantaine du disque jetable pendant {{days}} jours au lieu de la Corbeille. L'espace est libéré tout de suite. Désactivée, ou si ce disque manque ou n'est pas en bonne santé : la Corbeille."
+    "quarantineHint": "Les éléments supprimés de vos autres disques vont dans le dossier Quarantaine du disque jetable pendant {{days}} jours au lieu de la Corbeille. L'espace est libéré tout de suite. Désactivée, ou si ce disque manque ou n'est pas en bonne santé : la Corbeille.",
+    "background": "Zone de notification et arrière-plan",
+    "closeToTray": "Rester dans la zone de notification",
+    "closeToTrayHint": "Fermer la fenêtre laisse Scrub My Disks dans la zone de notification (toujours pendant une tâche, puis il vous prévient quand elle est finie).",
+    "guard": "Surveiller ce qui arrive sur le mauvais disque",
+    "guardHint": "Pendant que l'application tourne, elle repère les nouveaux jeux et dossiers et vous prévient s'ils arrivent sur le mauvais disque. Elle ne déplace jamais rien d'elle-même.",
+    "schedule": "Entretien express planifié",
+    "scheduleHint": "Windows lance un entretien express à cette heure et affiche la note dans une notification. Il analyse seulement : rien n'est supprimé.",
+    "scheduleOff": "Désactivé",
+    "scheduleDaily": "Chaque jour",
+    "scheduleWeekly": "Chaque semaine",
+    "scheduleDay": "Jour",
+    "scheduleHour": "Heure",
+    "scheduleOn": "Planifié dans le Planificateur de tâches de Windows.",
+    "scheduleMissing": "La tâche n'est plus dans le Planificateur de tâches : choisissez à nouveau l'heure pour la recréer.",
+    "days": {
+      "0": "Lundi",
+      "1": "Mardi",
+      "2": "Mercredi",
+      "3": "Jeudi",
+      "4": "Vendredi",
+      "5": "Samedi",
+      "6": "Dimanche"
+    }
   },
   "errors": {
     "title": "Ça n'a pas marché",
@@ -482,7 +518,8 @@
     "state": "État",
     "startMode": "Démarrage",
     "none": "Aucun.",
-    "unavailable": "Impossible à lire."
+    "unavailable": "Impossible à lire.",
+    "adminNeeded": "Pour tous les utilisateurs : Windows demande les droits administrateur quand vous le changez."
   },
   "applications": {
     "tabs": {
@@ -669,7 +706,7 @@
   },
   "hardware": {
     "live": "Capteurs en direct",
-    "adminForCpu": "La température du processeur et les ventilateurs de la carte mère demandent les droits d'administrateur. Ils arriveront avec l'assistant administrateur (phase 4).",
+    "adminForCpu": "La température du processeur et les ventilateurs de la carte mère demandent les droits administrateur.",
     "helperMissing": "Les capteurs en direct ne sont pas disponibles : l'assistant capteurs manque dans cette installation.",
     "helperStopped": "L'assistant capteurs s'est arrêté. Il a besoin du runtime .NET 8 de Microsoft.",
     "sensorsStarting": "Démarrage des capteurs…",
@@ -702,7 +739,7 @@
       "unhealthy": "Défaillant",
       "unknown": "Santé inconnue"
     },
-    "smartAdmin": "La santé vient de Windows. Usure, température et compteurs d'erreurs (SMART) demandent les droits d'administrateur et arrivent avec l'assistant administrateur (phase 4). CrystalDiskInfo dans la Boîte à outils les montre tous.",
+    "smartAdmin": "La santé vient de Windows. Température, heures d'utilisation, usure et compteurs d'erreurs (SMART) demandent les droits administrateur : Windows demande une fois. CrystalDiskInfo, dans la Boîte à outils, en montre encore plus.",
     "processor": "Processeur",
     "cpuLine": "{{cores}} cœurs, {{threads}} threads, jusqu'à {{ghz}} GHz",
     "graphics": "Carte graphique",
@@ -714,7 +751,22 @@
     "batteryHealth": "{{percent}} % de la capacité d'origine",
     "batteryLine": "{{full}} Wh aujourd'hui, {{design}} Wh neuve",
     "cycles_one": "{{count}} cycle de charge",
-    "cycles_other": "{{count}} cycles de charge"
+    "cycles_other": "{{count}} cycles de charge",
+    "adminSensors": "Lire les capteurs du processeur avec les droits administrateur",
+    "adminSensorsWhy": "Windows demande une fois. L'assistant capteurs lit ensuite la température du processeur et les ventilateurs.",
+    "pawnioNeeded": "La température du processeur et les ventilateurs demandent aussi le pilote gratuit PawnIO, qui n'est pas installé.",
+    "openToolbox": "L'obtenir dans la Boîte à outils",
+    "adminOn": "Lecture avec les droits administrateur.",
+    "readSmart": "Lire les détails SMART",
+    "smart": {
+      "temp": "{{now}} °C (maximum {{max}} °C)",
+      "hours_one": "{{count, number}} heure d'utilisation",
+      "hours_other": "{{count, number}} heures d'utilisation",
+      "wear": "usé à {{percent}} %",
+      "errors_one": "{{count, number}} erreur de lecture/écriture",
+      "errors_other": "{{count, number}} erreurs de lecture/écriture",
+      "noErrors": "aucune erreur de lecture/écriture"
+    }
   },
   "organizer": {
     "tabs": {
@@ -861,5 +913,119 @@
       "programsClosed": "À fermer d'abord : {{detail}}",
       "pluggedIn": "Branchez d'abord votre portable"
     }
+  },
+  "admin": {
+    "waiting": "En attente de Windows…",
+    "sessionOpen": "Les droits administrateur restent actifs quelques minutes (pas de nouvelle demande de Windows).",
+    "endSession": "Désactiver maintenant"
+  },
+  "tweaks": {
+    "intro": "Chaque réglage dit ce qu'il fait. Les réglages de votre compte s'appliquent tout de suite ; ceux de tout le PC demandent les droits administrateur, et un point de restauration est créé d'abord. Chaque réglage peut être annulé ici ou dans Mon activité.",
+    "filter": "Afficher",
+    "category": {
+      "all": "Tous",
+      "privacy": "Confidentialité",
+      "ads": "Publicités et suggestions",
+      "ai": "IA",
+      "explorer": "Explorateur",
+      "apps": "Applications intégrées"
+    },
+    "state": {
+      "applied": "Activé",
+      "notApplied": "Désactivé",
+      "partial": "En partie",
+      "notInstalled": "Non installée",
+      "unknown": "Inconnu",
+      "removed": "Supprimée",
+      "installed": "Installée"
+    },
+    "risk": {
+      "advanced": "Avancé",
+      "caution": "Avec prudence"
+    },
+    "needsAdmin": "Pour tout le PC : Windows demande les droits administrateur.",
+    "setBySmd": "Modifié par Scrub My Disks le {{date}}",
+    "undo": "Annuler",
+    "undoLabel": "Annuler : {{name}}",
+    "reinstall": "Réinstaller",
+    "reinstallLabel": "Réinstaller {{name}} depuis le Microsoft Store",
+    "apply_one": "Appliquer {{count}} réglage",
+    "apply_other": "Appliquer {{count}} réglages",
+    "applying": "Application…",
+    "nothingSelected": "Cochez les réglages voulus",
+    "adminNote_one": "{{count}} réglage concerne tout le PC : Windows demande les droits administrateur, et un point de restauration est créé d'abord.",
+    "adminNote_other": "{{count}} réglages concernent tout le PC : Windows demande les droits administrateur, et un point de restauration est créé d'abord.",
+    "userNote": "Ces réglages ne concernent que votre compte et s'appliquent tout de suite.",
+    "confirmTitle_one": "Appliquer {{count}} réglage ?",
+    "confirmTitle_other": "Appliquer {{count}} réglages ?",
+    "confirm": "Appliquer",
+    "adminShort": "admin",
+    "confirmAdmin": "Windows va demander les droits administrateur. Scrub My Disks crée d'abord un point de restauration système.",
+    "confirmApps": "Les applications supprimées peuvent être réinstallées depuis le Microsoft Store. Les autres réglages peuvent être annulés ici.",
+    "confirmUndo": "Vous pouvez annuler chaque réglage ici ou dans Mon activité.",
+    "applied_one": "{{count}} réglage appliqué.",
+    "applied_other": "{{count}} réglages appliqués.",
+    "failedOne": "{{name}} : pas modifié ({{message}}).",
+    "restartWindows": "Certains réglages prennent effet après un redémarrage de Windows.",
+    "restartExplorerHint": "Certains réglages apparaissent après un redémarrage de l'Explorateur (ses fenêtres se ferment).",
+    "restartExplorer": "Redémarrer l'Explorateur",
+    "rp": {
+      "created": "Point de restauration créé ({{time}}).",
+      "recent": "Windows n'a pas créé de nouveau point de restauration, car celui du {{time}} a moins de 24 heures. Il couvre ces réglages.",
+      "off": "La protection du système est désactivée sur le disque système : aucun point de restauration n'a pu être créé.",
+      "failed": "Aucun point de restauration n'a pu être créé : {{message}}"
+    },
+    "noPointTitle": "Continuer sans point de restauration ?",
+    "noPointBody": "Rien n'a encore été modifié. Chaque réglage reste annulable ici, mais un point de restauration est un filet de sécurité de plus si Windows se comporte mal.",
+    "continueWithout": "Continuer sans",
+    "turnOnRestore": "Activer la protection du système et continuer"
+  },
+  "toolbox": {
+    "network": "La Boîte à outils n'utilise Internet (winget) que pour installer ou mettre à jour un outil, ou vérifier ce qui est installé.",
+    "check": "Vérifier ce qui est installé",
+    "checking": "Interrogation de winget…",
+    "checked": "Vérifié le {{date}}",
+    "loading": "winget vérifie ce qui est installé (environ 20 secondes)…",
+    "wingetMissing": "winget n'est pas disponible. Installez « Programme d'installation d'application » depuis le Microsoft Store, puis réessayez.",
+    "category": {
+      "apps": "Applications",
+      "files": "Fichiers et disques",
+      "hardware": "Matériel",
+      "system": "Système",
+      "privacy": "Confidentialité",
+      "security": "Sécurité"
+    },
+    "installed": "Installé",
+    "installedVersion": "Installé · {{version}}",
+    "license": "Licence : {{license}}",
+    "openSource": "open source",
+    "install": "Installer",
+    "installing": "Installation…",
+    "installLabel": "Installer {{name}}",
+    "update": "Mettre à jour",
+    "updating": "Mise à jour…",
+    "updateLabel": "Mettre à jour {{name}}",
+    "open": "Ouvrir",
+    "openLabel": "Ouvrir {{name}}",
+    "done": "{{name}} est installé.",
+    "updated": "{{name}} est à jour.",
+    "failed": "{{name}} n'a pas pu être installé (code winget {{code}}).",
+    "agreement": "Installer un outil signifie accepter sa licence (voir son site). Son installateur peut demander les droits administrateur."
+  },
+  "tray": {
+    "title": "Mini moniteur Scrub My Disks",
+    "score": "Dernier entretien : {{score}}/100",
+    "cpu": "Processeur",
+    "memory": "Mémoire",
+    "disk": "Activité disque",
+    "network": "Réseau",
+    "cpuTemp": "Température du processeur",
+    "cpuTempNone": "droits admin requis (Santé du matériel)",
+    "free": "{{drive}} {{free}} libres sur {{total}}",
+    "smartCare": "Entretien express",
+    "emptyBin": "Vider la Corbeille",
+    "emptyConfirm": "Supprimer {{size}} définitivement ?",
+    "open": "Ouvrir",
+    "busy": "Une tâche est en cours."
   }
 }

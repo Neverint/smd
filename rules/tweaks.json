@@ -1,0 +1,429 @@
+{
+  "version": 1,
+  "tweaks": [
+    {
+      "id": "advertising-id",
+      "category": "privacy",
+      "risk": "safe",
+      "title": { "en": "Turn off the advertising ID", "fr": "Désactiver l'identifiant de publicité" },
+      "description": {
+        "en": "Apps can no longer use an ID to show you personalized ads. Same as Settings > Privacy & security > General.",
+        "fr": "Les applications ne peuvent plus utiliser un identifiant pour vous montrer des publicités personnalisées. Comme Paramètres > Confidentialité et sécurité > Général."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo", "name": "Enabled", "value": 0 }
+      ]
+    },
+    {
+      "id": "tailored-experiences",
+      "category": "privacy",
+      "risk": "safe",
+      "title": { "en": "No tailored experiences", "fr": "Pas d'expériences personnalisées" },
+      "description": {
+        "en": "Microsoft stops using your diagnostic data for personalized tips, ads and recommendations.",
+        "fr": "Microsoft n'utilise plus vos données de diagnostic pour des conseils, publicités et recommandations personnalisés."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Privacy", "name": "TailoredExperiencesWithDiagnosticDataEnabled", "value": 0 }
+      ]
+    },
+    {
+      "id": "feedback-requests",
+      "category": "privacy",
+      "risk": "safe",
+      "title": { "en": "No feedback requests", "fr": "Pas de demandes d'avis" },
+      "description": {
+        "en": "Windows stops asking how it is doing. Same as Settings > Privacy & security > Diagnostics & feedback > Feedback frequency: Never.",
+        "fr": "Windows ne vous demande plus votre avis. Comme Paramètres > Confidentialité et sécurité > Diagnostics et commentaires > Fréquence des commentaires : jamais."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Siuf\\Rules", "name": "NumberOfSIUFInPeriod", "value": 0 }
+      ]
+    },
+    {
+      "id": "app-launch-tracking",
+      "category": "privacy",
+      "risk": "safe",
+      "title": { "en": "Don't track app launches", "fr": "Ne pas suivre les lancements d'applications" },
+      "description": {
+        "en": "Windows stops recording which apps you open. The Start menu no longer shows your most used apps.",
+        "fr": "Windows n'enregistre plus les applications que vous ouvrez. Le menu Démarrer n'affiche plus les applications les plus utilisées."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "name": "Start_TrackProgs", "value": 0 }
+      ]
+    },
+    {
+      "id": "activity-history",
+      "category": "privacy",
+      "risk": "safe",
+      "title": { "en": "Turn off activity history", "fr": "Désactiver l'historique des activités" },
+      "description": {
+        "en": "Windows stops collecting and uploading the apps, files and sites you use. Uses a Windows policy (needs admin).",
+        "fr": "Windows ne collecte et n'envoie plus les applications, fichiers et sites que vous utilisez. Utilise une stratégie Windows (droits administrateur)."
+      },
+      "registry": [
+        { "hive": "hklm", "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System", "name": "PublishUserActivities", "value": 0 },
+        { "hive": "hklm", "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\System", "name": "UploadUserActivities", "value": 0 }
+      ]
+    },
+    {
+      "id": "diagnostic-data-required",
+      "category": "privacy",
+      "risk": "advanced",
+      "title": { "en": "Send only required diagnostic data", "fr": "Envoyer seulement les données de diagnostic obligatoires" },
+      "description": {
+        "en": "Limits diagnostic data to the required level through a Windows policy (needs admin). Settings then shows \"Some settings are managed by your organization\": that is normal.",
+        "fr": "Limite les données de diagnostic au niveau obligatoire via une stratégie Windows (droits administrateur). Paramètres affiche alors « Certains paramètres sont gérés par votre organisation » : c'est normal."
+      },
+      "registry": [
+        { "hive": "hklm", "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection", "name": "AllowTelemetry", "value": 1 }
+      ]
+    },
+    {
+      "id": "telemetry-service",
+      "category": "privacy",
+      "risk": "advanced",
+      "restartWindows": true,
+      "title": { "en": "Stop the telemetry service", "fr": "Arrêter le service de télémétrie" },
+      "description": {
+        "en": "Disables \"Connected User Experiences and Telemetry\" (DiagTrack). Takes effect after a restart. Some Feedback Hub features stop working.",
+        "fr": "Désactive « Expériences des utilisateurs connectés et télémétrie » (DiagTrack). Prend effet après un redémarrage. Certaines fonctions du Hub de commentaires ne marchent plus."
+      },
+      "services": [{ "name": "DiagTrack", "start": "disabled" }]
+    },
+    {
+      "id": "start-suggestions",
+      "category": "ads",
+      "risk": "safe",
+      "title": { "en": "No suggestions in Start", "fr": "Pas de suggestions dans Démarrer" },
+      "description": {
+        "en": "Removes app suggestions and promotions from the Start menu.",
+        "fr": "Retire les suggestions et promotions d'applications du menu Démarrer."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "name": "SystemPaneSuggestionsEnabled", "value": 0 },
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "name": "SubscribedContent-338388Enabled", "value": 0 }
+      ]
+    },
+    {
+      "id": "tips-and-tricks",
+      "category": "ads",
+      "risk": "safe",
+      "title": { "en": "No tips and tricks pop-ups", "fr": "Pas de fenêtres d'astuces" },
+      "description": {
+        "en": "Windows stops showing tips, tricks and suggestions as you use it.",
+        "fr": "Windows n'affiche plus d'astuces et de suggestions pendant que vous l'utilisez."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "name": "SubscribedContent-338389Enabled", "value": 0 },
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "name": "SoftLandingEnabled", "value": 0 }
+      ]
+    },
+    {
+      "id": "settings-suggestions",
+      "category": "ads",
+      "risk": "safe",
+      "title": { "en": "No suggested content in Settings", "fr": "Pas de contenu suggéré dans Paramètres" },
+      "description": {
+        "en": "Removes the suggested content and offers shown in the Settings app.",
+        "fr": "Retire le contenu suggéré et les offres affichés dans l'application Paramètres."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "name": "SubscribedContent-338393Enabled", "value": 0 },
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "name": "SubscribedContent-353694Enabled", "value": 0 },
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "name": "SubscribedContent-353696Enabled", "value": 0 }
+      ]
+    },
+    {
+      "id": "lock-screen-ads",
+      "category": "ads",
+      "risk": "safe",
+      "title": { "en": "No fun facts and ads on the lock screen", "fr": "Pas d'anecdotes ni de publicités sur l'écran de verrouillage" },
+      "description": {
+        "en": "Removes the fun facts, tips and offers drawn over the lock screen picture.",
+        "fr": "Retire les anecdotes, astuces et offres affichées sur l'image de l'écran de verrouillage."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "name": "RotatingLockScreenOverlayEnabled", "value": 0 },
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "name": "SubscribedContent-338387Enabled", "value": 0 }
+      ]
+    },
+    {
+      "id": "silent-app-installs",
+      "category": "ads",
+      "risk": "safe",
+      "title": { "en": "No apps installed without asking", "fr": "Pas d'applications installées sans demander" },
+      "description": {
+        "en": "Windows stops installing suggested apps and games on its own. Apps already installed stay.",
+        "fr": "Windows n'installe plus de lui-même des applications et jeux suggérés. Les applications déjà installées restent."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "name": "SilentInstalledAppsEnabled", "value": 0 },
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "name": "PreInstalledAppsEnabled", "value": 0 },
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "name": "OemPreInstalledAppsEnabled", "value": 0 }
+      ]
+    },
+    {
+      "id": "finish-setup-screen",
+      "category": "ads",
+      "risk": "safe",
+      "title": { "en": "No \"Let's finish setting up\" screen", "fr": "Pas d'écran « Terminons la configuration »" },
+      "description": {
+        "en": "Windows stops showing the full-screen setup reminder after updates.",
+        "fr": "Windows n'affiche plus le rappel de configuration en plein écran après les mises à jour."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\UserProfileEngagement", "name": "ScoobeSystemSettingEnabled", "value": 0 },
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager", "name": "SubscribedContent-310093Enabled", "value": 0 }
+      ]
+    },
+    {
+      "id": "start-web-search",
+      "category": "ads",
+      "risk": "advanced",
+      "restartExplorer": true,
+      "title": { "en": "No web results in Start search", "fr": "Pas de résultats web dans la recherche Démarrer" },
+      "description": {
+        "en": "Searching from Start only finds things on this PC. Also hides recent search suggestions. Uses a Windows policy for your account.",
+        "fr": "La recherche depuis Démarrer ne trouve que ce qui est sur ce PC. Masque aussi les suggestions de recherche récentes. Utilise une stratégie Windows pour votre compte."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Policies\\Microsoft\\Windows\\Explorer", "name": "DisableSearchBoxSuggestions", "value": 1 }
+      ]
+    },
+    {
+      "id": "widgets-news",
+      "category": "ads",
+      "risk": "safe",
+      "title": { "en": "Turn off Widgets news", "fr": "Désactiver les actualités des Widgets" },
+      "description": {
+        "en": "Turns off the Widgets board and its news feed through a Windows policy (needs admin).",
+        "fr": "Désactive le panneau Widgets et son fil d'actualités via une stratégie Windows (droits administrateur)."
+      },
+      "registry": [
+        { "hive": "hklm", "key": "SOFTWARE\\Policies\\Microsoft\\Dsh", "name": "AllowNewsAndInterests", "value": 0 }
+      ]
+    },
+    {
+      "id": "recall-snapshots",
+      "category": "ai",
+      "risk": "safe",
+      "title": { "en": "No Recall snapshots", "fr": "Pas d'instantanés Recall" },
+      "description": {
+        "en": "Windows does not save snapshots of your screen for Recall (Copilot+ PCs). Uses Windows policies for your account and the PC (needs admin).",
+        "fr": "Windows n'enregistre pas d'instantanés de votre écran pour Recall (PC Copilot+). Utilise des stratégies Windows pour votre compte et le PC (droits administrateur)."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Policies\\Microsoft\\Windows\\WindowsAI", "name": "DisableAIDataAnalysis", "value": 1 },
+        { "hive": "hklm", "key": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI", "name": "DisableAIDataAnalysis", "value": 1 }
+      ]
+    },
+    {
+      "id": "click-to-do",
+      "category": "ai",
+      "risk": "safe",
+      "title": { "en": "Turn off Click to Do", "fr": "Désactiver Cliquer pour faire" },
+      "description": {
+        "en": "Turns off the Click to Do screen analysis (Copilot+ PCs) for your account.",
+        "fr": "Désactive l'analyse de l'écran Cliquer pour faire (PC Copilot+) pour votre compte."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Policies\\Microsoft\\Windows\\WindowsAI", "name": "DisableClickToDo", "value": 1 }
+      ]
+    },
+    {
+      "id": "copilot-app",
+      "category": "ai",
+      "risk": "safe",
+      "title": { "en": "Remove the Copilot app", "fr": "Supprimer l'application Copilot" },
+      "description": {
+        "en": "Removes the Copilot app for your account. You can reinstall it from the Microsoft Store.",
+        "fr": "Supprime l'application Copilot pour votre compte. Vous pouvez la réinstaller depuis le Microsoft Store."
+      },
+      "appx": "Microsoft.Copilot"
+    },
+    {
+      "id": "show-file-extensions",
+      "category": "explorer",
+      "risk": "safe",
+      "restartExplorer": true,
+      "title": { "en": "Show file extensions", "fr": "Afficher les extensions de fichiers" },
+      "description": {
+        "en": "File Explorer shows .exe, .pdf and other extensions, so a file named \"photo.jpg.exe\" can't hide what it is.",
+        "fr": "L'Explorateur affiche .exe, .pdf et les autres extensions, pour qu'un fichier « photo.jpg.exe » ne cache plus ce qu'il est."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "name": "HideFileExt", "value": 0 }
+      ]
+    },
+    {
+      "id": "explorer-this-pc",
+      "category": "explorer",
+      "risk": "safe",
+      "title": { "en": "Open File Explorer on This PC", "fr": "Ouvrir l'Explorateur sur Ce PC" },
+      "description": {
+        "en": "File Explorer opens on your drives instead of Home.",
+        "fr": "L'Explorateur s'ouvre sur vos disques au lieu de l'Accueil."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "name": "LaunchTo", "value": 1 }
+      ]
+    },
+    {
+      "id": "classic-context-menu",
+      "category": "explorer",
+      "risk": "advanced",
+      "restartExplorer": true,
+      "title": { "en": "Classic right-click menu", "fr": "Menu contextuel classique" },
+      "description": {
+        "en": "Right-click shows the full Windows 10 style menu, without \"Show more options\". A well-known registry switch for your account.",
+        "fr": "Le clic droit affiche le menu complet de Windows 10, sans « Afficher plus d'options ». Un réglage du registre bien connu, pour votre compte."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32", "name": "", "value": "" }
+      ]
+    },
+    {
+      "id": "taskbar-end-task",
+      "category": "explorer",
+      "risk": "safe",
+      "title": { "en": "\"End task\" in the taskbar menu", "fr": "« Fin de tâche » dans le menu de la barre des tâches" },
+      "description": {
+        "en": "Right-click an app in the taskbar to close it when it stops responding.",
+        "fr": "Clic droit sur une application dans la barre des tâches pour la fermer quand elle ne répond plus."
+      },
+      "registry": [
+        { "hive": "hkcu", "key": "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings", "name": "TaskbarEndTask", "value": 1 }
+      ]
+    },
+    {
+      "id": "remove-news",
+      "category": "apps",
+      "risk": "safe",
+      "title": { "en": "Remove Microsoft News", "fr": "Supprimer Microsoft Actualités" },
+      "description": { "en": "Reinstall it from the Microsoft Store if you miss it.", "fr": "Réinstallez-la depuis le Microsoft Store si elle vous manque." },
+      "appx": "Microsoft.BingNews"
+    },
+    {
+      "id": "remove-weather",
+      "category": "apps",
+      "risk": "safe",
+      "title": { "en": "Remove MSN Weather", "fr": "Supprimer MSN Météo" },
+      "description": { "en": "Reinstall it from the Microsoft Store if you miss it.", "fr": "Réinstallez-la depuis le Microsoft Store si elle vous manque." },
+      "appx": "Microsoft.BingWeather"
+    },
+    {
+      "id": "remove-get-help",
+      "category": "apps",
+      "risk": "safe",
+      "title": { "en": "Remove Get Help", "fr": "Supprimer Obtenir de l'aide" },
+      "description": { "en": "Some troubleshooters open this app. Reinstall it from the Microsoft Store if needed.", "fr": "Certains utilitaires de résolution des problèmes ouvrent cette application. Réinstallez-la depuis le Microsoft Store si besoin." },
+      "appx": "Microsoft.GetHelp"
+    },
+    {
+      "id": "remove-tips",
+      "category": "apps",
+      "risk": "safe",
+      "title": { "en": "Remove Tips", "fr": "Supprimer Astuces" },
+      "description": { "en": "Reinstall it from the Microsoft Store if you miss it.", "fr": "Réinstallez-la depuis le Microsoft Store si elle vous manque." },
+      "appx": "Microsoft.Getstarted"
+    },
+    {
+      "id": "remove-solitaire",
+      "category": "apps",
+      "risk": "safe",
+      "title": { "en": "Remove Solitaire Collection", "fr": "Supprimer Solitaire Collection" },
+      "description": { "en": "Your saved games and stats may be lost. Reinstall it from the Microsoft Store if you miss it.", "fr": "Vos parties et statistiques peuvent être perdues. Réinstallez-la depuis le Microsoft Store si elle vous manque." },
+      "appx": "Microsoft.MicrosoftSolitaireCollection"
+    },
+    {
+      "id": "remove-feedback-hub",
+      "category": "apps",
+      "risk": "safe",
+      "title": { "en": "Remove Feedback Hub", "fr": "Supprimer Hub de commentaires" },
+      "description": { "en": "Reinstall it from the Microsoft Store if you want to send feedback to Microsoft.", "fr": "Réinstallez-le depuis le Microsoft Store pour envoyer des commentaires à Microsoft." },
+      "appx": "Microsoft.WindowsFeedbackHub"
+    },
+    {
+      "id": "remove-clipchamp",
+      "category": "apps",
+      "risk": "safe",
+      "title": { "en": "Remove Clipchamp", "fr": "Supprimer Clipchamp" },
+      "description": { "en": "Video editor. Projects saved online stay in your account.", "fr": "Éditeur vidéo. Les projets enregistrés en ligne restent dans votre compte." },
+      "appx": "Clipchamp.Clipchamp"
+    },
+    {
+      "id": "remove-office-hub",
+      "category": "apps",
+      "risk": "safe",
+      "title": { "en": "Remove the Microsoft 365 app", "fr": "Supprimer l'application Microsoft 365" },
+      "description": { "en": "The launcher app only. Word, Excel and your Office files are not touched.", "fr": "L'application de lancement seulement. Word, Excel et vos fichiers Office ne sont pas touchés." },
+      "appx": "Microsoft.MicrosoftOfficeHub"
+    },
+    {
+      "id": "remove-todo",
+      "category": "apps",
+      "risk": "advanced",
+      "title": { "en": "Remove Microsoft To Do", "fr": "Supprimer Microsoft To Do" },
+      "description": { "en": "Your lists stay in your Microsoft account. Keep it if you use it.", "fr": "Vos listes restent dans votre compte Microsoft. Gardez-la si vous l'utilisez." },
+      "appx": "Microsoft.Todos"
+    },
+    {
+      "id": "remove-power-automate",
+      "category": "apps",
+      "risk": "safe",
+      "title": { "en": "Remove Power Automate", "fr": "Supprimer Power Automate" },
+      "description": { "en": "Desktop automation tool. Keep it if you made flows with it.", "fr": "Outil d'automatisation. Gardez-le si vous avez créé des flux avec." },
+      "appx": "Microsoft.PowerAutomateDesktop"
+    },
+    {
+      "id": "remove-films-tv",
+      "category": "apps",
+      "risk": "safe",
+      "title": { "en": "Remove Films & TV", "fr": "Supprimer Films et TV" },
+      "description": { "en": "Media Player still plays your videos.", "fr": "Lecteur multimédia lit toujours vos vidéos." },
+      "appx": "Microsoft.ZuneVideo"
+    },
+    {
+      "id": "remove-dev-home",
+      "category": "apps",
+      "risk": "safe",
+      "title": { "en": "Remove Dev Home", "fr": "Supprimer Dev Home" },
+      "description": { "en": "Microsoft has retired this app.", "fr": "Microsoft a abandonné cette application." },
+      "appx": "Microsoft.Windows.DevHome"
+    },
+    {
+      "id": "remove-people",
+      "category": "apps",
+      "risk": "safe",
+      "title": { "en": "Remove People", "fr": "Supprimer Contacts" },
+      "description": { "en": "Old contacts app. Your contacts stay in your account.", "fr": "Ancienne application de contacts. Vos contacts restent dans votre compte." },
+      "appx": "Microsoft.People"
+    },
+    {
+      "id": "remove-new-outlook",
+      "category": "apps",
+      "risk": "advanced",
+      "title": { "en": "Remove the new Outlook", "fr": "Supprimer le nouvel Outlook" },
+      "description": { "en": "Keep it if you read your mail with it. Your mail stays online.", "fr": "Gardez-le si vous lisez vos mails avec. Vos mails restent en ligne." },
+      "appx": "Microsoft.OutlookForWindows"
+    },
+    {
+      "id": "remove-teams-personal",
+      "category": "apps",
+      "risk": "advanced",
+      "title": { "en": "Remove Microsoft Teams (free)", "fr": "Supprimer Microsoft Teams (gratuit)" },
+      "description": { "en": "Keep it if you use Teams for calls or work.", "fr": "Gardez-le si vous utilisez Teams pour vos appels ou votre travail." },
+      "appx": "MSTeams"
+    },
+    {
+      "id": "remove-phone-link",
+      "category": "apps",
+      "risk": "caution",
+      "title": { "en": "Remove Phone Link", "fr": "Supprimer Lien avec Windows" },
+      "description": { "en": "Links your phone to the PC. Keep it if you use your phone from Windows.", "fr": "Relie votre téléphone au PC. Gardez-le si vous utilisez votre téléphone depuis Windows." },
+      "appx": "Microsoft.YourPhone"
+    }
+  ]
+}

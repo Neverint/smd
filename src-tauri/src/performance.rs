@@ -31,12 +31,27 @@ pub async fn startup_list() -> AppResult<Vec<StartupItem>> {
 pub async fn startup_set(app: AppHandle, id: String, enabled: bool) -> AppResult<Vec<StartupItem>> {
     blocking(move || {
         let state = app.state::<AppState>();
-        let previous =
+        let machine = smd_win::startup::list()
+            .iter()
+            .find(|i| i.id == id)
+            .ok_or_else(|| AppError::NotFound(format!("startup item {id}")))?
+            .needs_admin;
+        let previous = if machine {
+            // Machine-wide items: the elevated helper changes HKLM's StartupApproved.
+            crate::helper::call::<bool>(
+                &state,
+                &smd_win::helper::Op::StartupSet {
+                    id: id.clone(),
+                    enabled,
+                },
+            )?
+        } else {
             smd_win::startup::set_enabled(&id, enabled, now_ms()).map_err(|e| match e.kind() {
                 std::io::ErrorKind::PermissionDenied => AppError::AccessDenied(e.to_string()),
                 std::io::ErrorKind::NotFound => AppError::NotFound(e.to_string()),
                 _ => AppError::Io(e),
-            })?;
+            })?
+        };
         let name = id
             .split_once(':')
             .map(|(_, n)| n.to_string())
@@ -46,6 +61,7 @@ pub async fn startup_set(app: AppHandle, id: String, enabled: bool) -> AppResult
             startup: Some(StartupUndo {
                 id: id.clone(),
                 was_enabled: previous,
+                machine,
             }),
             ..Default::default()
         };

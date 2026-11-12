@@ -29,7 +29,7 @@ function cat(id: string, extra: Partial<CleanupCategory> = {}): CleanupCategory 
 const scan: CleanupScanResult = {
   scanId: 7,
   reclaimableBytes: 600,
-  durationMs: 10,
+  adminScanned: false, durationMs: 10,
   categories: [
     cat("temp"),
     cat("thumbs", { defaultSelected: false }),

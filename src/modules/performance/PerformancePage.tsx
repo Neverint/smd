@@ -1,4 +1,4 @@
-import { LockClosed16Regular, Open20Regular } from "@fluentui/react-icons";
+import { Open20Regular, Shield16Regular } from "@fluentui/react-icons";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, ErrorNotice, Tabs, Toggle } from "../../components";
@@ -57,11 +57,11 @@ function StartupTab() {
               </span>
               {i.needsAdmin && (
                 <span className="cat-row__note">
-                  <LockClosed16Regular aria-hidden="true" /> {t("performance.adminLocked")}
+                  <Shield16Regular aria-hidden="true" /> {t("performance.adminNeeded")}
                 </span>
               )}
             </div>
-            <Toggle checked={i.enabled} disabled={i.needsAdmin || busy !== null} onChange={(v) => void toggle(i, v)} label={t("performance.toggleLabel", { name: i.name })} />
+            <Toggle checked={i.enabled} disabled={busy !== null} onChange={(v) => void toggle(i, v)} label={t("performance.toggleLabel", { name: i.name })} />
           </li>
         ))}
       </ul>

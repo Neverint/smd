@@ -22,15 +22,19 @@ interface CleanupState {
   setSkipped: (id: string, paths: string[]) => void;
   run: () => Promise<CleanupReport | null>;
   reset: () => void;
+  /** Scans the admin categories again with admin rights (UAC prompt). */
+  adminScan: () => Promise<void>;
+  adminBusy: boolean;
+  adminError: BackendError | null;
 }
 
-/** A category can be selected when it needs no admin rights and has something in it. */
-export function isSelectable(c: CleanupCategory): boolean {
-  return !c.admin && c.bytes > 0;
+/** A category can be selected when it has something in it, and admin ones only after an admin scan. */
+export function isSelectable(c: CleanupCategory, adminScanned = false): boolean {
+  return (!c.admin || adminScanned) && c.bytes > 0;
 }
 
 export function initialSelection(scan: CleanupScanResult): Record<string, boolean> {
-  return Object.fromEntries(scan.categories.map((c) => [c.id, isSelectable(c) && c.defaultSelected]));
+  return Object.fromEntries(scan.categories.map((c) => [c.id, isSelectable(c, scan.adminScanned) && c.defaultSelected]));
 }
 
 /** Bytes that a run would free with the current selection. */
@@ -38,7 +42,7 @@ export function selectedBytes(scan: CleanupScanResult | null, selected: Record<s
   if (!scan) return 0;
   let total = 0;
   for (const c of scan.categories) {
-    if (!selected[c.id] || !isSelectable(c)) continue;
+    if (!selected[c.id] || !isSelectable(c, scan.adminScanned)) continue;
     const skip = new Set(skipped[c.id] ?? []);
     const skippedBytes = c.items.filter((i) => skip.has(i.path)).reduce((s, i) => s + i.bytes, 0);
     total += c.bytes - skippedBytes;
@@ -47,7 +51,7 @@ export function selectedBytes(scan: CleanupScanResult | null, selected: Record<s
 }
 
 export function buildSelections(scan: CleanupScanResult, selected: Record<string, boolean>, skipped: Record<string, string[]>): CleanupSelection[] {
-  return scan.categories.filter((c) => selected[c.id] && isSelectable(c)).map((c) => ({ id: c.id, skip: skipped[c.id] ?? [] }));
+  return scan.categories.filter((c) => selected[c.id] && isSelectable(c, scan.adminScanned)).map((c) => ({ id: c.id, skip: skipped[c.id] ?? [] }));
 }
 
 export const useCleanup = create<CleanupState>()((set, get) => ({
@@ -90,4 +94,17 @@ export const useCleanup = create<CleanupState>()((set, get) => ({
   },
 
   reset: () => set({ phase: "idle", progress: null, scan: null, selected: {}, skipped: {}, report: null, error: null }),
+  adminBusy: false,
+  adminError: null,
+  adminScan: async () => {
+    const current = get().scan;
+    if (!current) return;
+    set({ adminBusy: true, adminError: null });
+    try {
+      const scan = await call("cleanup_admin_scan", { scanId: current.scanId });
+      set({ scan, adminBusy: false });
+    } catch (e) {
+      set({ adminBusy: false, adminError: toBackendError(e) });
+    }
+  },
 }));

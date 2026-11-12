@@ -1,4 +1,4 @@
-import { Info16Regular, LockClosed16Regular, Warning16Regular } from "@fluentui/react-icons";
+import { Info16Regular, LockClosed16Regular, Shield20Regular, ShieldCheckmark16Regular, Warning16Regular } from "@fluentui/react-icons";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { moduleById } from "../../app/modules";
@@ -15,8 +15,9 @@ const GROUPS: CleanupGroup[] = ["system", "browsers", "recycleBin"];
 function CategoryRow({ c, onReview }: { c: CleanupCategory; onReview: () => void }) {
   const { t } = useTranslation();
   const f = useFormat();
-  const { selected, skipped, toggleCategory } = useCleanup();
-  const selectable = isSelectable(c);
+  const { selected, skipped, toggleCategory, scan } = useCleanup();
+  const adminScanned = !!scan?.adminScanned;
+  const selectable = isSelectable(c, adminScanned);
   const name = t(`cleanup.cat.${c.id}.name`);
   const skip = skipped[c.id]?.length ?? 0;
   const descId = `cat-${c.id}-desc`;
@@ -33,9 +34,14 @@ function CategoryRow({ c, onReview }: { c: CleanupCategory; onReview: () => void
         <div id={descId} className="cat-row__desc">
           {t(`cleanup.cat.${c.id}.desc`)}
         </div>
-        {c.admin && (
+        {c.admin && !adminScanned && (
           <div className="cat-row__note">
             <LockClosed16Regular aria-hidden="true" /> {t("cleanup.needsAdmin")}
+          </div>
+        )}
+        {c.admin && adminScanned && (
+          <div className="cat-row__note">
+            <ShieldCheckmark16Regular aria-hidden="true" /> {t("cleanup.adminReady")}
           </div>
         )}
         {!c.admin && c.running.length > 0 && c.bytes > 0 && (
@@ -132,7 +138,7 @@ export function CleanupPage() {
   const { t } = useTranslation();
   const f = useFormat();
   const def = moduleById("cleanup");
-  const { phase, progress, scan, selected, skipped, report, error, startScan, run, reset } = useCleanup();
+  const { phase, progress, scan, selected, skipped, report, error, startScan, run, reset, adminScan, adminBusy, adminError } = useCleanup();
   const [reviewing, setReviewing] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [settings, setSettings] = useState<BackendSettings | null>(null);
@@ -145,7 +151,8 @@ export function CleanupPage() {
 
   const total = selectedBytes(scan, selected, skipped);
   const bin = scan?.categories.find((c) => c.permanent);
-  const binSelected = !!bin && !!selected[bin.id] && isSelectable(bin);
+  const binSelected = !!bin && !!selected[bin.id] && isSelectable(bin, scan?.adminScanned);
+  const hasAdmin = !!scan?.categories.some((c) => c.admin);
   const permanentMode = settings?.deleteMode === "permanent";
   const stepName = progress?.step ? t(`cleanup.cat.${progress.step}.name`) : "";
 
@@ -196,7 +203,16 @@ export function CleanupPage() {
                 <h1>{scan.reclaimableBytes > 0 || (bin?.bytes ?? 0) > 0 ? `${f.bytes(total)} ${t("cleanup.found")}` : t("cleanup.foundNone")}</h1>
                 <div className="results__meta">{t("common.scannedIn", { seconds: f.seconds(scan.durationMs) })}</div>
               </div>
+              {hasAdmin && !scan.adminScanned && (
+                <div className="admin-offer">
+                  <Button icon={<Shield20Regular />} disabled={adminBusy} onClick={() => void adminScan()}>
+                    {adminBusy ? t("admin.waiting") : t("cleanup.adminScan")}
+                  </Button>
+                  <p className="inline-note">{t("cleanup.adminScanWhy")}</p>
+                </div>
+              )}
             </div>
+            {adminError && <ErrorNotice error={adminError} />}
             {GROUPS.map((g) => {
               const cats = scan.categories.filter((c) => c.group === g);
               if (cats.length === 0) return null;

@@ -23,6 +23,14 @@ pub struct Settings {
     pub purge_consent: Option<bool>,
     /// Files in the scratch folder older than this are listed for cleanup.
     pub scratch_days: u32,
+    /// Closing the window keeps the app in the tray (it always does while a task runs).
+    pub close_to_tray: bool,
+    /// While the app runs, notify when a new game or folder lands on the wrong drive.
+    pub guard: bool,
+    /// UI language (`en` or `fr`), for notifications and the tray menu.
+    pub language: String,
+    /// Scheduled Smart Care (changed only through `schedule_set`, which registers the task).
+    pub schedule: crate::schedule::Schedule,
 }
 
 impl Default for Settings {
@@ -34,6 +42,10 @@ impl Default for Settings {
             quarantine_days: 30,
             purge_consent: None,
             scratch_days: 14,
+            close_to_tray: false,
+            guard: true,
+            language: "en".into(),
+            schedule: crate::schedule::Schedule::default(),
         }
     }
 }
@@ -81,17 +93,28 @@ pub fn settings_set(state: State<'_, AppState>, settings: Settings) -> AppResult
     let mut clean = settings;
     clean.exclusions.sort();
     clean.exclusions.dedup();
-    store::write_json(&state.data_dir.join(FILE), &clean)?;
-    *state
-        .settings
-        .lock()
-        .map_err(|_| AppError::Internal("settings lock".into()))? = clean.clone();
+    if !matches!(clean.language.as_str(), "en" | "fr") {
+        clean.language = "en".into();
+    }
+    // The schedule only changes through schedule_set (it registers the task).
+    clean.schedule = crate::state::lock(&state.settings)?.schedule;
+    save(&state, &clean)?;
     log::info!(
         "settings saved: {} exclusions, delete mode {:?}",
         clean.exclusions.len(),
         clean.delete_mode
     );
     Ok(clean)
+}
+
+/// Writes the settings file and updates the live copy.
+pub fn save(state: &AppState, settings: &Settings) -> AppResult<()> {
+    store::write_json(&state.data_dir.join(FILE), settings)?;
+    *state
+        .settings
+        .lock()
+        .map_err(|_| AppError::Internal("settings lock".into()))? = settings.clone();
+    Ok(())
 }
 
 /// Opens the local log folder in Explorer.

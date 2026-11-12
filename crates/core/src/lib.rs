@@ -13,3 +13,5 @@ pub mod organizer;
 pub mod safety;
 pub mod space;
 pub mod startup;
+pub mod toolbox;
+pub mod tweaks;

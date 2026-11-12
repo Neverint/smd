@@ -1,5 +1,6 @@
 import { MotionConfig } from "motion/react";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { createHashRouter, Outlet, RouterProvider, useLocation } from "react-router";
 import { call } from "../lib/backend";
 import { useApplyTheme } from "../lib/theme";
@@ -16,6 +17,9 @@ import { ProtectionPage } from "../modules/protection/ProtectionPage";
 import { SettingsPage } from "../modules/settings/SettingsPage";
 import { SmartCarePage } from "../modules/smart-care/SmartCarePage";
 import { SpaceLensPage } from "../modules/space-lens/SpaceLensPage";
+import { ToolboxPage } from "../modules/toolbox/ToolboxPage";
+import { TrayPage } from "../modules/tray/TrayPage";
+import { TweaksPage } from "../modules/tweaks/TweaksPage";
 import { MODULES, moduleForPath } from "./modules";
 import { Sidebar } from "./Sidebar";
 import { TitleBar } from "./TitleBar";
@@ -38,7 +42,7 @@ function Shell() {
 }
 
 /** Modules with their own page; the others show the "planned for phase N" placeholder. */
-const BUILT = new Set(["smart-care", "cleanup", "space-lens", "activity", "settings", "performance", "applications", "clutter", "protection", "hardware", "drive-organizer"]);
+const BUILT = new Set(["smart-care", "cleanup", "space-lens", "activity", "settings", "performance", "applications", "clutter", "protection", "hardware", "drive-organizer", "tweaks", "toolbox"]);
 
 const router = createHashRouter([
   {
@@ -54,6 +58,8 @@ const router = createHashRouter([
       { path: "protection", element: <ProtectionPage /> },
       { path: "hardware", element: <HardwarePage /> },
       { path: "drive-organizer", element: <DriveOrganizerPage /> },
+      { path: "tweaks", element: <TweaksPage /> },
+      { path: "toolbox", element: <ToolboxPage /> },
       { path: "settings", element: <SettingsPage /> },
       ...MODULES.filter((m) => !BUILT.has(m.id)).map((m) => ({
         path: m.path.slice(1),
@@ -62,10 +68,21 @@ const router = createHashRouter([
       { path: "dev/gallery", element: <GalleryPage /> },
     ],
   },
+  // The tray icon's popover window (no title bar or sidebar).
+  { path: "tray", element: <TrayPage /> },
 ]);
 
 export function App() {
   useApplyTheme();
+  const { i18n } = useTranslation();
+  const lang = i18n.resolvedLanguage?.startsWith("fr") ? "fr" : "en";
+
+  // The backend writes notifications and the tray menu in the UI language.
+  useEffect(() => {
+    call("settings_get")
+      .then((s) => (s.language !== lang ? call("settings_set", { settings: { ...s, language: lang } }) : s))
+      .catch(() => undefined);
+  }, [lang]);
 
   // Make the page transparent only once the backend confirms Mica or acrylic is on.
   useEffect(() => {

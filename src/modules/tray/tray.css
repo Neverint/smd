@@ -1,0 +1,72 @@
+/* The tray popover window: compact, no sidebar or title bar. */
+.tray-window,
+.tray-window body {
+  overflow: hidden;
+}
+
+.tray {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100vh;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  background: var(--bg-solid);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.tray__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tray__score {
+  color: var(--text-secondary);
+}
+
+.tray-metric {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--stroke-divider);
+}
+
+.tray-metric__name {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.tray-metric__value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.spark {
+  color: var(--accent, currentColor);
+  flex: none;
+}
+
+.tray-free {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 2px;
+}
+
+.tray__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.tray__note {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+}

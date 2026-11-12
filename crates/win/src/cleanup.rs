@@ -11,7 +11,7 @@ use smd_core::safety;
 
 use crate::walk::measure;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Item {
     pub path: String,
@@ -28,7 +28,7 @@ pub struct Item {
     pub item_is_root: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Category {
     pub id: String,
@@ -237,14 +237,14 @@ pub enum DeleteMode {
     Permanent,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Failure {
     pub path: String,
     pub reason: FailReason,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum FailReason {
     /// Open in another program, or Windows refused access.
@@ -255,7 +255,7 @@ pub enum FailReason {
     Refused,
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
 pub struct Outcome {
     /// Removed paths with their size.
     pub removed: Vec<(String, u64)>,

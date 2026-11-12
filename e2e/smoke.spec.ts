@@ -31,8 +31,10 @@ test("Cleanup review, skip and confirm before emptying the Recycle Bin", async (
   await page.getByRole("button", { name: "Scan", exact: true }).click();
   await expect(page.getByText("can be removed")).toBeVisible();
 
-  // Admin-only categories cannot be ticked.
+  // Admin-only categories cannot be ticked until they are checked with admin rights.
   await expect(page.getByRole("checkbox", { name: "Windows Update downloads" })).toBeDisabled();
+  await page.getByRole("button", { name: "Check Windows files too" }).click();
+  await expect(page.getByRole("checkbox", { name: "Windows Update downloads" })).toBeEnabled();
 
   // Untick one item in the review sheet: the total goes down.
   const button = page.getByRole("button", { name: /^Clean / });
@@ -75,13 +77,15 @@ test("Space Lens scans a drive and drills into folders", async ({ page }) => {
   await expect(crumbs.getByRole("button", { name: "C:\\" })).toHaveAttribute("aria-current", "location");
 });
 
-test("Performance: turn a startup item off, machine-wide items stay locked, undo in My Activity", async ({ page }) => {
+test("Performance: turn a startup item off, machine-wide items say they need admin, undo in My Activity", async ({ page }) => {
   await page.goto("/#/performance");
   const discord = page.getByRole("switch", { name: "Start Discord with Windows" });
   await expect(discord).toHaveAttribute("aria-checked", "true");
   await discord.click();
   await expect(discord).toHaveAttribute("aria-checked", "false");
-  await expect(page.getByRole("switch", { name: "Start RtkAudUService with Windows" })).toBeDisabled();
+  // Machine-wide items can be changed too: the admin helper does it, and the row says so.
+  await expect(page.getByRole("switch", { name: "Start RtkAudUService with Windows" })).toBeEnabled();
+  await expect(page.getByText("For all users: Windows asks for admin rights when you change it.").first()).toBeVisible();
 
   await page.getByRole("tab", { name: "Running now" }).click();
   await expect(page.getByRole("region", { name: "Using memory" })).toContainText("msedge.exe");
@@ -153,7 +157,9 @@ test("Protection: status, a quick scan, and a Store app permission with undo", a
 test("Hardware Health: live sensors, drives and memory", async ({ page }) => {
   await page.goto("/#/hardware");
   await expect(page.getByRole("region", { name: "AMD Radeon RX 6700 XT" })).toContainText("°C");
-  await expect(page.getByText("Processor temperature and motherboard fans need admin rights")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Read CPU sensors with admin rights" })).toBeVisible();
+  await page.getByRole("button", { name: "Read SMART details" }).click();
+  await expect(page.getByText(/4,120 hours of use/)).toBeVisible();
   await expect(page.getByText("X: Samsung SSD 990 PRO with Heatsink 1TB")).toBeVisible();
   await expect(page.getByText("2 of 4 slots used")).toBeVisible();
   await expect(page.getByText("Battery", { exact: true })).toHaveCount(0);
@@ -192,6 +198,58 @@ test("Settings: permanent delete shows a warning", async ({ page }) => {
   await expect(page.getByText("Permanent delete skips the Recycle Bin")).toBeVisible();
   await page.getByRole("radio", { name: "Recycle Bin" }).click();
   await expect(page.getByText("Permanent delete skips the Recycle Bin")).toBeHidden();
+});
+
+test("Privacy & Tweaks: apply with a restore point, then undo", async ({ page }) => {
+  await page.goto("/#/tweaks");
+  await expect(page.getByRole("heading", { level: 1, name: "Privacy & Tweaks" })).toBeVisible();
+  // Already on: cannot be ticked. Not installed apps: cannot be ticked.
+  await expect(page.getByRole("checkbox", { name: "Show file extensions" })).toBeDisabled();
+  await expect(page.getByRole("checkbox", { name: "Remove the Copilot app" })).toBeDisabled();
+
+  await page.getByRole("checkbox", { name: "Turn off the advertising ID" }).check();
+  await page.getByRole("checkbox", { name: "Turn off activity history" }).check();
+  await expect(page.getByText(/1 change is for the whole PC/)).toBeVisible();
+  await page.getByRole("button", { name: "Apply 2 changes" }).click();
+  const confirm = page.getByRole("dialog", { name: "Apply 2 changes?" });
+  await expect(confirm).toContainText(/restore point/i);
+  await confirm.getByRole("button", { name: "Apply" }).click();
+  await expect(page.getByText("2 changes applied.")).toBeVisible();
+  await expect(page.getByText(/Restore point made/)).toBeVisible();
+
+  await page.getByRole("button", { name: "Undo: Turn off the advertising ID" }).click();
+  await expect(page.getByRole("checkbox", { name: "Turn off the advertising ID" })).toBeEnabled();
+
+  await page.goto("/#/activity");
+  await expect(page.getByText("Restore point made")).toBeVisible();
+});
+
+test("Toolbox: install a tool, installed ones can be opened", async ({ page }) => {
+  await page.goto("/#/toolbox");
+  await expect(page.getByText(/uses the internet \(winget\) only/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Open CrystalDiskInfo" })).toBeVisible();
+  await page.getByRole("button", { name: "Install Bulk Crap Uninstaller" }).click();
+  await expect(page.getByText("Bulk Crap Uninstaller is installed.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Open Bulk Crap Uninstaller" })).toBeVisible();
+  await expect(page.getByText("Klocman.BulkCrapUninstaller")).toBeVisible();
+});
+
+test("Tray popover shows live numbers and quick actions", async ({ page }) => {
+  await page.goto("/#/tray");
+  await expect(page.getByRole("main", { name: "Scrub My Disks mini monitor" })).toBeVisible();
+  await expect(page.getByText("Last Smart Care: 92/100")).toBeVisible();
+  await expect(page.getByRole("img", { name: /^Processor: \d+ %/ })).toBeVisible();
+  await page.getByRole("button", { name: "Empty Recycle Bin" }).click();
+  await page.getByRole("button", { name: /^Delete .* for good\?$/ }).click();
+  await expect(page.getByRole("button", { name: "Empty Recycle Bin" })).toBeDisabled();
+});
+
+test("Settings: scheduled Smart Care and tray options", async ({ page }) => {
+  await page.goto("/#/settings");
+  await page.getByRole("radio", { name: "Weekly" }).click();
+  await expect(page.getByText("Scheduled in Windows Task Scheduler.")).toBeVisible();
+  await expect(page.getByRole("combobox", { name: "Day" })).toHaveValue("6");
+  await expect(page.getByRole("switch", { name: "Keep running in the tray" })).toHaveAttribute("aria-checked", "false");
 });
 
 test("navigates to a module page", async ({ page }) => {

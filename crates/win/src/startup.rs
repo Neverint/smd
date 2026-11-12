@@ -211,20 +211,26 @@ mod imp {
         out
     }
 
-    /// Turns an item off or on. Returns the previous state. Machine-wide items are refused.
-    pub fn set_enabled(id: &str, enabled: bool, now_ms: i64) -> io::Result<bool> {
+    /// Turns an item off or on. Returns the previous state. Machine-wide items are refused
+    /// unless `allow_machine` (the elevated helper).
+    pub fn set_enabled_any(
+        id: &str,
+        enabled: bool,
+        now_ms: i64,
+        allow_machine: bool,
+    ) -> io::Result<bool> {
         let item = list()
             .into_iter()
             .find(|i| i.id == id)
             .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, format!("startup item {id}")))?;
-        if item.needs_admin {
+        if item.needs_admin && !allow_machine {
             return Err(io::Error::new(
                 io::ErrorKind::PermissionDenied,
                 "machine-wide startup items need admin rights",
             ));
         }
         let p = place(item.source);
-        let (key, _) = hive(false)
+        let (key, _) = hive(p.machine)
             .create_subkey_with_flags(format!(r"{APPROVED}\{}", p.approved_sub), KEY_SET_VALUE)?;
         let value = approved_value(enabled, filetime_from_unix_ms(now_ms));
         key.set_raw_value(
@@ -244,12 +250,22 @@ mod imp {
     pub fn list() -> Vec<StartupItem> {
         Vec::new()
     }
-    pub fn set_enabled(_id: &str, _enabled: bool, _now_ms: i64) -> io::Result<bool> {
+    pub fn set_enabled_any(
+        _id: &str,
+        _enabled: bool,
+        _now_ms: i64,
+        _allow_machine: bool,
+    ) -> io::Result<bool> {
         Err(io::Error::new(io::ErrorKind::Unsupported, "Windows only"))
     }
 }
 
 pub use imp::*;
+
+/// Turns one of your own startup items off or on. Returns the previous state.
+pub fn set_enabled(id: &str, enabled: bool, now_ms: i64) -> io::Result<bool> {
+    set_enabled_any(id, enabled, now_ms, false)
+}
 
 #[cfg(test)]
 mod squirrel_tests {

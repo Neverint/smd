@@ -4,19 +4,28 @@ mod cleanup;
 mod clutter;
 mod commands;
 mod error;
+mod guard;
 mod hardware;
+mod helper;
+mod notify;
 mod organizer;
 mod performance;
 mod protection;
 mod removal;
+mod schedule;
 mod settings;
 mod smart_care;
 mod space_lens;
 mod state;
 mod store;
+mod toolbox;
+mod tray;
+mod tweaks;
 mod window_effect;
 
-use tauri::Manager;
+use tauri::{Manager, WindowEvent};
+
+pub use helper::helper_main;
 use tauri_plugin_log::{RotationStrategy, Target, TargetKind};
 
 /// Keep at most this many rotated log files, each up to 2 MB, in the app's local log folder.
@@ -24,7 +33,17 @@ const LOG_FILES_KEPT: usize = 5;
 const LOG_FILE_MAX_BYTES: u128 = 2 * 1024 * 1024;
 
 pub fn run() {
+    // Started by the scheduled task: scan in the background, notify, quit.
+    let silent = std::env::args().any(|a| a == "--smart-care");
     tauri::Builder::default()
+        // First: a second start (scheduled task, double-click) goes to the running app.
+        .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
+            if args.iter().any(|a| a == "--smart-care") {
+                tray::run_smart_care(app, false);
+            } else {
+                tray::show_main(app);
+            }
+        }))
         .plugin(
             tauri_plugin_log::Builder::new()
                 .targets([
@@ -40,7 +59,8 @@ pub fn run() {
         )
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
-        .setup(|app| {
+        .plugin(tauri_plugin_notification::init())
+        .setup(move |app| {
             let window = app
                 .get_webview_window("main")
                 .expect("main window is declared in tauri.conf.json");
@@ -57,7 +77,21 @@ pub fn run() {
             std::thread::spawn(move || {
                 organizer::purge_old(&handle.state::<state::AppState>());
             });
+            tray::setup(app.handle())?;
+            if silent {
+                tray::run_smart_care(app.handle(), true);
+            } else {
+                window.show()?;
+                guard::start(app.handle());
+            }
             Ok(())
+        })
+        .on_window_event(|window, event| {
+            if window.label() == "main"
+                && let WindowEvent::CloseRequested { api, .. } = event
+            {
+                tray::on_main_close(window.app_handle(), api);
+            }
         })
         .invoke_handler(tauri::generate_handler![
             commands::app_info,
@@ -113,6 +147,24 @@ pub fn run() {
             organizer::quarantine_restore,
             organizer::quarantine_purge_consent,
             clutter::clutter_scratch,
+            cleanup::cleanup_admin_scan,
+            hardware::disk_reliability,
+            hardware::sensors_admin_poll,
+            hardware::sensors_admin_stop,
+            tweaks::tweaks_list,
+            tweaks::tweaks_apply,
+            tweaks::tweak_undo,
+            tweaks::restart_explorer,
+            tweaks::admin_session_end,
+            toolbox::toolbox_list,
+            toolbox::toolbox_install,
+            toolbox::toolbox_open,
+            tray::tray_info,
+            tray::tray_sample,
+            tray::tray_action,
+            tray::tray_hide,
+            schedule::schedule_get,
+            schedule::schedule_set,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Scrub My Disks");

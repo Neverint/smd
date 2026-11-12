@@ -38,7 +38,7 @@ crates/win/          Windows access: drives, memory, Recycle Bin, disk walk, cle
 src-tauri/           Tauri app: one file per module's commands (cleanup, smart_care, space_lens, performance, applications,
                      clutter, activity, settings),
                      state.rs, store.rs (JSON files), error.rs (typed AppError), window_effect.rs
-rules/               cleanup.json (cleanup rules), drive-policy.json (default drive roles); tweaks.json comes in Phase 4
+rules/               cleanup.json (cleanup rules), drive-policy.json (default drive roles), tweaks.json (Privacy & Tweaks), toolbox.json (Toolbox)
 sidecars/hwmon/      .NET 8 LibreHardwareMonitor helper; `npm run hwmon` builds it into src-tauri/resources/hwmon (not committed)
 docs/                DECISIONS.md, design-system.md
 ```
@@ -74,5 +74,8 @@ $env:Path += ';G:\Documents\Dev\.rust\cargo\bin'; $env:RUSTUP_HOME='G:\Documents
 - All UI text goes through i18n (EN + FR). Plain, friendly wording: say what an item is and whether it is safe to remove. No fear-based copy.
 - Colors only through tokens. Text on a module color uses `--m-solid` / `--m-on` (AA contrast); `--m-from` / `--m-to` are decorative only.
 - Icon-only buttons need a label (`IconButton` enforces it). Respect `prefers-reduced-motion` (`MotionConfig reducedMotion="user"`).
+- Admin work only through the elevated helper: add a typed variant to `smd_win::helper::Op`, re-check its input inside the helper against a built-in catalog, call it with `crate::helper::call`. Never pass a command, program path or registry path to it. Test the pipe without UAC in a debug build with `SMD_HELPER_NO_UAC=1`; on the developer's PC only read-only operations.
+- Tweaks are data (`rules/tweaks.json`): registry values under `HKCU\Software` or `HKLM\SOFTWARE\Policies`, service start types, or one Store app. Every apply saves an exact undo. Machine-wide batches make a restore point first.
+- PowerShell edits on Windows: `Set-Content -Encoding utf8` adds a BOM (Tauri then cannot read its JSON config) and double-quoted here-strings eat `$` and backticks; prefer the Edit tool.
 - Record non-obvious choices in `docs/DECISIONS.md`.
 - Work phase by phase. At the end of each phase: build, run, test, commit, push, summarize, wait for "go".

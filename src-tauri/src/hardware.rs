@@ -27,6 +27,16 @@ pub struct HardwareView {
     /// Empty on desktops.
     pub batteries: Vec<BatteryInfo>,
     pub has_battery: bool,
+    /// The PawnIO driver is installed (CPU temperatures and fans with admin rights).
+    pub pawnio: bool,
+}
+
+fn pawnio_installed() -> bool {
+    use winreg::RegKey;
+    use winreg::enums::{HKEY_LOCAL_MACHINE, KEY_READ};
+    RegKey::predef(HKEY_LOCAL_MACHINE)
+        .open_subkey_with_flags(r"SYSTEM\CurrentControlSet\Services\PawnIO", KEY_READ)
+        .is_ok()
 }
 
 #[tauri::command]
@@ -50,6 +60,7 @@ pub async fn hardware_info(app: AppHandle) -> AppResult<HardwareView> {
             memory: smd_win::system::memory().ok(),
             batteries,
             has_battery: smd_win::system::has_battery(),
+            pawnio: pawnio_installed(),
         })
     })
     .await
@@ -100,4 +111,46 @@ pub fn sensors_poll(app: AppHandle, state: tauri::State<'_, AppState>) -> AppRes
 pub fn sensors_stop(state: tauri::State<'_, AppState>) -> AppResult<()> {
     *lock(&state.sensors)? = None;
     Ok(())
+}
+
+/// SMART counters (temperature, wear, hours, errors) through the admin helper.
+#[tauri::command]
+pub async fn disk_reliability(app: AppHandle) -> AppResult<Vec<smd_win::helper::DiskReliability>> {
+    blocking(move || {
+        let state = app.state::<AppState>();
+        crate::helper::call(&state, &smd_win::helper::Op::DiskReliability)
+    })
+    .await
+}
+
+/// Sensors read with admin rights (CPU temperature and fans need the PawnIO driver too).
+#[tauri::command]
+pub async fn sensors_admin_poll(app: AppHandle) -> AppResult<SensorsView> {
+    blocking(move || {
+        let state = app.state::<AppState>();
+        // The normal helper is not needed while the admin one runs.
+        *lock(&state.sensors)? = None;
+        let snap: Option<SensorSnapshot> =
+            crate::helper::call(&state, &smd_win::helper::Op::SensorsPoll)?;
+        *lock(&state.admin_sensors)? = snap.clone();
+        Ok(SensorsView {
+            running: true,
+            exit_code: None,
+            snapshot: snap,
+        })
+    })
+    .await
+}
+
+#[tauri::command]
+pub async fn sensors_admin_stop(app: AppHandle) -> AppResult<()> {
+    blocking(move || {
+        let state = app.state::<AppState>();
+        *lock(&state.admin_sensors)? = None;
+        if crate::helper::is_running(&state) {
+            crate::helper::call::<bool>(&state, &smd_win::helper::Op::SensorsStop)?;
+        }
+        Ok(())
+    })
+    .await
 }

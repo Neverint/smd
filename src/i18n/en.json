@@ -305,7 +305,11 @@
     },
     "unknownSize": "Not measured",
     "doneQuarantine": "{{size}} moved to {{path}}. That space is free now; everything stays there for 30 days and can be put back from My Activity.",
-    "quarantineNote": "Removed items go to the quarantine on your disposable drive (kept {{days}} days), or to the Recycle Bin if that drive isn't there."
+    "quarantineNote": "Removed items go to the quarantine on your disposable drive (kept {{days}} days), or to the Recycle Bin if that drive isn't there.",
+    "adminScan": "Check Windows files too",
+    "adminScanWhy": "Windows temp files, the update cache and crash dumps belong to the system. Windows asks once for admin rights so the helper can read and clean them. They go to the Recycle Bin.",
+    "adminReady": "Checked with admin rights: cleaned by the admin helper, to the Recycle Bin.",
+    "doneAdmin": "{{size}} of Windows files went to the Recycle Bin."
   },
   "spaceLens": {
     "pick": "Choose a drive or folder to scan",
@@ -356,7 +360,11 @@
       "signatureUpdate": "Virus definitions update",
       "permissionChange": "App permission changed",
       "migration": "Files moved to another drive",
-      "quarantinePurge": "Old quarantine purged"
+      "quarantinePurge": "Old quarantine purged",
+      "tweaksApplied": "Privacy & Tweaks",
+      "restorePoint": "Restore point made",
+      "toolInstall": "Tool installed",
+      "toolUpdate": "Tool updated"
     },
     "detail": {
       "smartCareScan": "Score {{score}} · {{size}} of junk found",
@@ -390,7 +398,12 @@
       "permissionOff": "{{app}} can no longer use the {{what}}",
       "migration_one": "{{count}} item, {{size}}",
       "migration_other": "{{count}} items, {{size}}",
-      "quarantinePurge": "{{size}} deleted for good"
+      "quarantinePurge": "{{size}} deleted for good",
+      "tweaks_one": "{{count}} change",
+      "tweaks_other": "{{count}} changes",
+      "restorePoint": "Before system changes",
+      "tool": "{{name}}",
+      "toolFailed": "{{name}} · failed"
     },
     "undo": "Undo",
     "undoLabel": "Undo: {{what}}",
@@ -434,7 +447,30 @@
     "gallery": "Open the component gallery",
     "privacy": "No telemetry, no account. Logs stay on this PC.",
     "quarantine": "Quarantine on the disposable drive",
-    "quarantineHint": "Items removed from your other drives go to the disposable drive's Quarantine folder for {{days}} days instead of the Recycle Bin. The space is freed at once. Off, or when that drive is missing or unhealthy: the Recycle Bin."
+    "quarantineHint": "Items removed from your other drives go to the disposable drive's Quarantine folder for {{days}} days instead of the Recycle Bin. The space is freed at once. Off, or when that drive is missing or unhealthy: the Recycle Bin.",
+    "background": "Tray and background",
+    "closeToTray": "Keep running in the tray",
+    "closeToTrayHint": "Closing the window keeps Scrub My Disks in the tray (it always does while a task runs, then tells you when it is done).",
+    "guard": "Watch for things on the wrong drive",
+    "guardHint": "While the app runs, it notices new games and folders and tells you if they land on the wrong drive. It never moves anything by itself.",
+    "schedule": "Scheduled Smart Care",
+    "scheduleHint": "Windows runs a Smart Care scan at this time and shows the score in a notification. It only scans: nothing is removed.",
+    "scheduleOff": "Off",
+    "scheduleDaily": "Daily",
+    "scheduleWeekly": "Weekly",
+    "scheduleDay": "Day",
+    "scheduleHour": "Time",
+    "scheduleOn": "Scheduled in Windows Task Scheduler.",
+    "scheduleMissing": "The task is missing from Task Scheduler: pick the time again to recreate it.",
+    "days": {
+      "0": "Monday",
+      "1": "Tuesday",
+      "2": "Wednesday",
+      "3": "Thursday",
+      "4": "Friday",
+      "5": "Saturday",
+      "6": "Sunday"
+    }
   },
   "errors": {
     "title": "That didn't work",
@@ -482,7 +518,8 @@
     "state": "State",
     "startMode": "Starts",
     "none": "None found.",
-    "unavailable": "Couldn't be read."
+    "unavailable": "Couldn't be read.",
+    "adminNeeded": "For all users: Windows asks for admin rights when you change it."
   },
   "applications": {
     "tabs": {
@@ -669,7 +706,7 @@
   },
   "hardware": {
     "live": "Live sensors",
-    "adminForCpu": "Processor temperature and motherboard fans need admin rights. They will appear with the admin helper (phase 4).",
+    "adminForCpu": "Processor temperature and motherboard fans need admin rights.",
     "helperMissing": "Live sensors aren't available: the sensor helper is missing from this installation.",
     "helperStopped": "The sensor helper stopped. It needs the .NET 8 Runtime from Microsoft.",
     "sensorsStarting": "Starting the sensors…",
@@ -702,7 +739,7 @@
       "unhealthy": "Unhealthy",
       "unknown": "Health unknown"
     },
-    "smartAdmin": "Health comes from Windows. Wear, temperature and error counters (SMART) need admin rights and arrive with the admin helper (phase 4). CrystalDiskInfo in the Toolbox shows them all.",
+    "smartAdmin": "Health comes from Windows. Temperature, hours of use, wear and error counters (SMART) need admin rights: Windows asks once. CrystalDiskInfo in the Toolbox shows even more.",
     "processor": "Processor",
     "cpuLine": "{{cores}} cores, {{threads}} threads, up to {{ghz}} GHz",
     "graphics": "Graphics",
@@ -714,7 +751,22 @@
     "batteryHealth": "{{percent}} % of the original capacity",
     "batteryLine": "{{full}} Wh now, {{design}} Wh when new",
     "cycles_one": "{{count}} charge cycle",
-    "cycles_other": "{{count}} charge cycles"
+    "cycles_other": "{{count}} charge cycles",
+    "adminSensors": "Read CPU sensors with admin rights",
+    "adminSensorsWhy": "Windows asks once. The sensor helper then reads the processor temperature and fans.",
+    "pawnioNeeded": "Processor temperature and fans also need the free PawnIO driver, which is not installed.",
+    "openToolbox": "Get it in the Toolbox",
+    "adminOn": "Reading with admin rights.",
+    "readSmart": "Read SMART details",
+    "smart": {
+      "temp": "{{now}} °C (highest {{max}} °C)",
+      "hours_one": "{{count, number}} hour of use",
+      "hours_other": "{{count, number}} hours of use",
+      "wear": "{{percent}} % worn",
+      "errors_one": "{{count, number}} read/write error",
+      "errors_other": "{{count, number}} read/write errors",
+      "noErrors": "no read/write errors"
+    }
   },
   "organizer": {
     "tabs": {
@@ -861,5 +913,119 @@
       "programsClosed": "Close first: {{detail}}",
       "pluggedIn": "Plug in your laptop first"
     }
+  },
+  "admin": {
+    "waiting": "Waiting for Windows…",
+    "sessionOpen": "Admin rights are on for a few minutes (no new Windows prompt).",
+    "endSession": "Turn off now"
+  },
+  "tweaks": {
+    "intro": "Each change says what it does. Changes for your account apply at once; changes for the whole PC need admin rights, and a restore point is made first. Every change can be undone here or in My Activity.",
+    "filter": "Show",
+    "category": {
+      "all": "All",
+      "privacy": "Privacy",
+      "ads": "Ads & suggestions",
+      "ai": "AI",
+      "explorer": "File Explorer",
+      "apps": "Built-in apps"
+    },
+    "state": {
+      "applied": "On",
+      "notApplied": "Off",
+      "partial": "Partly on",
+      "notInstalled": "Not installed",
+      "unknown": "Unknown",
+      "removed": "Removed",
+      "installed": "Installed"
+    },
+    "risk": {
+      "advanced": "Advanced",
+      "caution": "Use caution"
+    },
+    "needsAdmin": "For the whole PC: Windows asks for admin rights.",
+    "setBySmd": "Changed by Scrub My Disks on {{date}}",
+    "undo": "Undo",
+    "undoLabel": "Undo: {{name}}",
+    "reinstall": "Reinstall",
+    "reinstallLabel": "Reinstall {{name}} from the Microsoft Store",
+    "apply_one": "Apply {{count}} change",
+    "apply_other": "Apply {{count}} changes",
+    "applying": "Applying…",
+    "nothingSelected": "Tick the changes you want",
+    "adminNote_one": "{{count}} change is for the whole PC: Windows asks for admin rights, and a restore point is made first.",
+    "adminNote_other": "{{count}} changes are for the whole PC: Windows asks for admin rights, and a restore point is made first.",
+    "userNote": "These changes are for your account only and apply at once.",
+    "confirmTitle_one": "Apply {{count}} change?",
+    "confirmTitle_other": "Apply {{count}} changes?",
+    "confirm": "Apply",
+    "adminShort": "admin",
+    "confirmAdmin": "Windows will ask for admin rights. Scrub My Disks makes a System Restore point first.",
+    "confirmApps": "Removed apps can be reinstalled from the Microsoft Store. Other changes can be undone here.",
+    "confirmUndo": "You can undo each change here or in My Activity.",
+    "applied_one": "{{count}} change applied.",
+    "applied_other": "{{count}} changes applied.",
+    "failedOne": "{{name}}: not changed ({{message}}).",
+    "restartWindows": "Some changes take effect after you restart Windows.",
+    "restartExplorerHint": "Some changes show after File Explorer restarts (its windows close).",
+    "restartExplorer": "Restart File Explorer",
+    "rp": {
+      "created": "Restore point made ({{time}}).",
+      "recent": "Windows made no new restore point because one from {{time}} is less than 24 hours old. That one covers these changes.",
+      "off": "System Protection is off for the system drive, so no restore point could be made.",
+      "failed": "No restore point could be made: {{message}}"
+    },
+    "noPointTitle": "Go on without a restore point?",
+    "noPointBody": "Nothing was changed yet. Each change can still be undone here, but a restore point is the extra safety net if Windows misbehaves.",
+    "continueWithout": "Go on without",
+    "turnOnRestore": "Turn on System Protection and go on"
+  },
+  "toolbox": {
+    "network": "The Toolbox uses the internet (winget) only when you install or update a tool, or check what is installed.",
+    "check": "Check what is installed",
+    "checking": "Asking winget…",
+    "checked": "Checked {{date}}",
+    "loading": "Asking winget what is installed (about 20 seconds)…",
+    "wingetMissing": "winget is not available. Install \"App Installer\" from the Microsoft Store, then try again.",
+    "category": {
+      "apps": "Apps",
+      "files": "Files and disks",
+      "hardware": "Hardware",
+      "system": "System",
+      "privacy": "Privacy",
+      "security": "Security"
+    },
+    "installed": "Installed",
+    "installedVersion": "Installed · {{version}}",
+    "license": "License: {{license}}",
+    "openSource": "open source",
+    "install": "Install",
+    "installing": "Installing…",
+    "installLabel": "Install {{name}}",
+    "update": "Update",
+    "updating": "Updating…",
+    "updateLabel": "Update {{name}}",
+    "open": "Open",
+    "openLabel": "Open {{name}}",
+    "done": "{{name}} is installed.",
+    "updated": "{{name}} is up to date.",
+    "failed": "{{name}} could not be installed (winget code {{code}}).",
+    "agreement": "Installing a tool means you accept its license (see its website). Its installer may ask for admin rights."
+  },
+  "tray": {
+    "title": "Scrub My Disks mini monitor",
+    "score": "Last Smart Care: {{score}}/100",
+    "cpu": "Processor",
+    "memory": "Memory",
+    "disk": "Disk activity",
+    "network": "Network",
+    "cpuTemp": "CPU temperature",
+    "cpuTempNone": "needs admin (Hardware Health)",
+    "free": "{{drive}} {{free}} free of {{total}}",
+    "smartCare": "Smart Care",
+    "emptyBin": "Empty Recycle Bin",
+    "emptyConfirm": "Delete {{size}} for good?",
+    "open": "Open",
+    "busy": "A task is running."
   }
 }

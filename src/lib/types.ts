@@ -17,6 +17,13 @@ export interface BackendSettings {
   quarantineDays: number;
   purgeConsent: boolean | null;
   scratchDays: number;
+  /** Closing the window keeps the app in the tray. */
+  closeToTray: boolean;
+  /** Notify when a game or folder lands on the wrong drive (while the app runs). */
+  guard: boolean;
+  language: "en" | "fr";
+  /** Read-only here: changed through schedule_set. */
+  schedule: Schedule;
 }
 
 /* ---------- Cleanup ---------- */
@@ -54,6 +61,8 @@ export interface CleanupScanResult {
   categories: CleanupCategory[];
   reclaimableBytes: number;
   durationMs: number;
+  /** The admin categories were scanned with admin rights and can be selected. */
+  adminScanned: boolean;
 }
 
 export interface ScanProgress {
@@ -79,6 +88,8 @@ export interface CleanupReport {
   undoAvailable: boolean;
   /** Items went to this quarantine folder instead of the Recycle Bin. */
   quarantine: string | null;
+  /** Removed by the admin helper (Windows files, in the Recycle Bin). */
+  adminBytes: number;
   activityId: number;
 }
 
@@ -139,6 +150,7 @@ export interface PhysicalDisk {
   health: DiskHealth;
   operationalStatus: string;
   letters: string[];
+  serial?: string;
 }
 
 export interface SmartCareResult {
@@ -234,7 +246,11 @@ export type ActivityKind =
   | "signatureUpdate"
   | "permissionChange"
   | "migration"
-  | "quarantinePurge";
+  | "quarantinePurge"
+  | "tweaksApplied"
+  | "restorePoint"
+  | "toolInstall"
+  | "toolUpdate";
 
 export interface ActivityEntry {
   id: number;
@@ -552,6 +568,18 @@ export interface HardwareView {
   memory: MemoryInfo | null;
   batteries: BatteryInfo[];
   hasBattery: boolean;
+  /** The PawnIO driver is installed (CPU temperatures with admin rights). */
+  pawnio: boolean;
+}
+export interface DiskReliability {
+  serial: string;
+  name: string;
+  temperature: number | null;
+  temperatureMax: number | null;
+  wear: number | null;
+  powerOnHours: number | null;
+  readErrors: number | null;
+  writeErrors: number | null;
 }
 
 export interface SensorReading {
@@ -727,4 +755,102 @@ export interface QuarantineRestore {
   restored: number;
   conflicts: number;
   failed: number;
+}
+
+/* ---------- Privacy & Tweaks ---------- */
+export type TweakCategory = "privacy" | "ads" | "ai" | "explorer" | "apps";
+export type TweakRisk = "safe" | "advanced" | "caution";
+export type TweakState = "applied" | "notApplied" | "partial" | "notInstalled" | "unknown";
+export interface Text2 {
+  en: string;
+  fr: string;
+}
+export interface Tweak {
+  id: string;
+  category: TweakCategory;
+  risk: TweakRisk;
+  title: Text2;
+  description: Text2;
+  restartExplorer: boolean;
+  restartWindows: boolean;
+  appx: string | null;
+  state: TweakState;
+  needsAdmin: boolean;
+  /** Set by Scrub My Disks (undo available here). */
+  appliedMs: number | null;
+  /** A removed app: "Reinstall" opens its Store page. */
+  reinstall: boolean;
+}
+export interface TweaksView {
+  tweaks: Tweak[];
+  adminSession: boolean;
+}
+export type RestorePoint =
+  | { status: "created"; timeMs: number | null }
+  | { status: "recent"; timeMs: number | null }
+  | { status: "off" }
+  | { status: "failed"; message: string };
+export interface ApplyReport {
+  restorePoint: RestorePoint | null;
+  needsConfirm: boolean;
+  applied: string[];
+  failed: { id: string; message: string }[];
+  restartExplorer: boolean;
+  restartWindows: boolean;
+  activityId: number | null;
+  view: TweaksView;
+}
+
+/* ---------- Toolbox ---------- */
+export interface Tool {
+  id: string;
+  wingetId: string;
+  name: string;
+  category: string;
+  license: string;
+  openSource: boolean;
+  homepage: string;
+  description: Text2;
+  installed: boolean;
+  version: string | null;
+  canOpen: boolean;
+}
+export interface ToolboxView {
+  tools: Tool[];
+  checkedMs: number;
+  wingetError: string | null;
+}
+export interface WingetResult {
+  ok: boolean;
+  code: number;
+  output: string;
+}
+
+/* ---------- Tray and schedule ---------- */
+export interface TraySample {
+  cpuPercent: number;
+  memoryPercent: number;
+  diskBytesPerSec: number;
+  netBytesPerSec: number;
+}
+export interface TrayInfo {
+  systemDrive: string;
+  systemFree: number;
+  systemTotal: number;
+  recycleBinBytes: number;
+  lastScore: number | null;
+  lastScoreMs: number | null;
+  cpuTempC: number | null;
+  busy: boolean;
+}
+export type TrayAction = "openApp" | "smartCare" | "emptyRecycleBin";
+export interface Schedule {
+  frequency: "off" | "daily" | "weekly";
+  /** 0 = Monday ... 6 = Sunday. */
+  day: number;
+  hour: number;
+}
+export interface ScheduleView {
+  schedule: Schedule;
+  registered: boolean;
 }
