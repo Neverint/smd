@@ -60,6 +60,8 @@ npm run budget         # budget de taille au démarrage (docs/PERFORMANCE.md)
 npm run tauri build    # installateurs NSIS + MSI
 ```
 
+La suite est décrite dans [docs/ROADMAP.md](docs/ROADMAP.md) (en anglais).
+
 ## Licence
 
 MIT, voir [LICENSE](LICENSE). Crédits : [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).

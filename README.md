@@ -72,7 +72,7 @@ npm run budget         # startup size budget (docs/PERFORMANCE.md)
 npm run tauri build    # NSIS + MSI installers
 ```
 
-Design choices are recorded in [docs/DECISIONS.md](docs/DECISIONS.md), performance budgets in [docs/PERFORMANCE.md](docs/PERFORMANCE.md), changes in [CHANGELOG.md](CHANGELOG.md).
+What comes next is in [docs/ROADMAP.md](docs/ROADMAP.md). Design choices are recorded in [docs/DECISIONS.md](docs/DECISIONS.md), performance budgets in [docs/PERFORMANCE.md](docs/PERFORMANCE.md), changes in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
