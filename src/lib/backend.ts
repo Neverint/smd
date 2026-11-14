@@ -1,4 +1,5 @@
 import { Channel, invoke } from "@tauri-apps/api/core";
+import { devlogCommand } from "../dev/devlog"; // DEVLOG
 import type {
   ActivityEntry,
   AppInfo,
@@ -184,7 +185,9 @@ export async function call<K extends CommandName>(
   const payload = (args[0] ?? {}) as Commands[K]["args"];
   try {
     if (!isTauri()) return await (await loadMocks()).mockHandlers[cmd](payload);
-    return await invoke<Commands[K]["result"]>(cmd, payload);
+    const result = invoke<Commands[K]["result"]>(cmd, payload);
+    devlogCommand(cmd, payload, result); // DEVLOG
+    return await result;
   } catch (err) {
     throw toBackendError(err);
   }
@@ -200,7 +203,9 @@ export async function stream<K extends StreamName>(
     if (!isTauri()) return await (await loadMocks()).mockStreams[cmd](args, onProgress);
     const channel = new Channel<StreamCommands[K]["progress"]>();
     channel.onmessage = onProgress;
-    return await invoke<StreamCommands[K]["result"]>(cmd, { ...args, onProgress: channel });
+    const result = invoke<StreamCommands[K]["result"]>(cmd, { ...args, onProgress: channel });
+    devlogCommand(cmd, args, result); // DEVLOG
+    return await result;
   } catch (err) {
     throw toBackendError(err);
   }

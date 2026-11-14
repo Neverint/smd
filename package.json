@@ -1,7 +1,7 @@
 {
   "name": "smd",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Scrub My Disks: free, open-source PC care for Windows",
   "license": "MIT",
   "type": "module",
@@ -17,7 +17,9 @@
     "e2e": "playwright test",
     "budget": "vite build && node scripts/check-budget.mjs",
     "check:rust": "cargo fmt --all --check && cargo clippy --workspace --all-targets -- -D warnings && cargo test --workspace",
-    "hwmon": "dotnet publish sidecars/hwmon -c Release -o src-tauri/resources/hwmon --nologo"
+    "hwmon": "dotnet publish sidecars/hwmon -c Release -o src-tauri/resources/hwmon --nologo",
+    "devlog": "node scripts/devlog.mjs",
+    "devlog:remove": "node scripts/devlog-remove.mjs"
   },
   "dependencies": {
     "@fluentui/react-icons": "^2.0.345",

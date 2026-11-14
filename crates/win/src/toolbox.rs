@@ -57,7 +57,11 @@ pub fn parse_export(json: &str) -> io::Result<HashMap<String, Option<String>>> {
 
 /// Installed winget packages (about 20 s: winget checks every program).
 pub fn installed(temp_dir: &Path) -> io::Result<HashMap<String, Option<String>>> {
-    let file = temp_dir.join(format!("winget-export-{}.json", std::process::id()));
+    // One file per call: two refreshes at once (two pages open together) used the same file,
+    // and both failed with "path not found" (seen in the 0.1.0 log).
+    static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    let n = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    let file = temp_dir.join(format!("winget-export-{}-{n}.json", std::process::id()));
     let status = winget()
         .args(["export", "-o"])
         .arg(&file)

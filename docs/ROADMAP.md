@@ -6,11 +6,14 @@ Each version below lists what it delivers and what must be true before the next 
 
 ## 0.1.x: first real-world use
 
-Fixes from installing and using 0.1.0 on real PCs.
+Fixes from installing and using 0.1.0 on real PCs, released as patch versions (0.1.1, 0.1.2 and so on). Each one is tested as an installed build before it becomes the standard version: see [VERSIONS.md](VERSIONS.md).
+
+- **0.1.1 (testing):** the developer data log, and fixes for parallel settings saves, parallel Toolbox checks and the log's time zone.
 
 - Try every admin action once with a real Windows prompt: Read SMART details (read-only), CPU sensors, Windows cleanup, an all-users startup item, a machine-wide tweak with its restore point, an admin leftover.
 - Try a full round on a second PC or a virtual machine: Smart Care, Cleanup, undo from My Activity, a Drive Organizer move on a test folder, scheduled Smart Care, uninstall (the scheduled task must disappear).
 - Fix what breaks, with a test for each fix.
+- Keep the developer data log on while testing (`npm run devlog` reads it, see [DEVLOG.md](DEVLOG.md)), so every problem met in real use leaves a trace. <!-- DEVLOG -->
 
 **Done when:** every admin operation has worked with a real Windows prompt, and no bug that loses or corrupts data is open.
 
@@ -80,6 +83,7 @@ Released when all of this is true:
 - Accessibility: the automated check in CI, plus the manual Narrator and keyboard passes.
 - English and French complete; other languages marked as community translations.
 - Threat model and SBOM published with the release.
+- The developer data log is out of the code (`npm run devlog:remove`; a test fails from 1.0.0 on until it is). <!-- DEVLOG -->
 
 ## Not planned
 
