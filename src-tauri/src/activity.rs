@@ -163,7 +163,9 @@ fn load(dir: &Path) -> Vec<Entry> {
 
 /// Appends an entry (newest first), keeping at most `MAX_ENTRIES`.
 pub fn record(state: &AppState, entry: Entry) {
+    crate::devlog::event("activity", serde_json::json!({ "entry": &entry })); // DEVLOG
     let Ok(_guard) = state.activity_lock.lock() else {
+        log::warn!("could not save activity {}: lock poisoned", entry.id);
         return;
     };
     let mut all = load(&state.data_dir);

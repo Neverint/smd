@@ -62,6 +62,7 @@ $env:Path += ';G:\Documents\Dev\.rust\cargo\bin'; $env:RUSTUP_HOME='G:\Documents
 | Rust checks | `cargo fmt --all --check`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo test --workspace` |
 | Sensor helper | `npm run hwmon` (needs the .NET 8 SDK; on this PC it is in `G:\Documents\Dev\.dotnet`: add it to PATH first). Required before any Rust build: tauri-build checks the bundled resources. |
 | Release build | `npm run hwmon`, then `npm run tauri build` (NSIS + MSI in `target/release/bundle`) |
+| What happened in the last app sessions (until 1.0) | `npm run devlog` (digest of the local developer log, see docs/DEVLOG.md) | <!-- DEVLOG -->
 
 ## Conventions
 
@@ -80,4 +81,5 @@ $env:Path += ';G:\Documents\Dev\.rust\cargo\bin'; $env:RUSTUP_HOME='G:\Documents
 - Tweaks are data (`rules/tweaks.json`): registry values under `HKCU\Software` or `HKLM\SOFTWARE\Policies`, service start types, or one Store app. Every apply saves an exact undo. Machine-wide batches make a restore point first.
 - PowerShell edits on Windows: `Set-Content -Encoding utf8` adds a BOM (Tauri then cannot read its JSON config) and double-quoted here-strings eat `$` and backticks; prefer the Edit tool.
 - Record non-obvious choices in `docs/DECISIONS.md`.
+- Until 1.0, start any bug hunt or review with `npm run devlog`: it shows what the user did, which commands failed or were slow, and sessions that ended without a clean exit. New hooks into the app follow docs/DEVLOG.md (one line ending in `// DEVLOG`). <!-- DEVLOG -->
 - Work phase by phase. At the end of each phase: build, run, test, commit, push, summarize, wait for "go".

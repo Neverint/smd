@@ -3,6 +3,7 @@ mod applications;
 mod cleanup;
 mod clutter;
 mod commands;
+mod devlog; // DEVLOG
 mod error;
 mod guard;
 mod hardware;
@@ -26,13 +27,14 @@ mod window_effect;
 use tauri::{Manager, WindowEvent};
 
 pub use helper::helper_main;
-use tauri_plugin_log::{RotationStrategy, Target, TargetKind};
+use tauri_plugin_log::{RotationStrategy, Target, TargetKind, TimezoneStrategy};
 
 /// Keep at most this many rotated log files, each up to 2 MB, in the app's local log folder.
 const LOG_FILES_KEPT: usize = 5;
 const LOG_FILE_MAX_BYTES: u128 = 2 * 1024 * 1024;
 
 pub fn run() {
+    devlog::start(); // DEVLOG
     // Started by the scheduled task: scan in the background, notify, quit.
     let silent = std::env::args().any(|a| a == "--smart-care");
     tauri::Builder::default()
@@ -51,9 +53,12 @@ pub fn run() {
                     Target::new(TargetKind::LogDir {
                         file_name: Some("smd".into()),
                     }),
+                    devlog::log_target(), // DEVLOG
                 ])
                 .max_file_size(LOG_FILE_MAX_BYTES)
                 .rotation_strategy(RotationStrategy::KeepSome(LOG_FILES_KEPT))
+                // Local time, like every other time the app shows (the default is UTC).
+                .timezone_strategy(TimezoneStrategy::UseLocal)
                 .level(log::LevelFilter::Info)
                 .build(),
         )
@@ -165,7 +170,11 @@ pub fn run() {
             tray::tray_hide,
             schedule::schedule_get,
             schedule::schedule_set,
+            devlog::devlog_write, // DEVLOG
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running Scrub My Disks");
+        .build(tauri::generate_context!())
+        .expect("error while running Scrub My Disks")
+        .run(|_app, _event| {
+            devlog::on_run_event(&_event); // DEVLOG
+        });
 }

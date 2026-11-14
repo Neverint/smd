@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Saving a settings file (drive roles, activity, schedule) could fail with "file not found" when two pages saved the same file at once: each write now uses its own temporary file.
+- The Toolbox could not tell which tools are installed when two pages asked at the same time ("winget export failed"): each check now uses its own export file.
+- The app's log (`smd.log`) now uses local time instead of UTC.
+
+### For developers
+
+- A local developer data log (one file per session, never sent anywhere) records commands, errors, pages and crashes, to trace problems found while using the app. It is removed before 1.0; see `docs/DEVLOG.md`. <!-- DEVLOG -->
+
 ## 0.1.0 (2026-11-12)
 
 First release. Windows 10 and 11, x64.

@@ -144,3 +144,14 @@ Defaults chosen during the build. Newest at the bottom of each phase.
 | 106 | Startup loads only Smart Care: every other page and the fake backend (used outside Tauri) are separate chunks. Startup JavaScript went from 258 KB to 213 KB gzip. Budgets in `docs/PERFORMANCE.md`; the frontend ones run in CI (`npm run budget`). | Spec: performance budget. |
 | 107 | README screenshots come from the mocked frontend (`scripts/screenshots.mjs`), never from the developer's PC. | No personal data in the repo. |
 | 108 | v0.1.0 is released from the tag `v0.1.0`: the release workflow builds unsigned NSIS and MSI installers into a draft GitHub Release, which is then published with the changelog. Code signing (SignPath Foundation) stays a later step. | Spec: tag and GitHub Release. |
+
+## 0.1.x: first real-world use (2026-11-14)
+
+| # | Decision | Why |
+|---|---|---|
+| 109 | A developer data log until 1.0: one JSON Lines file per app session in the app's local data folder (start, backend log lines, every command the UI calls with its time and error, pages, clicks, UI errors, panics, clean exit). Nothing is sent anywhere; the last 100 sessions are kept. Every hook is one line marked `// DEVLOG`, `npm run devlog:remove` takes it all out, and a test fails from 1.0.0 on while it is still there. Commands are recorded in `src/lib/backend.ts`, because `window.__TAURI_INTERNALS__.invoke` is read-only. | The 0.1.0 log could not explain the first real use (see 110). Local only, so the trust contract holds. |
+| 110 | First real use of 0.1.0 (2026-11-13): a Cleanup moved 554 items (1.97 GB, mostly `%TEMP%`) to `S:\Quarantine6-11-1394592833636`; its undo file was written, but no My Activity entry and no log line of that session exist, so the batch cannot be undone from My Activity (it can still be restored from Drive Organizer > Quarantine). The cause could not be found from the files left: this is what the developer log is for. `activity::record` now logs when it cannot save. | Look before you touch: say what is known and what is not. |
+| 111 | `store::write_json` writes to a temporary file of its own per call (`<name>.json.<pid>-<n>.tmp`) and removes it if the rename fails. Two writes of the same file at once used the same `.json.tmp`, and the second rename failed ("could not save the drive policy: file not found" in the 0.1.0 log). | Seen in the log; a test writes one file from 8 threads. |
+| 112 | `winget export` writes to `winget-export-<pid>-<n>.json`, one file per call. Two Toolbox checks at once shared one file and both failed (`0x80070003`). | Seen in the log. |
+| 113 | The log plugin uses local time (`TimezoneStrategy::UseLocal`); it was UTC, an hour off from every time the app shows. | Logs are read next to My Activity. |
+
