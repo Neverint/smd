@@ -6,7 +6,9 @@ Each version below lists what it delivers and what must be true before the next 
 
 ## 0.1.x: first real-world use
 
-Fixes from installing and using 0.1.0 on real PCs.
+Fixes from installing and using 0.1.0 on real PCs, released as patch versions (0.1.1, 0.1.2 and so on). Each one is tested as an installed build before it becomes the standard version: see [VERSIONS.md](VERSIONS.md).
+
+- **0.1.1 (testing):** the developer data log, and fixes for parallel settings saves, parallel Toolbox checks and the log's time zone.
 
 - Try every admin action once with a real Windows prompt: Read SMART details (read-only), CPU sensors, Windows cleanup, an all-users startup item, a machine-wide tweak with its restore point, an admin leftover.
 - Try a full round on a second PC or a virtual machine: Smart Care, Cleanup, undo from My Activity, a Drive Organizer move on a test folder, scheduled Smart Care, uninstall (the scheduled task must disappear).

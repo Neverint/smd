@@ -1,7 +1,7 @@
 {
   "name": "smd",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Scrub My Disks: free, open-source PC care for Windows",
   "license": "MIT",
   "type": "module",

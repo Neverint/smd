@@ -1,16 +1,20 @@
 # Changelog
 
-## Unreleased
+## 0.1.1 (testing)
+
+Fixes from the first real use of 0.1.0. Not released yet: see `docs/VERSIONS.md`.
 
 ### Fixed
 
 - Saving a settings file (drive roles, activity, schedule) could fail with "file not found" when two pages saved the same file at once: each write now uses its own temporary file.
 - The Toolbox could not tell which tools are installed when two pages asked at the same time ("winget export failed"): each check now uses its own export file.
-- The app's log (`smd.log`) now uses local time instead of UTC.
+- The app's log (`smd.log`) was an hour off: it now uses local time instead of UTC.
+- When a My Activity entry cannot be saved, the app's log now says so instead of staying silent.
 
 ### For developers
 
 - A local developer data log (one file per session, never sent anywhere) records commands, errors, pages and crashes, to trace problems found while using the app. It is removed before 1.0; see `docs/DEVLOG.md`. <!-- DEVLOG -->
+- Version numbers and change names are set in `docs/VERSIONS.md`.
 
 ## 0.1.0 (2026-11-12)
 

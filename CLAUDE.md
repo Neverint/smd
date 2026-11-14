@@ -62,10 +62,12 @@ $env:Path += ';G:\Documents\Dev\.rust\cargo\bin'; $env:RUSTUP_HOME='G:\Documents
 | Rust checks | `cargo fmt --all --check`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo test --workspace` |
 | Sensor helper | `npm run hwmon` (needs the .NET 8 SDK; on this PC it is in `G:\Documents\Dev\.dotnet`: add it to PATH first). Required before any Rust build: tauri-build checks the bundled resources. |
 | Release build | `npm run hwmon`, then `npm run tauri build` (NSIS + MSI in `target/release/bundle`) |
+| New version | Follow docs/VERSIONS.md: set the number in `Cargo.toml`, `package.json` and `src-tauri/tauri.conf.json`, then `cargo update --workspace` |
 | What happened in the last app sessions (until 1.0) | `npm run devlog` (digest of the local developer log, see docs/DEVLOG.md) | <!-- DEVLOG -->
 
 ## Conventions
 
+- Versions and change names follow docs/VERSIONS.md: `MAJOR.MINOR.PATCH`, numbers only; a version is tested as an installed build on its own pull request and merged into `main` only once it is stable. Changelog headings are Added, Changed, Fixed, Removed, Safety, For developers; commit titles start with `add:`, `change:`, `fix:`, `remove:`, `safety:`, `dev:` or `release:`.
 - Every backend command returns `AppResult<T>`; errors serialize as `{ code, message, details }`. Add each command to `Commands` in `src/lib/backend.ts` and a mock in `src/lib/mocks.ts`.
 - Pure logic goes in `crates/core` with unit tests. Windows API and file system code goes in `crates/win`.
 - Anything that removes files goes through `crate::removal::remove` (Recycle Bin, S: quarantine or opt-in permanent delete), which ends in `smd_win::cleanup::remove_items_to` and re-checks `smd_core::safety::check_removal`. Never remove a path the UI sent: act on the backend's own scan, by id.
